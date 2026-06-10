@@ -28,7 +28,12 @@ class _SignupScreenState extends State<SignupScreen> {
       await _supabase.signUp(_email.text.trim(), _password.text, _name.text.trim(), _role);
       if (mounted) context.go('/home');
     } catch (e) {
-      setState(() => _error = e.toString());
+      final msg = e.toString();
+      if (msg.contains('placeholder.supabase.co') || msg.contains('Failed to fetch')) {
+        setState(() => _error = 'Supabase is not configured. Add your real URL and anon key to mobile/.env, then restart the app.');
+      } else {
+        setState(() => _error = msg.replaceFirst('Exception: ', ''));
+      }
     } finally {
       if (mounted) setState(() => _loading = false);
     }
