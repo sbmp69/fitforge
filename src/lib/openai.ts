@@ -1,47 +1,52 @@
-import Anthropic from "@anthropic-ai/sdk";
+import OpenAI from "openai";
 
-const MODEL = "claude-sonnet-4-20250514";
+const MODEL = "gpt-4o-mini";
 
-export function getAnthropicClient() {
-  return new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY! });
+export function getOpenAIClient() {
+  return new OpenAI({ apiKey: process.env.OPENAI_API_KEY! });
 }
 
 export async function generateJSON<T>(
   systemPrompt: string,
   userPrompt: string
 ): Promise<T> {
-  const client = getAnthropicClient();
+  const openai = getOpenAIClient();
 
-  const response = await client.messages.create({
+  const response = await openai.chat.completions.create({
     model: MODEL,
-    max_tokens: 8192,
-    system: systemPrompt,
-    messages: [{ role: "user", content: userPrompt }],
+    max_tokens: 4096,
+    response_format: { type: "json_object" },
+    messages: [
+      { role: "system", content: systemPrompt },
+      { role: "user", content: userPrompt }
+    ],
   });
 
-  const text =
-    response.content[0].type === "text" ? response.content[0].text : "";
-
-  const jsonMatch = text.match(/\{[\s\S]*\}|\[[\s\S]*\]/);
-  if (!jsonMatch) throw new Error("Failed to parse AI response as JSON");
-
-  return JSON.parse(jsonMatch[0]) as T;
+  const text = response.choices[0]?.message?.content || "";
+  
+  try {
+    return JSON.parse(text) as T;
+  } catch (error) {
+    throw new Error("Failed to parse AI response as JSON");
+  }
 }
 
 export async function generateText(
   systemPrompt: string,
   userPrompt: string
 ): Promise<string> {
-  const client = getAnthropicClient();
+  const openai = getOpenAIClient();
 
-  const response = await client.messages.create({
+  const response = await openai.chat.completions.create({
     model: MODEL,
     max_tokens: 4096,
-    system: systemPrompt,
-    messages: [{ role: "user", content: userPrompt }],
+    messages: [
+      { role: "system", content: systemPrompt },
+      { role: "user", content: userPrompt }
+    ],
   });
 
-  return response.content[0].type === "text" ? response.content[0].text : "";
+  return response.choices[0]?.message?.content || "";
 }
 
 export const WORKOUT_SYSTEM_PROMPT = `You are an expert fitness coach. Generate workout plans as valid JSON only.

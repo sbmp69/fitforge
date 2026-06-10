@@ -34,20 +34,37 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Future<void> _load() async {
-    final results = await Future.wait([
-      _supabase.getProfile(),
-      _supabase.getActiveWorkoutPlan(),
-      _supabase.getActiveMealPlan(),
-      _supabase.getProgressLogs(limit: 30),
-    ]);
-    if (mounted) {
-      setState(() {
-        _profile = results[0] as Profile?;
-        _workout = results[1] as WorkoutPlan?;
-        _meal = results[2] as MealPlan?;
-        _logs = results[3] as List<ProgressLog>;
-        _loading = false;
-      });
+    try {
+      final results = await Future.wait([
+        _supabase.getProfile(),
+        _supabase.getActiveWorkoutPlan(),
+        _supabase.getActiveMealPlan(),
+        _supabase.getProgressLogs(limit: 30),
+      ]);
+        if (mounted) {
+          final profile = results[0] as Profile?;
+          if (profile != null && profile.heightCm == null) {
+            context.go('/physique-onboarding');
+            return;
+          }
+          setState(() {
+            _profile = profile;
+            _workout = results[1] as WorkoutPlan?;
+            _meal = results[2] as MealPlan?;
+            _logs = results[3] as List<ProgressLog>;
+            _loading = false;
+          });
+        }
+    } catch (e) {
+      debugPrint('Error loading home data: $e');
+      if (mounted) {
+        setState(() {
+          _loading = false;
+        });
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Failed to load data: $e')),
+        );
+      }
     }
   }
 

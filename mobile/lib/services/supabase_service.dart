@@ -16,6 +16,22 @@ class SupabaseService {
     return data != null ? Profile.fromJson(data) : null;
   }
 
+  Future<void> updatePhysiqueProfile({
+    required int heightCm,
+    required double weightKg,
+    required String goal,
+    required String level,
+  }) async {
+    final user = currentUser;
+    if (user == null) return;
+    await client.from('profiles').update({
+      'height_cm': heightCm,
+      'weight_kg': weightKg,
+      'primary_goal': goal,
+      'fitness_level': level,
+    }).eq('id', user.id);
+  }
+
   Future<WorkoutPlan?> getActiveWorkoutPlan() async {
     final user = currentUser;
     if (user == null) return null;

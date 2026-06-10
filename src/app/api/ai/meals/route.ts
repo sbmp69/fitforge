@@ -1,16 +1,18 @@
 import { NextRequest, NextResponse } from "next/server";
-import { createClient } from "@/lib/supabase/server";
+import { createClient, createAuthClient } from "@/lib/supabase/server";
 import {
   generateJSON,
   MEAL_SYSTEM_PROMPT,
   GROCERY_SYSTEM_PROMPT,
-} from "@/lib/anthropic";
+} from "@/lib/openai";
 import { AI_PLAN_LIMITS } from "@/lib/utils";
 import type { MealPlanData, GroceryItem } from "@/types/database";
 
 export async function POST(request: NextRequest) {
   try {
-    const supabase = await createClient();
+    const token = request.headers.get("Authorization")?.replace("Bearer ", "");
+    const supabase = token ? createAuthClient(token) : await createClient();
+
     const {
       data: { user },
     } = await supabase.auth.getUser();

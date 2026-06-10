@@ -9,6 +9,7 @@ import '../screens/home/home_screen.dart';
 import '../screens/marketplace/marketplace_screen.dart';
 import '../screens/meals/meals_screen.dart';
 import '../screens/onboarding/onboarding_screen.dart';
+import '../screens/onboarding/physique_onboarding_screen.dart';
 import '../screens/profile/profile_screen.dart';
 import '../screens/progress/progress_screen.dart';
 import '../screens/shell/main_shell.dart';
@@ -35,6 +36,7 @@ class AppRouter {
       },
       routes: [
         GoRoute(path: '/onboarding', builder: (_, __) => const OnboardingScreen()),
+        GoRoute(path: '/physique-onboarding', builder: (_, __) => const PhysiqueOnboardingScreen()),
         GoRoute(path: '/login', builder: (_, __) => const LoginScreen()),
         GoRoute(path: '/signup', builder: (_, __) => const SignupScreen()),
         GoRoute(path: '/coach', builder: (_, __) => const CoachScreen()),

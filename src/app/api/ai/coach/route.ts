@@ -1,10 +1,12 @@
 import { NextRequest, NextResponse } from "next/server";
-import { createClient } from "@/lib/supabase/server";
-import { generateText, COACH_SYSTEM_PROMPT } from "@/lib/anthropic";
+import { createClient, createAuthClient } from "@/lib/supabase/server";
+import { generateText, COACH_SYSTEM_PROMPT } from "@/lib/openai";
 
 export async function POST(request: NextRequest) {
   try {
-    const supabase = await createClient();
+    const token = request.headers.get("Authorization")?.replace("Bearer ", "");
+    const supabase = token ? createAuthClient(token) : await createClient();
+
     const {
       data: { user },
     } = await supabase.auth.getUser();

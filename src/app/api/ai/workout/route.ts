@@ -1,15 +1,17 @@
 import { NextRequest, NextResponse } from "next/server";
-import { createClient } from "@/lib/supabase/server";
+import { createClient, createAuthClient } from "@/lib/supabase/server";
 import {
   generateJSON,
   WORKOUT_SYSTEM_PROMPT,
-} from "@/lib/anthropic";
+} from "@/lib/openai";
 import { AI_PLAN_LIMITS } from "@/lib/utils";
 import type { WorkoutPlanData } from "@/types/database";
 
 export async function POST(request: NextRequest) {
   try {
-    const supabase = await createClient();
+    const token = request.headers.get("Authorization")?.replace("Bearer ", "");
+    const supabase = token ? createAuthClient(token) : await createClient();
+    
     const {
       data: { user },
     } = await supabase.auth.getUser();
@@ -18,14 +20,18 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const { data: profile } = await supabase
+    const { data: profile, error: profileError } = await supabase
       .from("profiles")
       .select("*")
       .eq("id", user.id)
       .single();
 
+    console.log("Supabase Auth User ID:", user.id);
+    console.log("Profile Error:", profileError);
+    console.log("Profile Data:", profile);
+
     if (!profile) {
-      return NextResponse.json({ error: "Profile not found" }, { status: 404 });
+      return NextResponse.json({ error: `Profile not found for user ${user.id}. DB Error: ${profileError?.message || 'none'}` }, { status: 404 });
     }
 
     const limit = AI_PLAN_LIMITS[profile.subscription_tier] ?? 3;
@@ -42,13 +48,17 @@ export async function POST(request: NextRequest) {
 
     let userPrompt: string;
 
+    const physiqueContext = `Physique Data: Height: ${profile.height_cm || 'Not provided'}cm, Weight: ${profile.weight_kg || 'Not provided'}kg.`;
+
     if (regenerateDay && existingPlan) {
       userPrompt = `Regenerate only the "${regenerateDay}" workout in this plan. Keep other days unchanged.
 Current plan: ${JSON.stringify(existingPlan)}
+${physiqueContext}
 Goal: ${goal}, Level: ${level}, Equipment: ${equipment?.join(", ") || "bodyweight only"}
 Return the full updated plan JSON.`;
     } else {
       userPrompt = `Create a ${daysPerWeek}-day weekly workout plan.
+${physiqueContext}
 Goal: ${goal}
 Level: ${level}
 Equipment available: ${equipment?.join(", ") || "bodyweight only"}

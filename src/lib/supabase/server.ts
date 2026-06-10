@@ -18,8 +18,23 @@ export async function createClient() {
               cookieStore.set(name, value, options)
             );
           } catch {
-            // Server Component — ignore
           }
+        },
+      },
+    }
+  );
+}
+
+import { createClient as createSupabaseClient } from "@supabase/supabase-js";
+
+export function createAuthClient(token: string) {
+  return createSupabaseClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    {
+      global: {
+        headers: {
+          Authorization: `Bearer ${token}`,
         },
       },
     }

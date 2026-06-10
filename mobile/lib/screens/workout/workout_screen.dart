@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../core/constants.dart';
 import '../../core/theme.dart';
+import '../../models/profile.dart';
 import '../../models/workout_plan.dart';
 import '../../services/api_service.dart';
 import '../../services/supabase_service.dart';
@@ -40,8 +41,18 @@ class _WorkoutScreenState extends State<WorkoutScreen> {
   }
 
   Future<void> _load() async {
-    final plan = await _supabase.getActiveWorkoutPlan();
-    if (mounted) setState(() => _plan = plan);
+    final results = await Future.wait([
+      _supabase.getActiveWorkoutPlan(),
+      _supabase.getProfile(),
+    ]);
+    if (mounted) {
+      setState(() {
+        _plan = results[0] as WorkoutPlan?;
+        final profile = results[1] as Profile?;
+        if (profile?.primaryGoal != null) _goal = profile!.primaryGoal!;
+        if (profile?.fitnessLevel != null) _level = profile!.fitnessLevel!;
+      });
+    }
   }
 
   Future<void> _generate() async {

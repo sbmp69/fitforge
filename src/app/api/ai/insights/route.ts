@@ -1,11 +1,13 @@
-import { NextResponse } from "next/server";
-import { createClient } from "@/lib/supabase/server";
-import { generateText, INSIGHTS_SYSTEM_PROMPT } from "@/lib/anthropic";
+import { NextResponse, NextRequest } from "next/server";
+import { createClient, createAuthClient } from "@/lib/supabase/server";
+import { generateText, INSIGHTS_SYSTEM_PROMPT } from "@/lib/openai";
 import { startOfWeek, format } from "date-fns";
 
-export async function POST() {
+export async function POST(request: NextRequest) {
   try {
-    const supabase = await createClient();
+    const token = request.headers.get("Authorization")?.replace("Bearer ", "");
+    const supabase = token ? createAuthClient(token) : await createClient();
+
     const {
       data: { user },
     } = await supabase.auth.getUser();

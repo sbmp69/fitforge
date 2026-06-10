@@ -8,6 +8,10 @@ class Profile {
   final int aiPlansUsedThisMonth;
   final int followerCount;
   final String? bio;
+  final int? heightCm;
+  final double? weightKg;
+  final String? primaryGoal;
+  final String? fitnessLevel;
 
   const Profile({
     required this.id,
@@ -19,6 +23,10 @@ class Profile {
     required this.aiPlansUsedThisMonth,
     required this.followerCount,
     this.bio,
+    this.heightCm,
+    this.weightKg,
+    this.primaryGoal,
+    this.fitnessLevel,
   });
 
   factory Profile.fromJson(Map<String, dynamic> json) => Profile(
@@ -31,5 +39,9 @@ class Profile {
         aiPlansUsedThisMonth: json['ai_plans_used_this_month'] as int? ?? 0,
         followerCount: json['follower_count'] as int? ?? 0,
         bio: json['bio'] as String?,
+        heightCm: json['height_cm'] as int?,
+        weightKg: (json['weight_kg'] as num?)?.toDouble(),
+        primaryGoal: json['primary_goal'] as String?,
+        fitnessLevel: json['fitness_level'] as String?,
       );
 }
