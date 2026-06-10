@@ -64,7 +64,25 @@ Open [http://localhost:3000](http://localhost:3000).
 | Pro | ₹299/mo | Unlimited AI plans, analytics, no ads |
 | Trainer | ₹799/mo | Create & sell programs, 80% revenue |
 
+## Mobile App (Flutter)
+
+The Flutter app lives in `mobile/` and shares the same Supabase backend.
+
+```bash
+cd mobile
+cp .env.example .env   # add Supabase credentials
+flutter pub get
+flutter run
+```
+
+**Screens:** Onboarding, Home, Workout, Meals, Progress, Marketplace, Profile, AI Coach
+
+**API_BASE_URL** points to your Next.js server for AI features:
+- Android emulator: `http://10.0.2.2:3000`
+- iOS simulator: `http://localhost:3000`
+- Physical device: your machine's LAN IP
+
 ## Deploy
 
 - **Web:** Deploy to Vercel, add env vars
-- **Mobile:** React Native + Expo (coming next)
+- **Mobile:** Flutter + EAS Build / Play Store / App Store
