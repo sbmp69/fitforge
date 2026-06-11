@@ -6,7 +6,7 @@ import '../screens/auth/login_screen.dart';
 import '../screens/auth/signup_screen.dart';
 import '../screens/coach/coach_screen.dart';
 import '../screens/home/home_screen.dart';
-import '../screens/marketplace/marketplace_screen.dart';
+
 import '../screens/meals/meals_screen.dart';
 import '../screens/onboarding/onboarding_screen.dart';
 import '../screens/onboarding/physique_onboarding_screen.dart';
@@ -40,15 +40,14 @@ class AppRouter {
         GoRoute(path: '/login', builder: (_, __) => const LoginScreen()),
         GoRoute(path: '/signup', builder: (_, __) => const SignupScreen()),
         GoRoute(path: '/coach', builder: (_, __) => const CoachScreen()),
-        ShellRoute(
-          builder: (context, state, child) => MainShell(child: child),
-          routes: [
-            GoRoute(path: '/home', builder: (_, __) => const HomeScreen()),
-            GoRoute(path: '/workout', builder: (_, __) => const WorkoutScreen()),
-            GoRoute(path: '/meals', builder: (_, __) => const MealsScreen()),
-            GoRoute(path: '/progress', builder: (_, __) => const ProgressScreen()),
-            GoRoute(path: '/marketplace', builder: (_, __) => const MarketplaceScreen()),
-            GoRoute(path: '/profile', builder: (_, __) => const ProfileScreen()),
+        StatefulShellRoute.indexedStack(
+          builder: (context, state, navigationShell) => MainShell(navigationShell: navigationShell),
+          branches: [
+            StatefulShellBranch(routes: [GoRoute(path: '/home', builder: (_, __) => const HomeScreen())]),
+            StatefulShellBranch(routes: [GoRoute(path: '/workout', builder: (_, __) => const WorkoutScreen())]),
+            StatefulShellBranch(routes: [GoRoute(path: '/meals', builder: (_, __) => const MealsScreen())]),
+            StatefulShellBranch(routes: [GoRoute(path: '/progress', builder: (_, __) => const ProgressScreen())]),
+            StatefulShellBranch(routes: [GoRoute(path: '/profile', builder: (_, __) => const ProfileScreen())]),
           ],
         ),
       ],

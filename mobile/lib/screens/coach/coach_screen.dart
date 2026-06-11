@@ -63,7 +63,25 @@ class _CoachScreenState extends State<CoachScreen> {
                     },
                   ),
           ),
-          if (_loading) const LinearProgressIndicator(minHeight: 2),
+          if (_loading) 
+            const Padding(
+              padding: EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
+              child: Align(
+                alignment: Alignment.centerLeft,
+                child: Text('Coach is typing...', style: TextStyle(color: AppColors.slate400, fontStyle: FontStyle.italic)),
+              ),
+            ),
+          SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            padding: const EdgeInsets.symmetric(horizontal: 12),
+            child: Row(
+              children: [
+                _QuickChip(label: 'Swap an exercise', onTap: () => _sendQuick('I need to swap an exercise in my workout.')),
+                _QuickChip(label: 'What is my next meal?', onTap: () => _sendQuick('Based on my meal plan, what should I eat next?')),
+                _QuickChip(label: 'I feel too sore', onTap: () => _sendQuick('I feel too sore to train today, what should I do?')),
+              ],
+            ),
+          ),
           Padding(
             padding: const EdgeInsets.all(12),
             child: Row(
@@ -84,10 +102,35 @@ class _CoachScreenState extends State<CoachScreen> {
       ),
     );
   }
+
+  void _sendQuick(String text) {
+    _controller.text = text;
+    _send();
+  }
 }
 
 class _Msg {
   final bool isUser;
   final String text;
   _Msg(this.isUser, this.text);
+}
+
+class _QuickChip extends StatelessWidget {
+  final String label;
+  final VoidCallback onTap;
+  
+  const _QuickChip({required this.label, required this.onTap});
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.only(right: 8.0),
+      child: ActionChip(
+        label: Text(label, style: const TextStyle(fontSize: 12)),
+        onPressed: onTap,
+        backgroundColor: AppColors.navy700,
+        side: BorderSide.none,
+      ),
+    );
+  }
 }

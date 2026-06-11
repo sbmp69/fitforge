@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:url_launcher/url_launcher.dart';
 import '../../core/constants.dart';
 import '../../core/theme.dart';
 import '../../models/profile.dart';
@@ -224,6 +225,19 @@ class _DayCardState extends State<_DayCard> {
                             children: [
                               Text(ex.name, style: const TextStyle(color: Colors.white)),
                               Text('${ex.sets} sets × ${ex.reps}', style: const TextStyle(fontSize: 12, color: AppColors.slate400)),
+                              const SizedBox(height: 8),
+                              OutlinedButton.icon(
+                                onPressed: () async {
+                                  final url = Uri.parse('https://www.youtube.com/results?search_query=how+to+do+${Uri.encodeComponent(ex.name)}+exercise+tutorial');
+                                  launchUrl(url, mode: LaunchMode.externalApplication).catchError((_) => false);
+                                },
+                                icon: const Icon(Icons.play_circle_outline, size: 16),
+                                label: const Text('Watch Tutorial 🎥', style: TextStyle(fontSize: 12)),
+                                style: OutlinedButton.styleFrom(
+                                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 0),
+                                  minimumSize: const Size(0, 32),
+                                ),
+                              ),
                             ],
                           ),
                         ),

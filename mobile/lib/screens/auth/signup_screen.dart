@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import '../../core/theme.dart';
+import '../../core/constants.dart';
 import '../../services/supabase_service.dart';
 
 class SignupScreen extends StatefulWidget {
@@ -73,31 +73,7 @@ class _SignupScreenState extends State<SignupScreen> {
                 decoration: const InputDecoration(labelText: 'Password'),
               ),
               const SizedBox(height: 16),
-              const Align(
-                alignment: Alignment.centerLeft,
-                child: Text('I am a...', style: TextStyle(color: AppColors.slate400)),
-              ),
               const SizedBox(height: 8),
-              Row(
-                children: [
-                  Expanded(
-                    child: ChoiceChip(
-                      label: const Text('Fitness User'),
-                      selected: _role == 'fitness_user',
-                      onSelected: (_) => setState(() => _role = 'fitness_user'),
-                    ),
-                  ),
-                  const SizedBox(width: 8),
-                  Expanded(
-                    child: ChoiceChip(
-                      label: const Text('Trainer'),
-                      selected: _role == 'trainer',
-                      onSelected: (_) => setState(() => _role = 'trainer'),
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 24),
               SizedBox(
                 width: double.infinity,
                 child: ElevatedButton(

@@ -1,3 +1,6 @@
+import 'dart:convert';
+import 'package:http/http.dart' as http;
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../models/meal_plan.dart';
 import '../models/profile.dart';
@@ -104,15 +107,25 @@ class SupabaseService {
   }
 
   Future<void> signUp(String email, String password, String fullName, String role) async {
-    await client.auth.signUp(
-      email: email,
-      password: password,
-      data: {'full_name': fullName, 'role': role},
+    final url = Uri.parse('${dotenv.env['API_BASE_URL'] ?? 'http://192.168.1.5:3000'}/api/auth/register');
+    final response = await http.post(
+      url,
+      headers: {'Content-Type': 'application/json'},
+      body: jsonEncode({
+        'email': email,
+        'password': password,
+        'full_name': fullName,
+        'role': role,
+      }),
     );
-    final user = currentUser;
-    if (user != null) {
-      await client.from('profiles').update({'role': role, 'full_name': fullName}).eq('id', user.id);
+
+    if (response.statusCode != 200) {
+      final body = jsonDecode(response.body);
+      throw Exception(body['error'] ?? 'Failed to sign up');
     }
+
+    // Login after successful creation
+    await client.auth.signInWithPassword(email: email, password: password);
   }
 
   Future<void> signOut() => client.auth.signOut();
