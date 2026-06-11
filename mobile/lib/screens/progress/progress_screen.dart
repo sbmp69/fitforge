@@ -5,6 +5,7 @@ import '../../core/theme.dart';
 import '../../models/progress_log.dart';
 import '../../services/api_service.dart';
 import '../../services/supabase_service.dart';
+import '../../services/notification_service.dart';
 import '../../widgets/app_card.dart';
 
 class ProgressScreen extends StatefulWidget {
@@ -49,6 +50,10 @@ class _ProgressScreenState extends State<ProgressScreen> {
       waterMl: int.tryParse(_water.text) ?? 0,
       sleepHours: double.tryParse(_sleep.text),
     );
+    
+    // Cancel today's reminder since they logged their progress
+    await NotificationService().cancel(1);
+    
     await _load();
     if (mounted) ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Saved!')));
   }

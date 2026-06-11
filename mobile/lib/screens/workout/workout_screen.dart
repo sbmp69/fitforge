@@ -24,6 +24,7 @@ class _WorkoutScreenState extends State<WorkoutScreen> {
   bool _showForm = false;
   String? _error;
   int? _activeRest;
+  final TextEditingController _customEquipmentController = TextEditingController();
 
   String _goal = 'build_muscle';
   String _level = 'intermediate';
@@ -62,11 +63,16 @@ class _WorkoutScreenState extends State<WorkoutScreen> {
       _error = null;
     });
     try {
+      final custom = _customEquipmentController.text.trim();
+      final allEquipment = _equipment.toList();
+      if (custom.isNotEmpty) {
+        allEquipment.add(custom);
+      }
       final data = await _api.generateWorkout(
         goal: _goal,
         level: _level,
         daysPerWeek: _days.round(),
-        equipment: _equipment.toList(),
+        equipment: allEquipment,
       );
       if (mounted) {
         setState(() {
@@ -143,10 +149,33 @@ class _WorkoutScreenState extends State<WorkoutScreen> {
                       );
                     }).toList(),
                   ),
-                  const SizedBox(height: 16),
-                  ElevatedButton(
-                    onPressed: _loading ? null : _generate,
-                    child: _loading ? const CircularProgressIndicator() : const Text('Generate Plan'),
+                  const SizedBox(height: 12),
+                  TextField(
+                    controller: _customEquipmentController,
+                    decoration: const InputDecoration(
+                      labelText: 'Custom Equipment (e.g. Ab Roller)',
+                      hintText: 'Type any specific equipment you have',
+                    ),
+                  ),
+                  const SizedBox(height: 24),
+                  InkWell(
+                    onTap: _loading ? null : _generate,
+                    borderRadius: BorderRadius.circular(12),
+                    child: Container(
+                      width: double.infinity,
+                      padding: const EdgeInsets.symmetric(vertical: 16),
+                      decoration: BoxDecoration(
+                        gradient: const LinearGradient(colors: [AppColors.primary, AppColors.accent]),
+                        borderRadius: BorderRadius.circular(12),
+                        boxShadow: [
+                          BoxShadow(color: AppColors.primary.withValues(alpha: 0.3), blurRadius: 12, offset: const Offset(0, 4)),
+                        ],
+                      ),
+                      alignment: Alignment.center,
+                      child: _loading 
+                          ? const SizedBox(height: 20, width: 20, child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2))
+                          : const Text('Generate AI Plan ⚡', style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold)),
+                    ),
                   ),
                 ],
               ),
@@ -193,26 +222,31 @@ class _DayCardState extends State<_DayCard> {
     return Padding(
       padding: const EdgeInsets.only(bottom: 12),
       child: AppCard(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            InkWell(
-              onTap: () => setState(() => _expanded = !_expanded),
-              child: Row(
-                children: [
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(widget.day.day, style: const TextStyle(fontWeight: FontWeight.w600, color: Colors.white)),
-                        Text(widget.day.focus, style: const TextStyle(color: AppColors.primary)),
-                      ],
+        child: Container(
+          decoration: const BoxDecoration(
+            border: Border(left: BorderSide(color: AppColors.accent, width: 4)),
+          ),
+          padding: const EdgeInsets.only(left: 12),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              InkWell(
+                onTap: () => setState(() => _expanded = !_expanded),
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(widget.day.day, style: const TextStyle(fontWeight: FontWeight.w600, color: Colors.white)),
+                          Text(widget.day.focus, style: const TextStyle(color: AppColors.primary)),
+                        ],
+                      ),
                     ),
-                  ),
-                  Icon(_expanded ? Icons.expand_less : Icons.expand_more, color: AppColors.slate400),
-                ],
+                    Icon(_expanded ? Icons.expand_less : Icons.expand_more, color: AppColors.slate400),
+                  ],
+                ),
               ),
-            ),
             if (_expanded) ...[
               const Divider(height: 24),
               ...widget.day.exercises.map((ex) => Padding(
@@ -250,6 +284,7 @@ class _DayCardState extends State<_DayCard> {
                   )),
             ],
           ],
+        ),
         ),
       ),
     );

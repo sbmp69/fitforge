@@ -98,8 +98,26 @@ class _MealsScreenState extends State<MealsScreen> {
                   ),
                   const SizedBox(height: 12),
                   TextField(controller: _allergies, decoration: const InputDecoration(labelText: 'Allergies (comma-separated)')),
-                  const SizedBox(height: 16),
-                  ElevatedButton(onPressed: _loading ? null : _generate, child: const Text('Generate')),
+                  const SizedBox(height: 24),
+                  InkWell(
+                    onTap: _loading ? null : _generate,
+                    borderRadius: BorderRadius.circular(12),
+                    child: Container(
+                      width: double.infinity,
+                      padding: const EdgeInsets.symmetric(vertical: 16),
+                      decoration: BoxDecoration(
+                        gradient: const LinearGradient(colors: [AppColors.amber, Colors.orangeAccent]),
+                        borderRadius: BorderRadius.circular(12),
+                        boxShadow: [
+                          BoxShadow(color: AppColors.amber.withValues(alpha: 0.3), blurRadius: 12, offset: const Offset(0, 4)),
+                        ],
+                      ),
+                      alignment: Alignment.center,
+                      child: _loading 
+                          ? const SizedBox(height: 20, width: 20, child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2))
+                          : const Text('Generate Meal Plan ⚡', style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold)),
+                    ),
+                  ),
                 ],
               ),
             ),
@@ -145,23 +163,29 @@ class _MealCard extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.only(bottom: 12),
       child: AppCard(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(title, style: const TextStyle(fontSize: 12, color: AppColors.slate400)),
-            const SizedBox(height: 4),
-            Text(meal.name, style: const TextStyle(fontWeight: FontWeight.w600, color: Colors.white)),
-            Text('${meal.calories} kcal', style: const TextStyle(color: AppColors.amber)),
-            const SizedBox(height: 8),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                _Macro('P', meal.protein, Colors.redAccent),
-                _Macro('C', meal.carbs, Colors.blueAccent),
-                _Macro('F', meal.fat, Colors.yellow),
-              ],
-            ),
-          ],
+        child: Container(
+          decoration: const BoxDecoration(
+            border: Border(left: BorderSide(color: AppColors.amber, width: 4)),
+          ),
+          padding: const EdgeInsets.only(left: 12),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(title, style: const TextStyle(fontSize: 12, color: AppColors.slate400)),
+              const SizedBox(height: 4),
+              Text(meal.name, style: const TextStyle(fontWeight: FontWeight.w600, color: Colors.white)),
+              Text('${meal.calories} kcal', style: const TextStyle(color: AppColors.amber)),
+              const SizedBox(height: 8),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  _Macro('P', meal.protein, Colors.redAccent),
+                  _Macro('C', meal.carbs, Colors.blueAccent),
+                  _Macro('F', meal.fat, Colors.yellow),
+                ],
+              ),
+            ],
+          ),
         ),
       ),
     );

@@ -2,13 +2,15 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 class AppColors {
-  static const primary = Color(0xFF1D9E75);
-  static const primaryLight = Color(0xFF2DAB7F);
+  static const primary = Color(0xFF22C55E);
+  static const primaryLight = Color(0xFF4ADE80);
+  static const accent = Color(0xFF38BDF8);
   static const navy900 = Color(0xFF0F172A);
   static const navy800 = Color(0xFF1E293B);
   static const navy700 = Color(0xFF334155);
-  static const slate400 = Color(0xFF94A3B8);
+  static const slate400 = Color(0xFF94A3B8); // Secondary
   static const slate300 = Color(0xFFCBD5E1);
+  static const slate50 = Color(0xFFF8FAFC); // Text
   static const amber = Color(0xFFFBBF24);
 }
 
@@ -19,12 +21,13 @@ class AppTheme {
       scaffoldBackgroundColor: AppColors.navy900,
       colorScheme: const ColorScheme.dark(
         primary: AppColors.primary,
+        secondary: AppColors.accent,
         surface: AppColors.navy800,
-        onSurface: Colors.white,
+        onSurface: AppColors.slate50,
       ),
-      textTheme: GoogleFonts.interTextTheme(base.textTheme).apply(
+      textTheme: GoogleFonts.outfitTextTheme(base.textTheme).apply(
         bodyColor: AppColors.slate300,
-        displayColor: Colors.white,
+        displayColor: AppColors.slate50,
       ),
       appBarTheme: const AppBarTheme(
         backgroundColor: AppColors.navy900,
@@ -32,11 +35,11 @@ class AppTheme {
         centerTitle: false,
       ),
       cardTheme: CardThemeData(
-        color: AppColors.navy800.withValues(alpha: 0.6),
+        color: AppColors.navy800,
         elevation: 0,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(16),
-          side: BorderSide(color: AppColors.navy700.withValues(alpha: 0.5)),
+          side: const BorderSide(color: AppColors.navy700),
         ),
       ),
       inputDecorationTheme: InputDecorationTheme(

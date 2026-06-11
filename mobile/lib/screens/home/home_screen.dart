@@ -8,6 +8,7 @@ import '../../models/profile.dart';
 import '../../models/progress_log.dart';
 import '../../models/workout_plan.dart';
 import '../../services/supabase_service.dart';
+import '../../services/notification_service.dart';
 import '../../widgets/app_card.dart';
 import '../../widgets/progress_ring.dart';
 import '../../widgets/streak_fire.dart';
@@ -41,6 +42,16 @@ class _HomeScreenState extends State<HomeScreen> {
         _supabase.getActiveMealPlan(),
         _supabase.getProgressLogs(limit: 30),
       ]);
+      
+      final notifs = NotificationService();
+      await notifs.requestPermissions();
+      await notifs.scheduleDailyReminder(
+        id: 1, 
+        title: 'Time to crush it! 💪', 
+        body: 'Don\'t forget to complete your workout today and log your progress!', 
+        hour: 17, // 5 PM
+        minute: 0,
+      );
         if (mounted) {
           final profile = results[0] as Profile?;
           if (profile != null && profile.heightCm == null) {
@@ -110,13 +121,20 @@ class _HomeScreenState extends State<HomeScreen> {
         title: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('Hey, $name 👋', style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
-            Text(DateFormat('EEEE, MMM d').format(DateTime.now()), style: const TextStyle(fontSize: 13, color: AppColors.slate400)),
+            Text('Hey, $name ⚡', style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: AppColors.slate50)),
+            Text(DateFormat('EEEE, MMM d').format(DateTime.now()), style: const TextStyle(fontSize: 14, color: AppColors.slate400)),
           ],
         ),
         actions: [
-          Chip(label: Text(tier), backgroundColor: AppColors.primary.withValues(alpha: 0.15)),
-          const SizedBox(width: 8),
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+            decoration: BoxDecoration(
+              gradient: const LinearGradient(colors: [AppColors.primary, AppColors.accent]),
+              borderRadius: BorderRadius.circular(20),
+            ),
+            child: Text(tier.toUpperCase(), style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: Colors.white)),
+          ),
+          const SizedBox(width: 16),
         ],
       ),
       body: RefreshIndicator(
@@ -148,6 +166,7 @@ class _HomeScreenState extends State<HomeScreen> {
             _QuickAction(icon: Icons.chat_bubble_outline, label: 'AI Coach', color: Colors.purpleAccent, onTap: () => context.push('/coach')),
             const SizedBox(height: 24),
             AppCard(
+              onTap: () => context.go('/workout'),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -162,6 +181,7 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
             const SizedBox(height: 12),
             AppCard(
+              onTap: () => context.go('/meals'),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -215,19 +235,45 @@ class _QuickAction extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.only(bottom: 8),
-      child: AppCard(
-        onTap: onTap,
-        child: Row(
-          children: [
-            Container(
-              padding: const EdgeInsets.all(10),
-              decoration: BoxDecoration(color: AppColors.navy700, borderRadius: BorderRadius.circular(12)),
-              child: Icon(icon, color: color),
+      padding: const EdgeInsets.only(bottom: 12),
+      child: Container(
+        decoration: BoxDecoration(
+          color: AppColors.navy800,
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(color: color.withValues(alpha: 0.3)),
+          boxShadow: [
+            BoxShadow(
+              color: color.withValues(alpha: 0.1),
+              blurRadius: 10,
+              spreadRadius: 1,
             ),
-            const SizedBox(width: 12),
-            Text(label, style: const TextStyle(fontWeight: FontWeight.w500, color: Colors.white)),
-          ],
+          ]
+        ),
+        child: Material(
+          color: Colors.transparent,
+          child: InkWell(
+            onTap: onTap,
+            borderRadius: BorderRadius.circular(16),
+            child: Padding(
+              padding: const EdgeInsets.all(16),
+              child: Row(
+                children: [
+                  Container(
+                    padding: const EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                      color: color.withValues(alpha: 0.15),
+                      shape: BoxShape.circle,
+                    ),
+                    child: Icon(icon, color: color, size: 24),
+                  ),
+                  const SizedBox(width: 16),
+                  Text(label, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600, color: AppColors.slate50)),
+                  const Spacer(),
+                  const Icon(Icons.chevron_right, color: AppColors.slate400),
+                ],
+              ),
+            ),
+          ),
         ),
       ),
     );

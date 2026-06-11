@@ -4,10 +4,12 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import 'core/env_check.dart';
 import 'core/theme.dart';
 import 'router/app_router.dart';
+import 'services/notification_service.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await dotenv.load(fileName: '.env');
+  await NotificationService().init();
 
   final supabaseUrl = dotenv.env['SUPABASE_URL'];
   final supabaseAnonKey = dotenv.env['SUPABASE_ANON_KEY'];

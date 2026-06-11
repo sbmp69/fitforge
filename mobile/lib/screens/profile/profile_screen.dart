@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../../core/constants.dart';
 import '../../core/theme.dart';
 import '../../models/profile.dart';
 import '../../services/supabase_service.dart';
+import '../../services/notification_service.dart';
 import '../../widgets/app_card.dart';
 
 class ProfileScreen extends StatefulWidget {
@@ -16,6 +18,7 @@ class ProfileScreen extends StatefulWidget {
 class _ProfileScreenState extends State<ProfileScreen> {
   final _supabase = SupabaseService();
   Profile? _profile;
+  bool _notificationsEnabled = true;
 
   @override
   void initState() {
@@ -25,7 +28,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   Future<void> _load() async {
     final profile = await _supabase.getProfile();
-    if (mounted) setState(() => _profile = profile);
+    final prefs = await SharedPreferences.getInstance();
+    if (mounted) setState(() {
+      _profile = profile;
+      _notificationsEnabled = prefs.getBool('notifications_enabled') ?? true;
+    });
   }
 
   Future<void> _logout() async {
@@ -82,6 +89,28 @@ class _ProfileScreenState extends State<ProfileScreen> {
             ),
           ),
           const SizedBox(height: 16),
+          SwitchListTile(
+            title: const Text('Daily Reminders', style: TextStyle(color: Colors.white)),
+            subtitle: const Text('Remind me to log progress at 5 PM', style: TextStyle(color: AppColors.slate400, fontSize: 12)),
+            value: _notificationsEnabled,
+            onChanged: (val) async {
+              setState(() => _notificationsEnabled = val);
+              final prefs = await SharedPreferences.getInstance();
+              await prefs.setBool('notifications_enabled', val);
+              if (val) {
+                await NotificationService().requestPermissions();
+                await NotificationService().scheduleDailyReminder(
+                  id: 1, 
+                  title: 'Time to crush it! 💪', 
+                  body: 'Don\'t forget to complete your workout today and log your progress!', 
+                  hour: 17, minute: 0,
+                );
+              } else {
+                await NotificationService().cancel(1);
+              }
+            },
+            activeColor: AppColors.primary,
+          ),
           ListTile(
             leading: const Icon(Icons.chat_bubble_outline, color: AppColors.primary),
             title: const Text('AI Coach'),
