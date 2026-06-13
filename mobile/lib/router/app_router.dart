@@ -39,12 +39,12 @@ class AppRouter {
         GoRoute(path: '/physique-onboarding', builder: (_, __) => const PhysiqueOnboardingScreen()),
         GoRoute(path: '/login', builder: (_, __) => const LoginScreen()),
         GoRoute(path: '/signup', builder: (_, __) => const SignupScreen()),
-        GoRoute(path: '/coach', builder: (_, __) => const CoachScreen()),
         StatefulShellRoute.indexedStack(
           builder: (context, state, navigationShell) => MainShell(navigationShell: navigationShell),
           branches: [
             StatefulShellBranch(routes: [GoRoute(path: '/home', builder: (_, __) => const HomeScreen())]),
             StatefulShellBranch(routes: [GoRoute(path: '/workout', builder: (_, __) => const WorkoutScreen())]),
+            StatefulShellBranch(routes: [GoRoute(path: '/coach', builder: (_, __) => const CoachScreen())]),
             StatefulShellBranch(routes: [GoRoute(path: '/meals', builder: (_, __) => const MealsScreen())]),
             StatefulShellBranch(routes: [GoRoute(path: '/progress', builder: (_, __) => const ProgressScreen())]),
             StatefulShellBranch(routes: [GoRoute(path: '/profile', builder: (_, __) => const ProfileScreen())]),

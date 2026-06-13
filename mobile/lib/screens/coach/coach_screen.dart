@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 import '../../core/theme.dart';
 import '../../services/api_service.dart';
 
@@ -15,6 +16,35 @@ class _CoachScreenState extends State<CoachScreen> {
   final _messages = <_Msg>[];
   bool _loading = false;
 
+  @override
+  void initState() {
+    super.initState();
+    _loadMessages();
+  }
+
+  Future<void> _loadMessages() async {
+    setState(() => _loading = true);
+    try {
+      final session = Supabase.instance.client.auth.currentSession;
+      if (session == null) return;
+      final data = await Supabase.instance.client
+          .from('ai_chat_messages')
+          .select()
+          .eq('user_id', session.user.id)
+          .order('created_at', ascending: true);
+      
+      final msgs = (data as List).map((row) => _Msg(row['role'] == 'user', row['content'])).toList();
+      if (mounted) setState(() {
+        _messages.clear();
+        _messages.addAll(msgs);
+      });
+    } catch (e) {
+      debugPrint(e.toString());
+    } finally {
+      if (mounted) setState(() => _loading = false);
+    }
+  }
+
   Future<void> _send() async {
     final text = _controller.text.trim();
     if (text.isEmpty || _loading) return;
@@ -23,8 +53,27 @@ class _CoachScreenState extends State<CoachScreen> {
       _controller.clear();
       _loading = true;
     });
+    
+    final session = Supabase.instance.client.auth.currentSession;
     try {
+      if (session != null) {
+        await Supabase.instance.client.from('ai_chat_messages').insert({
+          'user_id': session.user.id,
+          'role': 'user',
+          'content': text,
+        });
+      }
+      
       final reply = await _api.chatWithCoach(text);
+      
+      if (session != null) {
+        await Supabase.instance.client.from('ai_chat_messages').insert({
+          'user_id': session.user.id,
+          'role': 'assistant',
+          'content': reply,
+        });
+      }
+      
       if (mounted) setState(() => _messages.add(_Msg(false, reply)));
     } catch (e) {
       if (mounted) setState(() => _messages.add(_Msg(false, 'Sorry, try again.')));

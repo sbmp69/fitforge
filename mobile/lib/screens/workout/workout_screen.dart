@@ -7,7 +7,9 @@ import '../../models/workout_plan.dart';
 import '../../services/api_service.dart';
 import '../../services/supabase_service.dart';
 import '../../widgets/app_card.dart';
+import '../../widgets/loading_overlay.dart';
 import '../../widgets/workout_timer.dart';
+import '../paywall/paywall_screen.dart';
 
 class WorkoutScreen extends StatefulWidget {
   const WorkoutScreen({super.key});
@@ -81,7 +83,11 @@ class _WorkoutScreenState extends State<WorkoutScreen> {
         });
       }
     } catch (e) {
-      if (mounted) setState(() => _error = e.toString());
+      if (e.toString().toLowerCase().contains('limit')) {
+        if (mounted) Navigator.of(context).push(MaterialPageRoute(builder: (_) => const PaywallScreen()));
+      } else {
+        if (mounted) setState(() => _error = e.toString());
+      }
     } finally {
       if (mounted) setState(() => _loading = false);
     }
@@ -99,7 +105,9 @@ class _WorkoutScreenState extends State<WorkoutScreen> {
           ),
         ],
       ),
-      body: ListView(
+      body: Stack(
+        children: [
+          ListView(
         padding: const EdgeInsets.all(16),
         children: [
           if (_error != null)
@@ -172,9 +180,7 @@ class _WorkoutScreenState extends State<WorkoutScreen> {
                         ],
                       ),
                       alignment: Alignment.center,
-                      child: _loading 
-                          ? const SizedBox(height: 20, width: 20, child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2))
-                          : const Text('Generate AI Plan ⚡', style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold)),
+                      child: const Text('Generate AI Plan ⚡', style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold)),
                     ),
                   ),
                 ],
@@ -198,6 +204,9 @@ class _WorkoutScreenState extends State<WorkoutScreen> {
                 ),
               ),
             ),
+        ],
+      ),
+          if (_loading) const LoadingOverlay(text: 'Forging your workout... ⚡'),
         ],
       ),
     );

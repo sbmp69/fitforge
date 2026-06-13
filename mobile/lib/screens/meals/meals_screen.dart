@@ -1,10 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 import '../../core/constants.dart';
 import '../../core/theme.dart';
 import '../../models/meal_plan.dart';
 import '../../services/api_service.dart';
 import '../../services/supabase_service.dart';
 import '../../widgets/app_card.dart';
+import '../../widgets/loading_overlay.dart';
+import '../../models/profile.dart';
+import '../paywall/paywall_screen.dart';
 
 class MealsScreen extends StatefulWidget {
   const MealsScreen({super.key});
@@ -17,6 +21,7 @@ class _MealsScreenState extends State<MealsScreen> {
   final _supabase = SupabaseService();
   final _api = ApiService();
   MealPlan? _plan;
+  Profile? _profile;
   int _dayIndex = 0;
   bool _loading = false;
   bool _showForm = false;
@@ -33,11 +38,34 @@ class _MealsScreenState extends State<MealsScreen> {
   }
 
   Future<void> _load() async {
-    final plan = await _supabase.getActiveMealPlan();
-    if (mounted) setState(() => _plan = plan);
+    final results = await Future.wait([
+      _supabase.getActiveMealPlan(),
+      _supabase.getProfile(),
+    ]);
+    if (mounted) {
+      setState(() {
+        _plan = results[0] as MealPlan?;
+        _profile = results[1] as Profile?;
+      });
+    }
   }
 
   Future<void> _generate() async {
+    int aiUsed = _profile?.aiPlansUsedThisMonth ?? 0;
+    final session = Supabase.instance.client.auth.currentSession;
+    if (session != null) {
+      try {
+        final res = await Supabase.instance.client.from('profiles').select('ai_plans_used_this_month').eq('id', session.user.id).single();
+        aiUsed = res['ai_plans_used_this_month'] as int? ?? 0;
+      } catch (_) {}
+    }
+
+    final aiLimit = AppConstants.aiPlanLimits[_profile?.subscriptionTier] ?? 3;
+    if (aiUsed >= aiLimit) {
+      if (mounted) Navigator.of(context).push(MaterialPageRoute(builder: (_) => const PaywallScreen()));
+      return;
+    }
+
     setState(() {
       _loading = true;
       _error = null;
@@ -55,7 +83,11 @@ class _MealsScreenState extends State<MealsScreen> {
         });
       }
     } catch (e) {
-      if (mounted) setState(() => _error = e.toString());
+      if (e.toString().toLowerCase().contains('limit')) {
+        if (mounted) Navigator.of(context).push(MaterialPageRoute(builder: (_) => const PaywallScreen()));
+      } else {
+        if (mounted) setState(() => _error = e.toString());
+      }
     } finally {
       if (mounted) setState(() => _loading = false);
     }
@@ -72,7 +104,9 @@ class _MealsScreenState extends State<MealsScreen> {
           TextButton(onPressed: () => setState(() => _showForm = !_showForm), child: const Text('New Plan')),
         ],
       ),
-      body: ListView(
+      body: Stack(
+        children: [
+          ListView(
         padding: const EdgeInsets.all(16),
         children: [
           if (_error != null)
@@ -113,9 +147,7 @@ class _MealsScreenState extends State<MealsScreen> {
                         ],
                       ),
                       alignment: Alignment.center,
-                      child: _loading 
-                          ? const SizedBox(height: 20, width: 20, child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2))
-                          : const Text('Generate Meal Plan ⚡', style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold)),
+                      child: const Text('Generate Meal Plan ⚡', style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold)),
                     ),
                   ),
                 ],
@@ -146,6 +178,9 @@ class _MealsScreenState extends State<MealsScreen> {
             ],
           ] else if (!_showForm)
             const AppCard(child: Center(child: Padding(padding: EdgeInsets.all(24), child: Text('No meal plan yet', style: TextStyle(color: AppColors.slate400))))),
+        ],
+      ),
+          if (_loading) const LoadingOverlay(text: 'Forging your meal plan... ⚡'),
         ],
       ),
     );

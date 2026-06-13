@@ -2,6 +2,9 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:google_sign_in/google_sign_in.dart';
+import 'package:flutter/foundation.dart';
+import 'dart:io';
 import '../models/meal_plan.dart';
 import '../models/profile.dart';
 import '../models/program.dart';
@@ -9,7 +12,8 @@ import '../models/progress_log.dart';
 import '../models/workout_plan.dart';
 
 class SupabaseService {
-  SupabaseClient get client => Supabase.instance.client;
+  final client = Supabase.instance.client;
+  static bool _isGoogleSignInInitialized = false;
   User? get currentUser => client.auth.currentUser;
 
   Future<Profile?> getProfile() async {
@@ -126,6 +130,40 @@ class SupabaseService {
 
     // Login after successful creation
     await client.auth.signInWithPassword(email: email, password: password);
+  }
+
+  Future<void> signInWithGoogle() async {
+    if (kIsWeb) {
+      await client.auth.signInWithOAuth(OAuthProvider.google);
+      return;
+    }
+
+    const webClientId = '232259821601-aiqlebtbcs52hsvko0mmfqmshi5p3koa.apps.googleusercontent.com';
+    const iosClientId = 'YOUR_IOS_CLIENT_ID_HERE';
+
+    if (!_isGoogleSignInInitialized) {
+      try {
+        await GoogleSignIn.instance.initialize(
+          clientId: Platform.isIOS ? iosClientId : null,
+          serverClientId: webClientId,
+        );
+      } catch (e) {
+        debugPrint('GoogleSignIn initialization error: $e');
+      }
+      _isGoogleSignInInitialized = true;
+    }
+    
+    final googleUser = await GoogleSignIn.instance.authenticate();
+    
+    final googleAuth = await googleUser.authentication;
+    final idToken = googleAuth.idToken;
+
+    if (idToken == null) throw 'No ID Token found.';
+
+    await client.auth.signInWithIdToken(
+      provider: OAuthProvider.google,
+      idToken: idToken,
+    );
   }
 
   Future<void> signOut() => client.auth.signOut();

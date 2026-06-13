@@ -32,6 +32,14 @@ class ApiService {
     );
     final data = jsonDecode(res.body) as Map<String, dynamic>;
     if (res.statusCode != 200) throw Exception(data['error'] ?? 'Failed to generate workout');
+
+    final session = Supabase.instance.client.auth.currentSession;
+    if (session != null) {
+      final profile = await Supabase.instance.client.from('profiles').select('ai_plans_used_this_month').eq('id', session.user.id).single();
+      final used = profile['ai_plans_used_this_month'] as int? ?? 0;
+      await Supabase.instance.client.from('profiles').update({'ai_plans_used_this_month': used + 1}).eq('id', session.user.id);
+    }
+
     return data;
   }
 
@@ -51,6 +59,14 @@ class ApiService {
     );
     final data = jsonDecode(res.body) as Map<String, dynamic>;
     if (res.statusCode != 200) throw Exception(data['error'] ?? 'Failed to generate meals');
+
+    final session = Supabase.instance.client.auth.currentSession;
+    if (session != null) {
+      final profile = await Supabase.instance.client.from('profiles').select('ai_plans_used_this_month').eq('id', session.user.id).single();
+      final used = profile['ai_plans_used_this_month'] as int? ?? 0;
+      await Supabase.instance.client.from('profiles').update({'ai_plans_used_this_month': used + 1}).eq('id', session.user.id);
+    }
+
     return data;
   }
 
