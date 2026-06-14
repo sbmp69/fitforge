@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../../core/constants.dart';
 import '../../core/theme.dart';
@@ -60,6 +61,7 @@ class _WorkoutScreenState extends State<WorkoutScreen> {
   }
 
   Future<void> _generate() async {
+    HapticFeedback.lightImpact();
     setState(() {
       _loading = true;
       _error = null;

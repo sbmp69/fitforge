@@ -22,13 +22,32 @@ dependencies:
   flutter_local_notifications: ^22.0.0
   timezone: ^0.11.0
   google_sign_in: ^7.2.0
+  shimmer: ^3.0.0
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
-  flutter_lints: ^6.0.0
+  flutter_lints: ^3.0.0
+  flutter_native_splash: ^2.4.0
+  flutter_launcher_icons: ^0.13.1
 
 flutter:
   uses-material-design: true
   assets:
     - .env
+    - assets/logo.png
+
+flutter_native_splash:
+  color: "#0F172A"
+  image: "assets/logo.png"
+  web: false
+  android_12:
+    color: "#0F172A"
+    image: "assets/logo.png"
+
+flutter_launcher_icons:
+  android: true
+  ios: true
+  image_path: "assets/logo.png"
+  adaptive_icon_background: "#0F172A"
+  adaptive_icon_foreground: "assets/logo.png"

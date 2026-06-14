@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../core/constants.dart';
@@ -40,12 +41,99 @@ class _ProfileScreenState extends State<ProfileScreen> {
     if (mounted) context.go('/login');
   }
 
+  Future<void> _showEditProfileDialog(BuildContext context) async {
+    if (_profile == null) return;
+    final nameCtrl = TextEditingController(text: _profile!.fullName);
+    final goalCtrl = TextEditingController(text: _profile!.primaryGoal);
+    final levelCtrl = TextEditingController(text: _profile!.fitnessLevel);
+    bool saving = false;
+
+    List<String> goals = ['Weight Loss', 'Muscle Gain', 'Endurance', 'General Fitness'];
+    if (goalCtrl.text.isNotEmpty && !goals.contains(goalCtrl.text)) {
+      goals.add(goalCtrl.text);
+    }
+    List<String> levels = ['Beginner', 'Intermediate', 'Advanced'];
+    if (levelCtrl.text.isNotEmpty && !levels.contains(levelCtrl.text)) {
+      levels.add(levelCtrl.text);
+    }
+
+    await showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: AppColors.navy800,
+      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(24))),
+      builder: (context) => StatefulBuilder(
+        builder: (context, setModalState) {
+          return Padding(
+            padding: EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom, left: 24, right: 24, top: 24),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                const Text('Edit Profile', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.white)),
+                const SizedBox(height: 24),
+                TextField(controller: nameCtrl, decoration: const InputDecoration(labelText: 'Full Name')),
+                const SizedBox(height: 16),
+                DropdownButtonFormField<String>(
+                  value: goalCtrl.text.isNotEmpty ? goalCtrl.text : goals.first,
+                  decoration: const InputDecoration(labelText: 'Primary Goal'),
+                  items: goals.map((e) => DropdownMenuItem(value: e, child: Text(e))).toList(),
+                  onChanged: (val) => goalCtrl.text = val!,
+                ),
+                const SizedBox(height: 16),
+                DropdownButtonFormField<String>(
+                  value: levelCtrl.text.isNotEmpty ? levelCtrl.text : levels.first,
+                  decoration: const InputDecoration(labelText: 'Fitness Level'),
+                  items: levels.map((e) => DropdownMenuItem(value: e, child: Text(e))).toList(),
+                  onChanged: (val) => levelCtrl.text = val!,
+                ),
+                const SizedBox(height: 24),
+                ElevatedButton(
+                  onPressed: saving ? null : () async {
+                    HapticFeedback.lightImpact();
+                    setModalState(() => saving = true);
+                    try {
+                      await _supabase.updateProfileDetails(
+                        fullName: nameCtrl.text.trim(),
+                        goal: goalCtrl.text,
+                        level: levelCtrl.text,
+                      );
+                      await _load();
+                      if (context.mounted) Navigator.pop(context);
+                    } catch (e) {
+                      if (context.mounted) {
+                        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Error: $e')));
+                        setModalState(() => saving = false);
+                      }
+                    }
+                  },
+                  child: saving
+                      ? const SizedBox(height: 20, width: 20, child: CircularProgressIndicator(strokeWidth: 2))
+                      : const Text('Save Changes'),
+                ),
+                const SizedBox(height: 32),
+              ],
+            ),
+          );
+        },
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final tier = AppConstants.tierLabels[_profile?.subscriptionTier] ?? 'Free';
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Profile')),
+      appBar: AppBar(
+        title: const Text('Profile'),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.edit, color: AppColors.primary),
+            onPressed: () => _showEditProfileDialog(context),
+          ),
+        ],
+      ),
       body: ListView(
         padding: const EdgeInsets.all(16),
         children: [

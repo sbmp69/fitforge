@@ -76,7 +76,7 @@ class FitForgeApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp.router(
-      title: 'FitForge',
+      title: 'FitForge: Your AI Trainer',
       debugShowCheckedModeBanner: false,
       theme: AppTheme.dark,
       routerConfig: AppRouter.create(),

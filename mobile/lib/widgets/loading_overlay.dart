@@ -87,10 +87,12 @@ class _LoadingOverlayState extends State<LoadingOverlay> with SingleTickerProvid
             ),
             const SizedBox(height: 16),
             const Text(
-              'Analyzing your profile & goals...',
+              'Analyzing your profile & goals...\nThis process usually takes 15-30 seconds.',
+              textAlign: TextAlign.center,
               style: TextStyle(
                 color: AppColors.slate400,
                 fontSize: 14,
+                height: 1.5,
               ),
             ),
           ],

@@ -1,5 +1,7 @@
+import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:shimmer/shimmer.dart';
 import 'package:intl/intl.dart';
 import '../../core/constants.dart';
 import '../../core/theme.dart';
@@ -107,7 +109,26 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     if (_loading) {
-      return const Scaffold(body: Center(child: CircularProgressIndicator()));
+      return Scaffold(
+        body: SafeArea(
+          child: Padding(
+            padding: const EdgeInsets.all(16),
+            child: Shimmer.fromColors(
+              baseColor: AppColors.navy800,
+              highlightColor: AppColors.navy700,
+              child: Column(
+                children: [
+                  Container(height: 60, decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(16))),
+                  const SizedBox(height: 16),
+                  Container(height: 200, decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(16))),
+                  const SizedBox(height: 16),
+                  Container(height: 100, decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(16))),
+                ],
+              ),
+            ),
+          ),
+        ),
+      );
     }
 
     final name = _profile?.fullName?.split(' ').first ?? 'Athlete';
@@ -137,8 +158,44 @@ class _HomeScreenState extends State<HomeScreen> {
           const SizedBox(width: 16),
         ],
       ),
-      body: RefreshIndicator(
-        onRefresh: _load,
+      body: Stack(
+        children: [
+          // Ambient Glow 1
+          Positioned(
+            top: -100,
+            left: -100,
+            child: Container(
+              width: 300,
+              height: 300,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: AppColors.primary.withValues(alpha: 0.15),
+              ),
+            ),
+          ),
+          // Ambient Glow 2
+          Positioned(
+            bottom: 100,
+            right: -150,
+            child: Container(
+              width: 400,
+              height: 400,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: AppColors.accent.withValues(alpha: 0.1),
+              ),
+            ),
+          ),
+          // Blur Filter
+          Positioned.fill(
+            child: BackdropFilter(
+              filter: ImageFilter.blur(sigmaX: 80, sigmaY: 80),
+              child: const SizedBox(),
+            ),
+          ),
+          // Content
+          RefreshIndicator(
+            onRefresh: _load,
         child: ListView(
           padding: const EdgeInsets.all(16),
           children: [
@@ -196,6 +253,8 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
           ],
         ),
+      ),
+        ],
       ),
     );
   }

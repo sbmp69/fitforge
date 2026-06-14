@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../../core/constants.dart';
 import '../../core/theme.dart';
@@ -51,6 +52,8 @@ class _MealsScreenState extends State<MealsScreen> {
   }
 
   Future<void> _generate() async {
+    HapticFeedback.lightImpact();
+    setState(() => _loading = true);
     int aiUsed = _profile?.aiPlansUsedThisMonth ?? 0;
     final session = Supabase.instance.client.auth.currentSession;
     if (session != null) {

@@ -26,7 +26,7 @@ class _LoginScreenState extends State<LoginScreen> {
       await _supabase.signIn(_email.text.trim(), _password.text);
       if (mounted) context.go('/home');
     } catch (e) {
-      setState(() => _error = e.toString());
+      setState(() => _error = 'Incorrect email or password. Please try again.');
     } finally {
       if (mounted) setState(() => _loading = false);
     }
