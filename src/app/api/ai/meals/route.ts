@@ -39,7 +39,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const { calorieTarget, dietaryPreference, allergies, substituteMeal } =
+    const { dietaryPreference, allergies, substituteMeal } =
       await request.json();
 
     let userPrompt: string;
@@ -52,7 +52,9 @@ Allergies: ${allergies?.join(", ") || "none"}
 Return a single meal object JSON with name, calories, protein, carbs, fat, ingredients.`;
     } else {
       userPrompt = `Create a 7-day meal plan.
-Daily calorie target: ${calorieTarget} kcal
+User Profile: Height ${profile.height_cm}cm, Weight ${profile.weight_kg}kg, Fitness Level: ${profile.fitness_level}.
+Primary Goal: ${profile.primary_goal} (If missing, assume healthy maintenance).
+Instructions: First, calculate the required daily caloric intake for this specific user based on their metrics and goal (assume statistical average for age/gender if needed). Then, generate a meal plan that strictly matches those calculated daily calories.
 Dietary preference: ${dietaryPreference}
 Allergies to avoid: ${allergies?.join(", ") || "none"}
 Include breakfast, lunch, dinner, and 1-2 snacks per day with macro breakdowns.`;

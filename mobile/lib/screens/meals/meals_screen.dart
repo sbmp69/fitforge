@@ -28,7 +28,6 @@ class _MealsScreenState extends State<MealsScreen> {
   bool _showForm = false;
   String? _error;
 
-  double _calories = 2000;
   String _diet = 'non_veg';
   final _allergies = TextEditingController();
 
@@ -75,7 +74,6 @@ class _MealsScreenState extends State<MealsScreen> {
     });
     try {
       final data = await _api.generateMeals(
-        calorieTarget: _calories.round(),
         dietaryPreference: _diet,
         allergies: _allergies.text.split(',').map((e) => e.trim()).where((e) => e.isNotEmpty).toList(),
       );
@@ -110,7 +108,7 @@ class _MealsScreenState extends State<MealsScreen> {
       body: Stack(
         children: [
           ListView(
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.fromLTRB(16, 16, 16, 140),
         children: [
           if (_error != null)
             Container(
@@ -123,8 +121,6 @@ class _MealsScreenState extends State<MealsScreen> {
             AppCard(
               child: Column(
                 children: [
-                  Text('Calories: ${_calories.round()}'),
-                  Slider(value: _calories, min: 1200, max: 4000, divisions: 28, onChanged: (v) => setState(() => _calories = v)),
                   DropdownButtonFormField<String>(
                     value: _diet,
                     decoration: const InputDecoration(labelText: 'Diet'),

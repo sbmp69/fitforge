@@ -132,7 +132,7 @@ class _CoachScreenState extends State<CoachScreen> {
             ),
           ),
           Padding(
-            padding: const EdgeInsets.all(12),
+            padding: EdgeInsets.fromLTRB(12, 12, 12, MediaQuery.of(context).viewInsets.bottom > 0 ? 12 : 120),
             child: Row(
               children: [
                 Expanded(

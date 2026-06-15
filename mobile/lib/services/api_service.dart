@@ -44,7 +44,6 @@ class ApiService {
   }
 
   Future<Map<String, dynamic>> generateMeals({
-    required int calorieTarget,
     required String dietaryPreference,
     required List<String> allergies,
   }) async {
@@ -52,7 +51,6 @@ class ApiService {
       Uri.parse('$baseUrl/api/ai/meals'),
       headers: await _headers(),
       body: jsonEncode({
-        'calorieTarget': calorieTarget,
         'dietaryPreference': dietaryPreference,
         'allergies': allergies,
       }),

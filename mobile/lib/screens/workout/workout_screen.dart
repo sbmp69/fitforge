@@ -110,7 +110,7 @@ class _WorkoutScreenState extends State<WorkoutScreen> {
       body: Stack(
         children: [
           ListView(
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.fromLTRB(16, 16, 16, 140),
         children: [
           if (_error != null)
             Container(
