@@ -79,7 +79,7 @@ Include breakfast, lunch, dinner, and 1-2 snacks per day with macro breakdowns.`
       .from("meal_plans")
       .insert({
         user_id: user.id,
-        calorie_target: calorieTarget,
+        calorie_target: 0,
         dietary_preference: dietaryPreference,
         allergies: allergies || [],
         plan_data: planData,
