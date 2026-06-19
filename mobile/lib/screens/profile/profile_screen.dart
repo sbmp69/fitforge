@@ -203,7 +203,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
           ListTile(
             leading: const Icon(Icons.chat_bubble_outline, color: AppColors.primary),
             title: const Text('AI Coach'),
-            onTap: () => context.push('/coach'),
+            onTap: () => context.go('/coach'),
           ),
           ListTile(
             leading: const Icon(Icons.logout, color: Colors.redAccent),
