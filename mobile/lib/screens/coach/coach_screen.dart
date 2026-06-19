@@ -3,6 +3,8 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import '../../core/theme.dart';
 import '../../services/api_service.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
+import '../../widgets/animated_mesh_background.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 
 class CoachScreen extends StatefulWidget {
   const CoachScreen({super.key});
@@ -70,10 +72,13 @@ class _CoachScreenState extends State<CoachScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('AI Coach')),
-      body: Column(
-        children: [
-          Expanded(
+      appBar: AppBar(title: const Text('AI Coach'), backgroundColor: Colors.transparent),
+      extendBodyBehindAppBar: true,
+      body: AnimatedMeshBackground(
+        child: Column(
+          children: [
+            const SizedBox(height: 100), // padding for transparent appbar
+            Expanded(
             child: _messages.isEmpty
                 ? const Center(child: Text('Ask anything about fitness & nutrition', style: TextStyle(color: AppColors.slate400)))
                 : ListView.builder(
@@ -99,7 +104,7 @@ class _CoachScreenState extends State<CoachScreen> {
                               strong: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
                             ),
                           ),
-                        ),
+                        ).animate(key: ValueKey(m.text)).fadeIn(duration: 400.ms).slideY(begin: 0.2, curve: Curves.easeOut),
                       );
                     },
                   ),

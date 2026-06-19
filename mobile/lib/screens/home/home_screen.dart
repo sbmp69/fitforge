@@ -14,6 +14,8 @@ import '../../services/notification_service.dart';
 import '../../widgets/app_card.dart';
 import '../../widgets/progress_ring.dart';
 import '../../widgets/streak_fire.dart';
+import '../../widgets/animated_mesh_background.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -158,103 +160,75 @@ class _HomeScreenState extends State<HomeScreen> {
           const SizedBox(width: 16),
         ],
       ),
-      body: Stack(
-        children: [
-          // Ambient Glow 1
-          Positioned(
-            top: -100,
-            left: -100,
-            child: Container(
-              width: 300,
-              height: 300,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                color: AppColors.primary.withValues(alpha: 0.15),
-              ),
-            ),
-          ),
-          // Ambient Glow 2
-          Positioned(
-            bottom: 100,
-            right: -150,
-            child: Container(
-              width: 400,
-              height: 400,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                color: AppColors.accent.withValues(alpha: 0.1),
-              ),
-            ),
-          ),
-          // Blur Filter
-          Positioned.fill(
-            child: BackdropFilter(
-              filter: ImageFilter.blur(sigmaX: 80, sigmaY: 80),
-              child: const SizedBox(),
-            ),
-          ),
-          // Content
-          RefreshIndicator(
-            onRefresh: _load,
-        child: ListView(
-          padding: const EdgeInsets.fromLTRB(16, 16, 16, 140),
-          children: [
-            Row(
-              children: [
-                Expanded(child: AppCard(child: StreakFire(streak: _streak()))),
-                const SizedBox(width: 12),
-                Expanded(child: AppCard(child: Center(child: ProgressRing(progress: _weeklyProgress(), label: 'This week')))),
-              ],
-            ),
-            const SizedBox(height: 12),
-            Row(
-              children: [
-                Expanded(child: _StatCard(title: 'AI Plans Left', value: aiLeft, subtitle: 'this month')),
-                const SizedBox(width: 12),
-                Expanded(child: _StatCard(title: 'Workouts', value: '${_logs.where((l) => l.workoutCompleted).take(7).length}/7', subtitle: 'this week')),
-              ],
-            ),
-            const SizedBox(height: 24),
-            const Text('Quick Actions', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600, color: Colors.white)),
-            const SizedBox(height: 12),
-            _QuickAction(icon: Icons.fitness_center, label: "Today's Workout", color: AppColors.primary, onTap: () => context.go('/workout')),
-            _QuickAction(icon: Icons.restaurant, label: 'Meal Plan', color: AppColors.amber, onTap: () => context.go('/meals')),
-            _QuickAction(icon: Icons.trending_up, label: 'Log Progress', color: Colors.blueAccent, onTap: () => context.go('/progress')),
-            _QuickAction(icon: Icons.chat_bubble_outline, label: 'AI Coach', color: Colors.purpleAccent, onTap: () => context.push('/coach')),
-            const SizedBox(height: 24),
-            AppCard(
-              onTap: () => context.go('/workout'),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+      body: AnimatedMeshBackground(
+        child: RefreshIndicator(
+          onRefresh: _load,
+          child: ListView(
+            padding: const EdgeInsets.fromLTRB(16, 16, 16, 140),
+            children: [
+              Row(
                 children: [
-                  const Text('Active Workout', style: TextStyle(fontWeight: FontWeight.w600, color: Colors.white)),
-                  const SizedBox(height: 8),
-                  Text(
-                    _workout?.title ?? 'No plan yet — generate one',
-                    style: TextStyle(color: _workout != null ? AppColors.primary : AppColors.slate400),
-                  ),
+                  Expanded(child: AppCard(child: StreakFire(streak: _streak()))),
+                  const SizedBox(width: 12),
+                  Expanded(child: AppCard(child: Center(child: ProgressRing(progress: _weeklyProgress(), label: 'This week')))),
                 ],
               ),
-            ),
-            const SizedBox(height: 12),
-            AppCard(
-              onTap: () => context.go('/meals'),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+              const SizedBox(height: 12),
+              Row(
                 children: [
-                  const Text('Active Meal Plan', style: TextStyle(fontWeight: FontWeight.w600, color: Colors.white)),
-                  const SizedBox(height: 8),
-                  Text(
-                    _meal?.title ?? 'No plan yet — generate one',
-                    style: TextStyle(color: _meal != null ? AppColors.amber : AppColors.slate400),
-                  ),
+                  Expanded(child: _StatCard(title: 'AI Plans Left', value: aiLeft, subtitle: 'this month')),
+                  const SizedBox(width: 12),
+                  Expanded(child: _StatCard(title: 'Workouts', value: '${_logs.where((l) => l.workoutCompleted).take(7).length}/7', subtitle: 'this week')),
                 ],
               ),
-            ),
-          ],
+              const SizedBox(height: 24),
+              const Text('Quick Actions', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600, color: Colors.white)),
+              const SizedBox(height: 12),
+              _QuickAction(icon: Icons.fitness_center, label: "Today's Workout", color: AppColors.primary, onTap: () => context.go('/workout')),
+              _QuickAction(icon: Icons.restaurant, label: 'Meal Plan', color: AppColors.amber, onTap: () => context.go('/meals')),
+              _QuickAction(icon: Icons.trending_up, label: 'Log Progress', color: Colors.blueAccent, onTap: () => context.go('/progress')),
+              _QuickAction(icon: Icons.chat_bubble_outline, label: 'AI Coach', color: Colors.purpleAccent, onTap: () => context.push('/coach')),
+              const SizedBox(height: 24),
+              if (_workout != null)
+                Hero(
+                  tag: 'workout_card',
+                  child: AppCard(
+                    onTap: () => context.go('/workout'),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Text('Active Workout', style: TextStyle(fontWeight: FontWeight.w600, color: Colors.white)),
+                        const SizedBox(height: 8),
+                        Text(
+                          _workout?.title ?? 'No plan yet — generate one',
+                          style: TextStyle(color: _workout != null ? AppColors.primary : AppColors.slate400),
+                        ),
+                      ],
+                    ),
+                  ),
+                ).animate().fadeIn(duration: 400.ms).slideY(begin: 0.1, curve: Curves.easeOut),
+              const SizedBox(height: 12),
+              if (_meal != null)
+                Hero(
+                  tag: 'meal_card',
+                  child: AppCard(
+                    onTap: () => context.go('/meals'),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Text('Active Meal Plan', style: TextStyle(fontWeight: FontWeight.w600, color: Colors.white)),
+                        const SizedBox(height: 8),
+                        Text(
+                          _meal?.title ?? 'No plan yet — generate one',
+                          style: TextStyle(color: _meal != null ? AppColors.amber : AppColors.slate400),
+                        ),
+                      ],
+                    ),
+                  ),
+                ).animate().fadeIn(duration: 400.ms, delay: 100.ms).slideY(begin: 0.1, curve: Curves.easeOut),
+            ],
+          ),
         ),
-      ),
-        ],
       ),
     );
   }

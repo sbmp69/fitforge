@@ -2,6 +2,7 @@ import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import '../../core/theme.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 import '../../models/progress_log.dart';
 import '../../services/api_service.dart';
 import '../../services/supabase_service.dart';
@@ -97,7 +98,7 @@ class _ProgressScreenState extends State<ProgressScreen> {
                   title: const Text('Workout completed'),
                   contentPadding: EdgeInsets.zero,
                 ),
-                ElevatedButton(onPressed: _save, child: const Text('Save')),
+                ElevatedButton(onPressed: _save, child: const Text('Save')).animate(onPlay: (c) => c.repeat(reverse: true)).shimmer(duration: 2.seconds, color: Colors.white24),
               ],
             ),
           ),

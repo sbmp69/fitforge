@@ -8,6 +8,7 @@ import '../../services/api_service.dart';
 import '../../services/supabase_service.dart';
 import '../../widgets/app_card.dart';
 import '../../widgets/loading_overlay.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 import '../../models/profile.dart';
 import '../paywall/paywall_screen.dart';
 
@@ -148,11 +149,25 @@ class _MealsScreenState extends State<MealsScreen> {
                       alignment: Alignment.center,
                       child: const Text('Generate Meal Plan ⚡', style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold)),
                     ),
-                  ),
+                  ).animate(onPlay: (c) => c.repeat(reverse: true)).shimmer(duration: 2.seconds, color: Colors.white24),
                 ],
               ),
             ),
           if (_plan != null && _plan!.days.isNotEmpty) ...[
+            Hero(
+              tag: 'meal_card',
+              child: AppCard(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text('Active Plan', style: TextStyle(color: AppColors.amber, fontWeight: FontWeight.w600)),
+                    const SizedBox(height: 8),
+                    Text(_plan!.title, style: const TextStyle(fontSize: 20, color: Colors.white)),
+                  ],
+                ),
+              ),
+            ),
+            const SizedBox(height: 16),
             SingleChildScrollView(
               scrollDirection: Axis.horizontal,
               child: Row(
