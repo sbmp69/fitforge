@@ -20,7 +20,7 @@ class AnimatedMeshBackground extends StatelessWidget {
         Positioned(
           top: -100,
           left: -50,
-          child: _buildOrb(AppColors.primary.withOpacity(0.15), 300)
+          child: _buildOrb(AppColors.primary.withValues(alpha: 0.15), 300)
               .animate(onPlay: (controller) => controller.repeat())
               .move(
                 duration: 10.seconds,
@@ -39,7 +39,7 @@ class AnimatedMeshBackground extends StatelessWidget {
         Positioned(
           bottom: -50,
           right: -100,
-          child: _buildOrb(AppColors.accent.withOpacity(0.1), 400)
+          child: _buildOrb(AppColors.accent.withValues(alpha: 0.15), 400)
               .animate(onPlay: (controller) => controller.repeat())
               .move(
                 duration: 12.seconds,

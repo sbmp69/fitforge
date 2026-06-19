@@ -28,8 +28,8 @@ class MainShell extends StatelessWidget {
                   backgroundColor: Colors.transparent,
                   indicatorColor: AppColors.primary.withValues(alpha: 0.2),
                   elevation: 0,
-                  height: 80,
-                  labelBehavior: NavigationDestinationLabelBehavior.alwaysShow,
+                  height: 65,
+                  labelBehavior: NavigationDestinationLabelBehavior.onlyShowSelected,
                   selectedIndex: navigationShell.currentIndex,
                   onDestinationSelected: (i) {
                     navigationShell.goBranch(i, initialLocation: i == navigationShell.currentIndex);

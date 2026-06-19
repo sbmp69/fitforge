@@ -11,6 +11,7 @@ import '../../widgets/loading_overlay.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import '../../models/profile.dart';
 import '../paywall/paywall_screen.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 class MealsScreen extends StatefulWidget {
   const MealsScreen({super.key});
@@ -141,7 +142,7 @@ class _MealsScreenState extends State<MealsScreen> {
                       padding: const EdgeInsets.symmetric(vertical: 16),
                       decoration: BoxDecoration(
                         gradient: const LinearGradient(colors: [AppColors.amber, Colors.orangeAccent]),
-                        borderRadius: BorderRadius.circular(12),
+                        borderRadius: BorderRadius.circular(30),
                         boxShadow: [
                           BoxShadow(color: AppColors.amber.withValues(alpha: 0.3), blurRadius: 12, offset: const Offset(0, 4)),
                         ],
@@ -162,7 +163,7 @@ class _MealsScreenState extends State<MealsScreen> {
                   children: [
                     const Text('Active Plan', style: TextStyle(color: AppColors.amber, fontWeight: FontWeight.w600)),
                     const SizedBox(height: 8),
-                    Text(_plan!.title, style: const TextStyle(fontSize: 20, color: Colors.white)),
+                    Text(_plan!.title, style: GoogleFonts.playfairDisplay(fontSize: 24, fontStyle: FontStyle.italic, fontWeight: FontWeight.bold, color: Colors.white)),
                   ],
                 ),
               ),

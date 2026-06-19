@@ -16,6 +16,7 @@ import '../../widgets/progress_ring.dart';
 import '../../widgets/streak_fire.dart';
 import '../../widgets/animated_mesh_background.dart';
 import 'package:flutter_animate/flutter_animate.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -144,8 +145,23 @@ class _HomeScreenState extends State<HomeScreen> {
         title: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('Hey, $name ⚡', style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: AppColors.slate50)),
-            Text(DateFormat('EEEE, MMM d').format(DateTime.now()), style: const TextStyle(fontSize: 14, color: AppColors.slate400)),
+            Text('Hello $name 👋', style: const TextStyle(fontSize: 14, color: AppColors.slate300)),
+            RichText(
+              text: TextSpan(
+                style: const TextStyle(fontSize: 24, fontWeight: FontWeight.w600, color: AppColors.slate50),
+                children: [
+                  const TextSpan(text: 'Build '),
+                  TextSpan(
+                    text: 'Better Habits',
+                    style: GoogleFonts.playfairDisplay(
+                      fontStyle: FontStyle.italic,
+                      color: AppColors.primary,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ],
+              ),
+            ),
           ],
         ),
         actions: [
@@ -272,7 +288,7 @@ class _QuickAction extends StatelessWidget {
       child: Container(
         decoration: BoxDecoration(
           color: AppColors.navy800,
-          borderRadius: BorderRadius.circular(16),
+          borderRadius: BorderRadius.circular(30),
           border: Border.all(color: color.withValues(alpha: 0.3)),
           boxShadow: [
             BoxShadow(
@@ -286,7 +302,7 @@ class _QuickAction extends StatelessWidget {
           color: Colors.transparent,
           child: InkWell(
             onTap: onTap,
-            borderRadius: BorderRadius.circular(16),
+            borderRadius: BorderRadius.circular(30),
             child: Padding(
               padding: const EdgeInsets.all(16),
               child: Row(
