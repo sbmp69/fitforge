@@ -146,6 +146,7 @@ class _CoachScreenState extends State<CoachScreen> {
           ),
         ],
       ),
+      ),
     );
   }
 
