@@ -77,7 +77,7 @@ class _CoachScreenState extends State<CoachScreen> {
       body: AnimatedMeshBackground(
         child: Column(
           children: [
-            const SizedBox(height: 100), // padding for transparent appbar
+            const SizedBox(height: kToolbarHeight), // padding for transparent appbar
             Expanded(
             child: _messages.isEmpty
                 ? const Center(child: Text('Ask anything about fitness & nutrition', style: TextStyle(color: AppColors.slate400)))
