@@ -57,23 +57,7 @@ class _CoachScreenState extends State<CoachScreen> {
     
     final session = Supabase.instance.client.auth.currentSession;
     try {
-      if (session != null) {
-        await Supabase.instance.client.from('ai_chat_messages').insert({
-          'user_id': session.user.id,
-          'role': 'user',
-          'content': text,
-        });
-      }
-      
       final reply = await _api.chatWithCoach(text);
-      
-      if (session != null) {
-        await Supabase.instance.client.from('ai_chat_messages').insert({
-          'user_id': session.user.id,
-          'role': 'assistant',
-          'content': reply,
-        });
-      }
       
       if (mounted) setState(() => _messages.add(_Msg(false, reply)));
     } catch (e) {
