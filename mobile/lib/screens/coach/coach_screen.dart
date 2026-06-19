@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../../core/theme.dart';
 import '../../services/api_service.dart';
+import 'package:flutter_markdown/flutter_markdown.dart';
 
 class CoachScreen extends StatefulWidget {
   const CoachScreen({super.key});
@@ -106,7 +107,14 @@ class _CoachScreenState extends State<CoachScreen> {
                             color: m.isUser ? AppColors.primary : AppColors.navy700,
                             borderRadius: BorderRadius.circular(16),
                           ),
-                          child: Text(m.text, style: const TextStyle(color: Colors.white)),
+                          child: MarkdownBody(
+                            data: m.text,
+                            styleSheet: MarkdownStyleSheet(
+                              p: const TextStyle(color: Colors.white),
+                              listBullet: const TextStyle(color: Colors.white),
+                              strong: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+                            ),
+                          ),
                         ),
                       );
                     },
