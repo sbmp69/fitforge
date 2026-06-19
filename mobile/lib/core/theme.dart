@@ -3,9 +3,9 @@ import 'package:google_fonts/google_fonts.dart';
 
 class AppColors {
   // Neon Accents
-  static const primary = Color(0xFF39FF14); // Neon Green
-  static const primaryLight = Color(0xFF65D84C); // Soft Lime
-  static const accent = Color(0xFF90FF7A); // Pale Neon
+  static const primary = Color(0xFF4ADE80); // Soothing Mint/Lime
+  static const primaryLight = Color(0xFF86EFAC); // Pastel Mint
+  static const accent = Color(0xFF6EE7B7); // Soft Emerald
   
   // Backgrounds
   static const navy900 = Color(0xFF000000); // Pure Black

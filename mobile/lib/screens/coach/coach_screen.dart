@@ -99,9 +99,9 @@ class _CoachScreenState extends State<CoachScreen> {
                           child: MarkdownBody(
                             data: m.text,
                             styleSheet: MarkdownStyleSheet(
-                              p: const TextStyle(color: Colors.white),
-                              listBullet: const TextStyle(color: Colors.white),
-                              strong: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+                              p: TextStyle(color: m.isUser ? AppColors.navy900 : Colors.white),
+                              listBullet: TextStyle(color: m.isUser ? AppColors.navy900 : Colors.white),
+                              strong: TextStyle(color: m.isUser ? AppColors.navy900 : Colors.white, fontWeight: FontWeight.bold),
                             ),
                           ),
                         ).animate(key: ValueKey(m.text)).fadeIn(duration: 400.ms).slideY(begin: 0.2, curve: Curves.easeOut),
