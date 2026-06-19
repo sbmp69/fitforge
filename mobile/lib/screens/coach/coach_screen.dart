@@ -77,15 +77,15 @@ class _CoachScreenState extends State<CoachScreen> {
       body: AnimatedMeshBackground(
         child: Column(
           children: [
-            const SizedBox(height: kToolbarHeight), // padding for transparent appbar
             Expanded(
             child: _messages.isEmpty
                 ? const Center(child: Text('Ask anything about fitness & nutrition', style: TextStyle(color: AppColors.slate400)))
                 : ListView.builder(
-                    padding: const EdgeInsets.all(16),
+                    reverse: true,
+                    padding: const EdgeInsets.only(left: 16, right: 16, bottom: 16, top: kToolbarHeight + 16),
                     itemCount: _messages.length,
                     itemBuilder: (_, i) {
-                      final m = _messages[i];
+                      final m = _messages[_messages.length - 1 - i];
                       return Align(
                         alignment: m.isUser ? Alignment.centerRight : Alignment.centerLeft,
                         child: Container(
