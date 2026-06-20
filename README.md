@@ -6,7 +6,7 @@
   [![Next.js](https://img.shields.io/badge/Next.js-14-black?logo=next.js)](https://nextjs.org/)
   [![Flutter](https://img.shields.io/badge/Flutter-3.19-02569B?logo=flutter)](https://flutter.dev/)
   [![Supabase](https://img.shields.io/badge/Supabase-DB_%26_Auth-3ECF8E?logo=supabase)](https://supabase.com/)
-  [![Anthropic](https://img.shields.io/badge/AI-Claude_3.5_Sonnet-D97757?logo=anthropic)](https://anthropic.com/)
+  [![OpenAI](https://img.shields.io/badge/AI-OpenAI_GPT--4o-412991?logo=openai)](https://openai.com/)
   [![Razorpay](https://img.shields.io/badge/Payments-Razorpay-02042B?logo=razorpay)](https://razorpay.com/)
 </div>
 
@@ -16,7 +16,7 @@
 
 FitForge is a full-stack, AI-native fitness ecosystem engineered for absolute scale. It operates on a monorepo-style structure housing a highly optimized **Next.js 14 web application** and a **cross-platform Flutter client**. 
 
-The platform leverages **Supabase** for edge-optimized PostgreSQL/Auth, **Razorpay** for complex marketplace payment routing, and the **Anthropic Claude 3.5 Sonnet API** to dynamically generate context-aware, hyper-personalized fitness and nutrition regimens.
+The platform leverages **Supabase** for edge-optimized PostgreSQL/Auth, **Razorpay** for complex marketplace payment routing, and the **OpenAI API** to dynamically generate context-aware, hyper-personalized fitness and nutrition regimens.
 
 ---
 
@@ -33,7 +33,7 @@ graph TD
 
     subgraph Edge API & Inference
         API[Next.js API Routes / Server Actions]
-        Claude[Anthropic Claude 3.5]
+        OpenAI[OpenAI GPT-4o]
     end
 
     subgraph Infrastructure
@@ -45,7 +45,7 @@ graph TD
 
     Web <--> API
     Mobile <--> API
-    API <--> Claude
+    API <--> OpenAI
     API <--> DB
     API <--> Payments
     Web <--> Auth
@@ -72,7 +72,7 @@ graph TD
 - **Database:** Supabase (PostgreSQL with Row Level Security)
 - **Authentication:** Supabase Auth (JWT, Magic Links)
 - **File Storage:** Supabase Storage (CDN-backed)
-- **LLM Engine:** Anthropic Claude 3.5 Sonnet (`claude-3-5-sonnet-20240620`)
+- **LLM Engine:** OpenAI API (`gpt-4o`)
 - **Payments:** Razorpay (Handling subscriptions and B2B vendor splits)
 
 ---
@@ -107,7 +107,7 @@ cp .env.example .env.local
 ```env
 NEXT_PUBLIC_SUPABASE_URL=your_supabase_url
 NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_key
-ANTHROPIC_API_KEY=sk-ant-...
+OPENAI_API_KEY=sk-proj-...
 RAZORPAY_KEY_ID=rzp_test_...
 RAZORPAY_KEY_SECRET=your_secret
 ```
@@ -152,7 +152,7 @@ flutter run --debug
 
 ## 🛡️ Security Posture
 - **Row Level Security (RLS):** All Postgres tables implement strict policies ensuring users can only read/mutate their respective `user_id` rows.
-- **API Sandboxing:** The Anthropic API key is strictly contained within Next.js Server Actions; the mobile app utilizes an authenticated proxy route.
+- **API Sandboxing:** The OpenAI API key is strictly contained within Next.js Server Actions; the mobile app utilizes an authenticated proxy route.
 - **Stateless Auth:** Session state is managed via secure, HttpOnly cookies on the web and secure local storage on mobile via the Supabase SDK.
 
 ---
