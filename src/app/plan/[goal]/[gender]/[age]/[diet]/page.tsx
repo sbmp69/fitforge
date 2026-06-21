@@ -99,7 +99,7 @@ export default function ProgrammaticSEOPage({ params }: PlanProps) {
         </p>
 
         <div className="bg-[#0A110C] border border-[#142419] rounded-3xl p-8 max-w-2xl mx-auto shadow-2xl shadow-[#39FF14]/5 my-12">
-          <h3 className="text-2xl font-bold mb-6 text-left border-b border-[#142419] pb-4">What's included in your plan:</h3>
+          <h3 className="text-2xl font-bold mb-6 text-left border-b border-[#142419] pb-4">What&apos;s included in your plan:</h3>
           <ul className="text-left space-y-4 text-slate-300">
             <li className="flex items-center gap-3">
               <span className="flex items-center justify-center w-8 h-8 rounded-full bg-[#39FF14]/20 text-[#39FF14]">✓</span>
