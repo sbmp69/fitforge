@@ -64,10 +64,13 @@ export default function PrivacyPolicy() {
         </section>
 
         <section className="space-y-4">
-          <h2 className="text-2xl font-bold text-white">6. Your Rights</h2>
-          <p>
-            Depending on your location, you may have the right to request access to, correction of, or deletion of your personal data. You can exercise these rights by contacting our support team.
-          </p>
+          <h2 className="text-2xl font-bold text-white">6. Your Rights (GDPR & CCPA)</h2>
+          <p>Depending on your location, you have specific rights regarding your personal data:</p>
+          <ul className="list-disc pl-6 space-y-2">
+            <li><strong>European Union Residents (GDPR):</strong> You have the right to request access to, correction, or erasure of your personal data. You also have the right to restrict or object to our processing of your data, and the right to data portability. You may withdraw consent for data tracking (such as analytics) at any time.</li>
+            <li><strong>California Residents (CCPA):</strong> You have the right to know what personal information we collect, the right to request deletion of your data, and the right to opt-out of the sale of your personal information. <strong>FitForge AI does not sell your personal information.</strong></li>
+          </ul>
+          <p className="mt-2">To exercise any of these rights, or to request full account deletion, please contact our support team.</p>
         </section>
 
         <section className="space-y-4">
