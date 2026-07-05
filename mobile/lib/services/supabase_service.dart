@@ -184,5 +184,16 @@ class SupabaseService {
     );
   }
 
+  Future<void> deleteAccount() async {
+    final user = currentUser;
+    if (user == null) return;
+    
+    // Delete the user's profile which should cascade to other tables
+    await client.from('profiles').delete().eq('id', user.id);
+    
+    // Log the user out of the app locally
+    await client.auth.signOut();
+  }
+
   Future<void> signOut() => client.auth.signOut();
 }

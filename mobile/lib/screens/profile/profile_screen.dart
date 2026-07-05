@@ -41,6 +41,46 @@ class _ProfileScreenState extends State<ProfileScreen> {
     if (mounted) context.go('/login');
   }
 
+  Future<void> _deleteAccount() async {
+    final confirm = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        backgroundColor: AppColors.navy800,
+        title: const Text('Delete Account', style: TextStyle(color: Colors.white)),
+        content: const Text('Are you sure you want to permanently delete your account and all associated data? This action cannot be undone.', style: TextStyle(color: AppColors.slate400)),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, false),
+            child: const Text('Cancel', style: TextStyle(color: Colors.white)),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, true),
+            child: const Text('Delete', style: TextStyle(color: Colors.redAccent, fontWeight: FontWeight.bold)),
+          ),
+        ],
+      ),
+    );
+
+    if (confirm == true) {
+      if (!mounted) return;
+      showDialog(
+        context: context, 
+        barrierDismissible: false,
+        builder: (ctx) => const Center(child: CircularProgressIndicator(color: AppColors.primary)),
+      );
+      try {
+        await _supabase.deleteAccount();
+        if (!mounted) return;
+        Navigator.pop(context); // close progress dialog
+        context.go('/login');
+      } catch (e) {
+        if (!mounted) return;
+        Navigator.pop(context);
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Error deleting account: $e')));
+      }
+    }
+  }
+
   Future<void> _showEditProfileDialog(BuildContext context) async {
     if (_profile == null) return;
     final nameCtrl = TextEditingController(text: _profile!.fullName);
@@ -209,6 +249,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
             leading: const Icon(Icons.logout, color: Colors.redAccent),
             title: const Text('Log out', style: TextStyle(color: Colors.redAccent)),
             onTap: _logout,
+          ),
+          ListTile(
+            leading: const Icon(Icons.delete_forever, color: Colors.redAccent),
+            title: const Text('Delete Account', style: TextStyle(color: Colors.redAccent, fontWeight: FontWeight.bold)),
+            onTap: _deleteAccount,
           ),
         ],
       ),
