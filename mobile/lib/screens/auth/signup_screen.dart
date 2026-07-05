@@ -18,6 +18,7 @@ class _SignupScreenState extends State<SignupScreen> {
   final _supabase = SupabaseService();
   String _role = 'fitness_user';
   bool _loading = false;
+  bool _obscurePassword = true;
   String? _error;
 
   Future<void> _signup() async {
@@ -85,8 +86,14 @@ class _SignupScreenState extends State<SignupScreen> {
               const SizedBox(height: 16),
               TextField(
                 controller: _password,
-                obscureText: true,
-                decoration: const InputDecoration(labelText: 'Password'),
+                obscureText: _obscurePassword,
+                decoration: InputDecoration(
+                  labelText: 'Password',
+                  suffixIcon: IconButton(
+                    icon: Icon(_obscurePassword ? Icons.visibility_off : Icons.visibility, color: AppColors.slate400),
+                    onPressed: () => setState(() => _obscurePassword = !_obscurePassword),
+                  ),
+                ),
               ),
               const SizedBox(height: 16),
               const SizedBox(height: 8),
