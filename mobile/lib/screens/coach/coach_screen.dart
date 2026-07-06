@@ -51,6 +51,27 @@ class _CoachScreenState extends State<CoachScreen> {
   Future<void> _send() async {
     final text = _controller.text.trim();
     if (text.isEmpty || _loading) return;
+    
+    // Hard limit: Users can only send 3 messages in the free version
+    final userMsgCount = _messages.where((m) => m.isUser).length;
+    if (userMsgCount >= 3) {
+      showDialog(
+        context: context,
+        builder: (ctx) => AlertDialog(
+          backgroundColor: AppColors.navy800,
+          title: const Text('Limit Reached', style: TextStyle(color: Colors.white)),
+          content: const Text('You have reached the free tier limit of 3 AI Coach interactions. Premium subscriptions are coming in the next update!', style: TextStyle(color: AppColors.slate400)),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(ctx),
+              child: const Text('Okay', style: TextStyle(color: AppColors.primary)),
+            ),
+          ],
+        ),
+      );
+      return;
+    }
+
     setState(() {
       _messages.add(_Msg(true, text));
       _controller.clear();
