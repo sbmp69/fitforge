@@ -46,7 +46,7 @@ export const TIER_LABELS: Record<string, string> = {
 };
 
 export const AI_PLAN_LIMITS: Record<string, number> = {
-  free: 3,
+  free: 10,
   pro: Infinity,
   trainer: Infinity,
 };

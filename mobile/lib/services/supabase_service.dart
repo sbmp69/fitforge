@@ -27,6 +27,8 @@ class SupabaseService {
     required String fullName,
     required String goal,
     required String level,
+    String? country,
+    String? mealPreference,
   }) async {
     final user = currentUser;
     if (user == null) return;
@@ -34,11 +36,15 @@ class SupabaseService {
     if (goal == 'Muscle Gain') dbGoal = 'build_muscle';
     else if (goal == 'Endurance') dbGoal = 'endurance';
 
-    await client.from('profiles').update({
+    final updateData = <String, dynamic>{
       'full_name': fullName,
       'primary_goal': dbGoal,
       'fitness_level': level.toLowerCase(),
-    }).eq('id', user.id);
+    };
+    if (country != null) updateData['country'] = country;
+    if (mealPreference != null) updateData['meal_preference'] = mealPreference;
+
+    await client.from('profiles').update(updateData).eq('id', user.id);
   }
 
   Future<void> updatePhysiqueProfile({
@@ -46,6 +52,8 @@ class SupabaseService {
     required double weightKg,
     required String goal,
     required String level,
+    required String country,
+    required String mealPreference,
   }) async {
     final user = currentUser;
     if (user == null) return;
@@ -54,6 +62,8 @@ class SupabaseService {
       'weight_kg': weightKg,
       'primary_goal': goal,
       'fitness_level': level,
+      'country': country,
+      'meal_preference': mealPreference,
     }).eq('id', user.id);
   }
 

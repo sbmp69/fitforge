@@ -86,16 +86,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
     final nameCtrl = TextEditingController(text: _profile!.fullName);
     final goalCtrl = TextEditingController(text: _profile!.primaryGoal);
     final levelCtrl = TextEditingController(text: _profile!.fitnessLevel);
+    final countryCtrl = TextEditingController(text: _profile!.country ?? 'India');
+    final mealCtrl = TextEditingController(text: _profile!.mealPreference ?? 'Indian');
     bool saving = false;
 
     List<String> goals = ['Weight Loss', 'Muscle Gain', 'Endurance', 'General Fitness'];
-    if (goalCtrl.text.isNotEmpty && !goals.contains(goalCtrl.text)) {
-      goals.add(goalCtrl.text);
-    }
+    if (goalCtrl.text.isNotEmpty && !goals.contains(goalCtrl.text)) goals.add(goalCtrl.text);
     List<String> levels = ['Beginner', 'Intermediate', 'Advanced'];
-    if (levelCtrl.text.isNotEmpty && !levels.contains(levelCtrl.text)) {
-      levels.add(levelCtrl.text);
-    }
+    if (levelCtrl.text.isNotEmpty && !levels.contains(levelCtrl.text)) levels.add(levelCtrl.text);
 
     await showModalBottomSheet(
       context: context,
@@ -128,6 +126,48 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   items: levels.map((e) => DropdownMenuItem(value: e, child: Text(e))).toList(),
                   onChanged: (val) => levelCtrl.text = val!,
                 ),
+                const SizedBox(height: 16),
+                Autocomplete<String>(
+                  initialValue: TextEditingValue(text: countryCtrl.text),
+                  optionsBuilder: (TextEditingValue val) {
+                    if (val.text.isEmpty) return AppConstants.allCountries;
+                    return AppConstants.allCountries.where((option) => option.toLowerCase().contains(val.text.toLowerCase()));
+                  },
+                  onSelected: (selection) => countryCtrl.text = selection,
+                  fieldViewBuilder: (context, controller, focusNode, onFieldSubmitted) {
+                    return TextFormField(
+                      controller: controller,
+                      focusNode: focusNode,
+                      decoration: const InputDecoration(
+                        labelText: 'Country',
+                        hintText: 'Search your country...',
+                        suffixIcon: Icon(Icons.search, color: AppColors.slate400),
+                      ),
+                      onChanged: (v) => countryCtrl.text = v,
+                    );
+                  },
+                ),
+                const SizedBox(height: 16),
+                Autocomplete<String>(
+                  initialValue: TextEditingValue(text: mealCtrl.text),
+                  optionsBuilder: (TextEditingValue val) {
+                    if (val.text.isEmpty) return AppConstants.popularCuisines;
+                    return AppConstants.popularCuisines.where((option) => option.toLowerCase().contains(val.text.toLowerCase()));
+                  },
+                  onSelected: (selection) => mealCtrl.text = selection,
+                  fieldViewBuilder: (context, controller, focusNode, onFieldSubmitted) {
+                    return TextFormField(
+                      controller: controller,
+                      focusNode: focusNode,
+                      decoration: const InputDecoration(
+                        labelText: 'Meal Preference / Cuisine',
+                        hintText: 'Type any cuisine (e.g. Vegan Keto, Indian)',
+                        suffixIcon: Icon(Icons.edit, color: AppColors.slate400),
+                      ),
+                      onChanged: (v) => mealCtrl.text = v,
+                    );
+                  },
+                ),
                 const SizedBox(height: 24),
                 ElevatedButton(
                   onPressed: saving ? null : () async {
@@ -138,6 +178,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         fullName: nameCtrl.text.trim(),
                         goal: goalCtrl.text,
                         level: levelCtrl.text,
+                        country: countryCtrl.text,
+                        mealPreference: mealCtrl.text,
                       );
                       await _load();
                       if (context.mounted) Navigator.pop(context);
@@ -164,6 +206,17 @@ class _ProfileScreenState extends State<ProfileScreen> {
   @override
   Widget build(BuildContext context) {
     final tier = AppConstants.tierLabels[_profile?.subscriptionTier] ?? 'Free';
+    final country = _profile?.country ?? 'India';
+    
+    String cur = '₹';
+    String proPrice = '299';
+    String trainerPrice = '799';
+
+    if (country == 'United States') { cur = '\$'; proPrice = '3.99'; trainerPrice = '9.99'; }
+    else if (country == 'United Kingdom') { cur = '£'; proPrice = '3.50'; trainerPrice = '8.99'; }
+    else if (country == 'Europe') { cur = '€'; proPrice = '3.99'; trainerPrice = '9.99'; }
+    else if (country == 'Australia') { cur = 'A\$'; proPrice = '5.99'; trainerPrice = '14.99'; }
+    else if (country != 'India') { cur = '\$'; proPrice = '3.99'; trainerPrice = '9.99'; }
 
     return Scaffold(
       appBar: AppBar(
@@ -211,9 +264,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
               children: [
                 const Text('Subscription', style: TextStyle(fontWeight: FontWeight.w600, color: Colors.white)),
                 const SizedBox(height: 8),
-                _PlanRow(name: 'Free', price: '₹0', current: tier == 'Free'),
-                _PlanRow(name: 'Pro', price: '₹299/mo', current: tier == 'Pro'),
-                _PlanRow(name: 'Trainer', price: '₹799/mo', current: tier == 'Trainer'),
+                _PlanRow(name: 'Free', price: '${cur}0', current: tier == 'Free'),
+                _PlanRow(name: 'Pro', price: '$cur$proPrice/mo', current: tier == 'Pro'),
+                _PlanRow(name: 'Trainer', price: '$cur$trainerPrice/mo', current: tier == 'Trainer'),
               ],
             ),
           ),

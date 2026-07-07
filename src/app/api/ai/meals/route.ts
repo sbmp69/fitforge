@@ -48,7 +48,10 @@ export async function POST(request: NextRequest) {
       userPrompt = `Suggest an alternative for this meal respecting preferences:
 Meal: ${JSON.stringify(substituteMeal.meal)}
 Dietary preference: ${dietaryPreference}
+Cuisine/Meal Preference: ${profile.meal_preference || "Not specified"}
+Country: ${profile.country || "Not specified"}
 Allergies: ${allergies?.join(", ") || "none"}
+Ensure the meal uses authentic regional ingredients for this cuisine/country.
 Return a single meal object JSON with name, calories, protein, carbs, fat, ingredients.`;
     } else {
       userPrompt = `Create a 7-day meal plan.
@@ -56,7 +59,10 @@ User Profile: Height ${profile.height_cm}cm, Weight ${profile.weight_kg}kg, Fitn
 Primary Goal: ${profile.primary_goal} (If missing, assume healthy maintenance).
 Instructions: First, calculate the required daily caloric intake for this specific user based on their metrics and goal (assume statistical average for age/gender if needed). Then, generate a meal plan that strictly matches those calculated daily calories.
 Dietary preference: ${dietaryPreference}
+Cuisine/Meal Preference: ${profile.meal_preference || "Not specified"}
+Country: ${profile.country || "Not specified"}
 Allergies to avoid: ${allergies?.join(", ") || "none"}
+Ensure the generated meals use authentic regional ingredients and recipes highly familiar to someone born and brought up in ${profile.country || "this country"}.
 Include breakfast, lunch, dinner, and 1-2 snacks per day with macro breakdowns.`;
     }
 

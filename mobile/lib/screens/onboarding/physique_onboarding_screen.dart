@@ -21,6 +21,8 @@ class _PhysiqueOnboardingScreenState extends State<PhysiqueOnboardingScreen> {
   double _weightKg = 70;
   String _primaryGoal = 'build_muscle';
   String _fitnessLevel = 'intermediate';
+  String _country = 'India';
+  String _mealPreference = 'Indian';
 
   Future<void> _submit() async {
     setState(() {
@@ -33,6 +35,8 @@ class _PhysiqueOnboardingScreenState extends State<PhysiqueOnboardingScreen> {
         weightKg: _weightKg,
         goal: _primaryGoal,
         level: _fitnessLevel,
+        country: _country,
+        mealPreference: _mealPreference,
       );
       if (mounted) context.go('/home');
     } catch (e) {
@@ -98,6 +102,48 @@ class _PhysiqueOnboardingScreenState extends State<PhysiqueOnboardingScreen> {
                     .map((e) => DropdownMenuItem(value: e.key, child: Text(e.value)))
                     .toList(),
                 onChanged: (v) => setState(() => _fitnessLevel = v!),
+              ),
+              const SizedBox(height: 16),
+              Autocomplete<String>(
+                initialValue: TextEditingValue(text: _country),
+                optionsBuilder: (TextEditingValue val) {
+                  if (val.text.isEmpty) return AppConstants.allCountries;
+                  return AppConstants.allCountries.where((option) => option.toLowerCase().contains(val.text.toLowerCase()));
+                },
+                onSelected: (selection) => setState(() => _country = selection),
+                fieldViewBuilder: (context, controller, focusNode, onFieldSubmitted) {
+                  return TextFormField(
+                    controller: controller,
+                    focusNode: focusNode,
+                    decoration: const InputDecoration(
+                      labelText: 'Country',
+                      hintText: 'Search your country...',
+                      suffixIcon: Icon(Icons.search, color: AppColors.slate400),
+                    ),
+                    onChanged: (v) => setState(() => _country = v),
+                  );
+                },
+              ),
+              const SizedBox(height: 16),
+              Autocomplete<String>(
+                initialValue: TextEditingValue(text: _mealPreference),
+                optionsBuilder: (TextEditingValue val) {
+                  if (val.text.isEmpty) return AppConstants.popularCuisines;
+                  return AppConstants.popularCuisines.where((option) => option.toLowerCase().contains(val.text.toLowerCase()));
+                },
+                onSelected: (selection) => setState(() => _mealPreference = selection),
+                fieldViewBuilder: (context, controller, focusNode, onFieldSubmitted) {
+                  return TextFormField(
+                    controller: controller,
+                    focusNode: focusNode,
+                    decoration: const InputDecoration(
+                      labelText: 'Meal Preference / Cuisine',
+                      hintText: 'Type any cuisine (e.g. Vegan Keto, Indian)',
+                      suffixIcon: Icon(Icons.edit, color: AppColors.slate400),
+                    ),
+                    onChanged: (v) => setState(() => _mealPreference = v),
+                  );
+                },
               ),
               const SizedBox(height: 32),
               ElevatedButton(
