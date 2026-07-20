@@ -203,7 +203,7 @@ class _HomeScreenState extends State<HomeScreen> {
               _QuickAction(icon: Icons.fitness_center, label: "Today's Workout", color: AppColors.primary, onTap: () => context.go('/workout')),
               _QuickAction(icon: Icons.restaurant, label: 'Meal Plan', color: AppColors.amber, onTap: () => context.go('/meals')),
               _QuickAction(icon: Icons.trending_up, label: 'Log Progress', color: Colors.blueAccent, onTap: () => context.go('/progress')),
-              _QuickAction(icon: Icons.chat_bubble_outline, label: 'AI Coach', color: Colors.purpleAccent, onTap: () => context.push('/coach')),
+              _QuickAction(icon: Icons.chat_bubble_outline, label: 'AI Coach', color: Colors.purpleAccent, onTap: () => context.go('/coach')),
               const SizedBox(height: 24),
               if (_workout != null)
                 Hero(

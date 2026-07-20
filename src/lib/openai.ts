@@ -94,7 +94,7 @@ CRITICAL RULES:
 2. Ensure the mathematical sum of calories from all meals exactly matches the dailyCalorieTarget (Protein=4kcal/g, Carbs=4kcal/g, Fat=9kcal/g).
 3. The ingredients array must contain exact measurements (e.g., "150g chicken breast", "1 tbsp olive oil") to act as a recipe guide.
 4. Strictly enforce all dietary preferences and allergies.
-5. CRITICAL: If a specific Country or Cuisine is requested, you MUST strictly generate authentic, traditional recipes and ingredients from that exact culture/region. Do NOT default to generic western fitness foods.`;
+5. CRITICAL: If a specific Country or Cuisine is requested, you MUST strictly generate authentic, everyday recipes and ingredients from that exact culture. EVERY single meal (breakfast, lunch, dinner, snacks) MUST consist entirely of native, locally accessible foods. COMPLETELY ELIMINATE generic western bodybuilding foods (like oatmeal, whey protein, chicken breast with broccoli) unless they are natively eaten in that region. Ensure the meals reflect what normal people in that country have access to everyday.`;
 
 export const GROCERY_SYSTEM_PROMPT = `Extract a consolidated grocery list from meal plan ingredients as JSON array:
 [{ "item": "Chicken breast", "quantity": "500g", "category": "Protein" }]
