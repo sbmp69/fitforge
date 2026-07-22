@@ -26,6 +26,8 @@ dependencies:
   flutter_markdown: ^0.7.7+1
   animated_text_kit: ^4.3.0
   flutter_animate: ^4.5.2
+  google_mobile_ads: ^9.0.0
+  purchases_flutter: ^10.4.2
 
 dev_dependencies:
   flutter_test:

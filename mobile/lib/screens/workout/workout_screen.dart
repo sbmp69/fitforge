@@ -8,11 +8,14 @@ import '../../models/workout_plan.dart';
 import '../../services/api_service.dart';
 import '../../services/supabase_service.dart';
 import '../../widgets/app_card.dart';
-import '../../widgets/loading_overlay.dart';
+import '../../widgets/primary_button.dart';
+import '../../services/ad_service.dart';
+import '../../services/subscription_service.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import '../../widgets/workout_timer.dart';
 import '../paywall/paywall_screen.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 class WorkoutScreen extends StatefulWidget {
   const WorkoutScreen({super.key});
@@ -64,10 +67,31 @@ class _WorkoutScreenState extends State<WorkoutScreen> {
 
   Future<void> _generate() async {
     HapticFeedback.lightImpact();
+    AdService.showInterstitialAd();
     setState(() {
       _loading = true;
       _error = null;
     });
+
+    if (!SubscriptionService.isPremium) {
+      int aiUsed = 0;
+      final session = Supabase.instance.client.auth.currentSession;
+      if (session != null) {
+        try {
+          final res = await Supabase.instance.client.from('profiles').select('ai_plans_used_this_month').eq('id', session.user.id).single();
+          aiUsed = res['ai_plans_used_this_month'] as int? ?? 0;
+        } catch (_) {}
+      }
+
+      final aiLimit = 10;
+      if (aiUsed >= aiLimit) {
+        if (mounted) {
+          setState(() => _loading = false);
+          Navigator.of(context).push(MaterialPageRoute(builder: (_) => const PaywallScreen()));
+        }
+        return;
+      }
+    }
     try {
       final custom = _customEquipmentController.text.trim();
       final allEquipment = _equipment.toList();

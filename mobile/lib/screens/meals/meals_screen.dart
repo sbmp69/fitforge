@@ -8,6 +8,9 @@ import '../../services/api_service.dart';
 import '../../services/supabase_service.dart';
 import '../../widgets/app_card.dart';
 import '../../widgets/loading_overlay.dart';
+import '../../widgets/primary_button.dart';
+import '../../services/ad_service.dart';
+import '../../services/subscription_service.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import '../../models/profile.dart';
 import '../paywall/paywall_screen.dart';
@@ -54,20 +57,27 @@ class _MealsScreenState extends State<MealsScreen> {
 
   Future<void> _generate() async {
     HapticFeedback.lightImpact();
+    AdService.showInterstitialAd();
     setState(() => _loading = true);
-    int aiUsed = _profile?.aiPlansUsedThisMonth ?? 0;
-    final session = Supabase.instance.client.auth.currentSession;
-    if (session != null) {
-      try {
-        final res = await Supabase.instance.client.from('profiles').select('ai_plans_used_this_month').eq('id', session.user.id).single();
-        aiUsed = res['ai_plans_used_this_month'] as int? ?? 0;
-      } catch (_) {}
-    }
+    
+    if (!SubscriptionService.isPremium) {
+      int aiUsed = _profile?.aiPlansUsedThisMonth ?? 0;
+      final session = Supabase.instance.client.auth.currentSession;
+      if (session != null) {
+        try {
+          final res = await Supabase.instance.client.from('profiles').select('ai_plans_used_this_month').eq('id', session.user.id).single();
+          aiUsed = res['ai_plans_used_this_month'] as int? ?? 0;
+        } catch (_) {}
+      }
 
-    final aiLimit = AppConstants.aiPlanLimits[_profile?.subscriptionTier] ?? 3;
-    if (aiUsed >= aiLimit) {
-      if (mounted) Navigator.of(context).push(MaterialPageRoute(builder: (_) => const PaywallScreen()));
-      return;
+      final aiLimit = AppConstants.aiPlanLimits[_profile?.subscriptionTier] ?? 10;
+      if (aiUsed >= aiLimit) {
+        if (mounted) {
+          setState(() => _loading = false);
+          Navigator.of(context).push(MaterialPageRoute(builder: (_) => const PaywallScreen()));
+        }
+        return;
+      }
     }
 
     setState(() {

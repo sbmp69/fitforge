@@ -5,6 +5,8 @@ import 'core/env_check.dart';
 import 'core/theme.dart';
 import 'router/app_router.dart';
 import 'services/notification_service.dart';
+import 'services/subscription_service.dart';
+import 'services/ad_service.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -23,6 +25,9 @@ Future<void> main() async {
     url: supabaseUrl!,
     anonKey: supabaseAnonKey!, // ignore: deprecated_member_use
   );
+
+  await SubscriptionService.initialize();
+  await AdService.initialize();
 
   runApp(const FitForgeApp());
 }
