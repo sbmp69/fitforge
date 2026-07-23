@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../../core/theme.dart';
 import '../../services/api_service.dart';
+import '../../services/subscription_service.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
 import '../../widgets/animated_mesh_background.dart';
 import 'package:flutter_animate/flutter_animate.dart';
