@@ -80,6 +80,8 @@ class _PaywallScreenState extends State<PaywallScreen> {
             _buildFeatureRow(Icons.restaurant, 'Unlimited AI Meal Plans'),
             const SizedBox(height: 20),
             _buildFeatureRow(Icons.chat_bubble, '24/7 Access to AI Fitness Coach'),
+            const SizedBox(height: 20),
+            _buildFeatureRow(Icons.block, 'Completely Ad-Free Experience'),
             const SizedBox(height: 48),
             if (_offerings != null && _offerings!.current != null)
               ..._offerings!.current!.availablePackages.map((package) {

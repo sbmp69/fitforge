@@ -1,4 +1,5 @@
 import 'dart:ui';
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:shimmer/shimmer.dart';
@@ -12,6 +13,7 @@ import '../../models/workout_plan.dart';
 import '../../services/subscription_service.dart';
 import '../../services/supabase_service.dart';
 import '../../services/notification_service.dart';
+import '../../services/ad_service.dart';
 import '../../widgets/app_card.dart';
 import '../../widgets/progress_ring.dart';
 import '../../widgets/streak_fire.dart';
@@ -33,11 +35,29 @@ class _HomeScreenState extends State<HomeScreen> {
   MealPlan? _meal;
   List<ProgressLog> _logs = [];
   bool _loading = true;
+  Timer? _adTimer;
 
   @override
   void initState() {
     super.initState();
     _load();
+    _startAdTimer();
+  }
+
+  void _startAdTimer() {
+    _adTimer = Timer.periodic(const Duration(seconds: 60), (timer) {
+      if (!SubscriptionService.isPremium) {
+        AdService.showInterstitialAd();
+      } else {
+        timer.cancel();
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    _adTimer?.cancel();
+    super.dispose();
   }
 
   Future<void> _load() async {
