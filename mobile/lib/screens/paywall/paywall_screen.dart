@@ -132,7 +132,7 @@ class _PaywallScreenState extends State<PaywallScreen> {
           color: isPopular ? AppColors.primary.withOpacity(0.1) : AppColors.navy800,
           borderRadius: BorderRadius.circular(16),
           border: Border.all(
-            color: isPopular ? AppColors.primary : AppColors.slate700,
+            color: isPopular ? AppColors.primary : AppColors.navy700,
             width: isPopular ? 2 : 1,
           ),
         ),

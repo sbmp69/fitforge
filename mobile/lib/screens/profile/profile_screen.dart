@@ -205,7 +205,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final tier = AppConstants.tierLabels[_profile?.subscriptionTier] ?? 'Free';
+    final tier = SubscriptionService.isPremium ? 'PRO' : (AppConstants.tierLabels[_profile?.subscriptionTier] ?? 'Free');
     final country = _profile?.country ?? 'India';
     
     String cur = '₹';

@@ -50,8 +50,8 @@ class SubscriptionService {
 
   static Future<bool> purchasePackage(Package package) async {
     try {
-      CustomerInfo customerInfo = await Purchases.purchasePackage(package);
-      if (customerInfo.entitlements.all['premium']?.isActive == true) {
+      final result = await Purchases.purchasePackage(package);
+      if (result.customerInfo.entitlements.all['premium']?.isActive == true) {
         _isPremium = true;
         return true;
       }

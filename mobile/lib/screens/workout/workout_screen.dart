@@ -8,7 +8,7 @@ import '../../models/workout_plan.dart';
 import '../../services/api_service.dart';
 import '../../services/supabase_service.dart';
 import '../../widgets/app_card.dart';
-import '../../widgets/primary_button.dart';
+import '../../widgets/loading_overlay.dart';
 import '../../services/ad_service.dart';
 import '../../services/subscription_service.dart';
 import 'package:flutter_animate/flutter_animate.dart';
@@ -248,7 +248,7 @@ class _WorkoutScreenState extends State<WorkoutScreen> {
             ),
         ],
       ),
-          if (_loading) const LoadingOverlay(text: 'Forging your workout... ⚡'),
+          if (_loading) LoadingOverlay(text: 'Forging your workout... ⚡'),
         ],
       ),
     );

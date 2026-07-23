@@ -135,7 +135,7 @@ class _HomeScreenState extends State<HomeScreen> {
     }
 
     final name = _profile?.fullName?.split(' ').first ?? 'Athlete';
-    final tier = AppConstants.tierLabels[_profile?.subscriptionTier] ?? 'Free';
+    final tier = SubscriptionService.isPremium ? 'PRO' : (AppConstants.tierLabels[_profile?.subscriptionTier] ?? 'Free');
     final aiLimit = AppConstants.aiPlanLimits[_profile?.subscriptionTier] ?? 10;
     final aiUsed = _profile?.aiPlansUsedThisMonth ?? 0;
     final aiLeft = aiLimit > 1000 ? '∞' : '${(aiLimit - aiUsed).clamp(0, aiLimit)}';
