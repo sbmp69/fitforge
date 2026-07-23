@@ -22,6 +22,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   final _supabase = SupabaseService();
   Profile? _profile;
   bool _notificationsEnabled = true;
+  TimeOfDay _notificationTime = const TimeOfDay(hour: 17, minute: 0);
 
   @override
   void initState() {
@@ -32,9 +33,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
   Future<void> _load() async {
     final profile = await _supabase.getProfile();
     final prefs = await SharedPreferences.getInstance();
+    final savedHour = prefs.getInt('notification_hour') ?? 17;
+    final savedMin = prefs.getInt('notification_minute') ?? 0;
+    
     if (mounted) setState(() {
       _profile = profile;
       _notificationsEnabled = prefs.getBool('notifications_enabled') ?? true;
+      _notificationTime = TimeOfDay(hour: savedHour, minute: savedMin);
     });
   }
 
@@ -205,8 +210,57 @@ class _ProfileScreenState extends State<ProfileScreen> {
     );
   }
 
+  void _scheduleDynamicNotifications() async {
+    await NotificationService().requestPermissions();
+    for (int i = 0; i < 7; i++) {
+      await NotificationService().cancel(i + 1); // clear old
+    }
+
+    final isIndia = _profile?.country == 'India' || _profile?.country == null;
+    
+    final indiaNotifs = [
+      {'title': 'Gym nahi jayega bhai? 🏋️‍♂️', 'body': 'Aaj ka workout skip mat karna! Chal uth jaa aur crush it!'},
+      {'title': 'Workout ka time ho gaya boss! ⏰', 'body': 'Pre-workout pi le aur gym nikal. Gains wait nahi karte!'},
+      {'title': 'Bhook lagi hai kya? 🍎', 'body': 'Junk food mat khana! Apne AI coach se aaj ki diet pooch le.'},
+      {'title': 'Kya haal hai champ? 🏆', 'body': 'Consistency is the key, dost! Aaj ka session complete kar.'},
+      {'title': 'So raha hai kya? 😴', 'body': 'Uth jaa aur thoda paseena baha le! Summer body banani hai na?'},
+      {'title': 'Cheat day nahi hai aaj! 🍕', 'body': 'Focus bhai focus! Apne AI workout plan ko follow kar.'},
+      {'title': 'Thak gaya kya? 💪', 'body': 'No pain, no gain! Tera AI coach wait kar raha hai.'},
+    ];
+
+    final globalNotifs = [
+      {'title': 'Missing the gym today? 🥺', 'body': 'Don\'t break your streak! Even a 20-minute home workout counts.'},
+      {'title': 'Your muscles are hungry! 🥩', 'body': 'Time to feed them some iron. Let\'s go crush today\'s workout!'},
+      {'title': 'Time to put in the work! ⚡', 'body': 'No excuses today. Grab your gear and let\'s make it happen!'},
+      {'title': 'Ready to sweat? 💦', 'body': 'Your AI coach has a killer routine waiting for you.'},
+      {'title': 'Consistency is everything 🏆', 'body': 'Show up for yourself today. You\'ll thank yourself tomorrow!'},
+      {'title': 'Don\'t skip it! 🚫', 'body': 'The only bad workout is the one that didn\'t happen.'},
+      {'title': 'Let\'s get moving! 🏃‍♂️', 'body': 'Time to hit your daily goals and log your progress!'},
+    ];
+
+    final notifs = isIndia ? indiaNotifs : globalNotifs;
+    notifs.shuffle(); // random order every time they save
+
+    for (int i = 0; i < 7; i++) {
+      // We will schedule one for each day of the week
+      // The NotificationService currently uses DateTimeComponents.time which repeats daily. 
+      // To do daily rotating, we need a slight modification to NotificationService, but for now we can just 
+      // schedule them offset by days if we modify the service. 
+      // Since we just want them to have quirky notifications, we will just pick ONE random one and set it as the daily repeating one for now.
+    }
+    
+    // Schedule one random quirky notification to repeat daily at the chosen time
+    await NotificationService().scheduleDailyReminder(
+      id: 1,
+      title: notifs[0]['title']!,
+      body: notifs[0]['body']!,
+      hour: _notificationTime.hour,
+      minute: _notificationTime.minute,
+    );
+  }
+
   @override
-  Widget build(BuildContext context) {
+  void build(BuildContext context) {
     final tier = SubscriptionService.isPremium ? 'PRO' : (AppConstants.tierLabels[_profile?.subscriptionTier] ?? 'Free');
     final country = _profile?.country ?? 'India';
     
@@ -283,28 +337,66 @@ class _ProfileScreenState extends State<ProfileScreen> {
             ),
           ),
           const SizedBox(height: 16),
-          SwitchListTile(
-            title: const Text('Daily Reminders', style: TextStyle(color: Colors.white)),
-            subtitle: const Text('Remind me to log progress at 5 PM', style: TextStyle(color: AppColors.slate400, fontSize: 12)),
-            value: _notificationsEnabled,
-            onChanged: (val) async {
-              setState(() => _notificationsEnabled = val);
-              final prefs = await SharedPreferences.getInstance();
-              await prefs.setBool('notifications_enabled', val);
-              if (val) {
-                await NotificationService().requestPermissions();
-                await NotificationService().scheduleDailyReminder(
-                  id: 1, 
-                  title: 'Time to crush it! 💪', 
-                  body: 'Don\'t forget to complete your workout today and log your progress!', 
-                  hour: 17, minute: 0,
-                );
-              } else {
-                await NotificationService().cancel(1);
-              }
-            },
-            activeColor: AppColors.primary,
+          AppCard(
+            child: Column(
+              children: [
+                SwitchListTile(
+                  contentPadding: EdgeInsets.zero,
+                  title: const Text('Daily Reminders', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+                  subtitle: Text('Get fun, Zomato-style motivation!', style: const TextStyle(color: AppColors.slate400, fontSize: 12)),
+                  value: _notificationsEnabled,
+                  onChanged: (val) async {
+                    setState(() => _notificationsEnabled = val);
+                    final prefs = await SharedPreferences.getInstance();
+                    await prefs.setBool('notifications_enabled', val);
+                    if (val) {
+                      _scheduleDynamicNotifications();
+                    } else {
+                      await NotificationService().cancel(1);
+                    }
+                  },
+                  activeColor: AppColors.primary,
+                ),
+                if (_notificationsEnabled)
+                  ListTile(
+                    contentPadding: EdgeInsets.zero,
+                    leading: const Icon(Icons.access_time, color: AppColors.primary),
+                    title: const Text('Reminder Time', style: TextStyle(color: Colors.white)),
+                    trailing: Text(_notificationTime.format(context), style: const TextStyle(color: AppColors.primary, fontWeight: FontWeight.bold)),
+                    onTap: () async {
+                      final time = await showTimePicker(
+                        context: context,
+                        initialTime: _notificationTime,
+                        builder: (context, child) {
+                          return Theme(
+                            data: ThemeData.dark().copyWith(
+                              colorScheme: const ColorScheme.dark(
+                                primary: AppColors.primary,
+                                onPrimary: Colors.black,
+                                surface: AppColors.navy800,
+                                onSurface: Colors.white,
+                              ),
+                            ),
+                            child: child!,
+                          );
+                        },
+                      );
+                      if (time != null) {
+                        setState(() => _notificationTime = time);
+                        final prefs = await SharedPreferences.getInstance();
+                        await prefs.setInt('notification_hour', time.hour);
+                        await prefs.setInt('notification_minute', time.minute);
+                        _scheduleDynamicNotifications();
+                        if (mounted) {
+                          ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Reminder set for ${time.format(context)}')));
+                        }
+                      }
+                    },
+                  ),
+              ],
+            ),
           ),
+          const SizedBox(height: 16),
           ListTile(
             leading: const Icon(Icons.chat_bubble_outline, color: AppColors.primary),
             title: const Text('AI Coach'),
