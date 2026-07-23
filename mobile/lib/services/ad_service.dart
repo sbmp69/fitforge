@@ -1,5 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'dart:async';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'subscription_service.dart';
 import '../router/app_router.dart';
@@ -11,11 +12,24 @@ class AdService {
   
   static InterstitialAd? _interstitialAd;
   static bool _isInterstitialAdReady = false;
+  static Timer? _adLoopTimer;
 
   static Future<void> initialize() async {
     if (kIsWeb) return;
     await MobileAds.instance.initialize();
     loadInterstitialAd();
+    startAdLoop();
+  }
+
+  static void startAdLoop() {
+    _adLoopTimer?.cancel();
+    _adLoopTimer = Timer.periodic(const Duration(seconds: 60), (timer) {
+      if (SubscriptionService.isPremium) {
+        timer.cancel();
+        return;
+      }
+      showInterstitialAd();
+    });
   }
 
   static void loadInterstitialAd() {

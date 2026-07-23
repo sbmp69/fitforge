@@ -395,7 +395,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 SwitchListTile(
                   contentPadding: EdgeInsets.zero,
                   title: const Text('Daily Reminders', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
-                  subtitle: Text('Get fun, Zomato-style motivation!', style: const TextStyle(color: AppColors.slate400, fontSize: 12)),
+                  subtitle: const Text('Get fun, personalized motivation!', style: TextStyle(color: AppColors.slate400, fontSize: 12)),
                   value: _notificationsEnabled,
                   onChanged: (val) async {
                     setState(() => _notificationsEnabled = val);

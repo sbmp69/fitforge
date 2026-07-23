@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'dart:convert';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../../core/theme.dart';
 import '../../services/api_service.dart';
@@ -29,6 +31,7 @@ class _CoachScreenState extends State<CoachScreen> {
 
   Future<void> _loadMessages() async {
     setState(() => _loading = true);
+    final prefs = await SharedPreferences.getInstance();
     try {
       final session = Supabase.instance.client.auth.currentSession;
       if (session == null) return;
@@ -43,8 +46,17 @@ class _CoachScreenState extends State<CoachScreen> {
         _messages.clear();
         _messages.addAll(msgs);
       });
+      await prefs.setString('cached_chat_messages', jsonEncode(_messages.map((m) => m.toJson()).toList()));
     } catch (e) {
       debugPrint(e.toString());
+      final cached = prefs.getString('cached_chat_messages');
+      if (cached != null) {
+        final List<dynamic> decoded = jsonDecode(cached);
+        if (mounted) setState(() {
+          _messages.clear();
+          _messages.addAll(decoded.map((d) => _Msg(d['role'] == 'user', d['content'])).toList());
+        });
+      }
     } finally {
       if (mounted) setState(() => _loading = false);
     }
@@ -75,6 +87,9 @@ class _CoachScreenState extends State<CoachScreen> {
       final reply = await _api.chatWithCoach(text);
       
       if (mounted) setState(() => _messages.add(_Msg(false, reply)));
+      
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setString('cached_chat_messages', jsonEncode(_messages.map((m) => m.toJson()).toList()));
     } catch (e) {
       if (mounted) setState(() => _messages.add(_Msg(false, 'Sorry, try again.')));
     } finally {
@@ -181,6 +196,7 @@ class _Msg {
   final bool isUser;
   final String text;
   _Msg(this.isUser, this.text);
+  Map<String, dynamic> toJson() => {'role': isUser ? 'user' : 'coach', 'content': text};
 }
 
 class _QuickChip extends StatelessWidget {
