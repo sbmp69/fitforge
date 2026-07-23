@@ -9,6 +9,7 @@ import '../../services/subscription_service.dart';
 import '../../services/supabase_service.dart';
 import '../../services/notification_service.dart';
 import '../../widgets/app_card.dart';
+import '../paywall/paywall_screen.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -266,8 +267,17 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 const Text('Subscription', style: TextStyle(fontWeight: FontWeight.w600, color: Colors.white)),
                 const SizedBox(height: 8),
                 _PlanRow(name: 'Free', price: '${cur}0', current: tier == 'Free'),
-                _PlanRow(name: 'Pro', price: '$cur$proPrice/mo', current: tier == 'Pro'),
-                _PlanRow(name: 'Trainer', price: '$cur$trainerPrice/mo', current: tier == 'Trainer'),
+                _PlanRow(name: 'Pro', price: '$cur$proPrice/mo', current: tier == 'PRO'),
+                if (tier == 'Free') ...[
+                  const SizedBox(height: 16),
+                  ElevatedButton(
+                    onPressed: () => Navigator.of(context).push(MaterialPageRoute(builder: (_) => const PaywallScreen())),
+                    style: ElevatedButton.styleFrom(
+                      minimumSize: const Size(double.infinity, 48),
+                    ),
+                    child: const Text('Upgrade to PRO ⚡', style: TextStyle(fontWeight: FontWeight.bold)),
+                  ),
+                ],
               ],
             ),
           ),

@@ -37,11 +37,11 @@ class _WorkoutScreenState extends State<WorkoutScreen> {
   String _goal = 'build_muscle';
   String _level = 'intermediate';
   double _days = 4;
-  final _equipment = <String>{'Dumbbells', 'Bodyweight Only'};
+  final _equipment = <String>{'Dumbbells', 'No Equipment'};
 
   static const _equipmentOptions = [
     'Dumbbells', 'Barbell', 'Resistance Bands', 'Pull-up Bar',
-    'Kettlebell', 'Cable Machine', 'Bench', 'Bodyweight Only',
+    'Kettlebell', 'Cable Machine', 'Bench', 'Bodyweight Only', 'No Equipment',
   ];
 
   @override
