@@ -13,6 +13,8 @@ import '../../services/supabase_service.dart';
 import '../../services/notification_service.dart';
 import '../../widgets/app_card.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
+import 'package:home_widget/home_widget.dart';
+import 'flex_card_screen.dart';
 
 class ProgressScreen extends StatefulWidget {
   const ProgressScreen({super.key});
@@ -71,7 +73,41 @@ class _ProgressScreenState extends State<ProgressScreen> {
     await NotificationService().cancel(1);
     
     await _load();
-    if (mounted) ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Saved!')));
+    if (mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Saved!')));
+      
+      // Calculate streak to pass to flex card
+      var streak = 0;
+      final today = DateTime.now();
+      for (var i = 0; i < 365; i++) {
+        final date = DateFormat('yyyy-MM-dd').format(today.subtract(Duration(days: i)));
+        final matches = _logs.where((l) => l.logDate == date);
+        final log = matches.isEmpty ? null : matches.first;
+        if (log?.workoutCompleted == true) {
+          streak++;
+        } else if (i > 0) {
+          break;
+        }
+      }
+      
+      final currentLog = _logs.firstWhere((l) => l.logDate == DateFormat('yyyy-MM-dd').format(today));
+      final profile = await _supabase.getProfile();
+
+      // Sync data to native Home Widget (Android)
+      try {
+        await HomeWidget.saveWidgetData<String>('water_ml', currentLog.waterMl.toString());
+        await HomeWidget.saveWidgetData<String>('streak_count', streak.toString());
+        await HomeWidget.updateWidget(name: 'FitForgeWidgetReceiver');
+      } catch (e) {
+        debugPrint('Error updating home widget: $e');
+      }
+
+      Navigator.push(context, MaterialPageRoute(builder: (_) => FlexCardScreen(
+        log: currentLog, 
+        currentStreak: streak,
+        userName: profile?.fullName?.split(' ').first ?? 'Athlete',
+      )));
+    }
   }
 
   Future<void> _getInsight() async {

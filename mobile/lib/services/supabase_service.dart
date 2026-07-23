@@ -4,6 +4,7 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:flutter/foundation.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:io';
 import '../models/meal_plan.dart';
 import '../models/profile.dart';
@@ -19,8 +20,19 @@ class SupabaseService {
   Future<Profile?> getProfile() async {
     final user = currentUser;
     if (user == null) return null;
-    final data = await client.from('profiles').select().eq('id', user.id).maybeSingle();
-    return data != null ? Profile.fromJson(data) : null;
+    final prefs = await SharedPreferences.getInstance();
+    try {
+      final data = await client.from('profiles').select().eq('id', user.id).maybeSingle();
+      if (data != null) {
+        await prefs.setString('cached_profile', jsonEncode(data));
+        return Profile.fromJson(data);
+      }
+      return null;
+    } catch (e) {
+      final cached = prefs.getString('cached_profile');
+      if (cached != null) return Profile.fromJson(jsonDecode(cached));
+      return null;
+    }
   }
 
   Future<void> updateProfileDetails({
@@ -70,41 +82,83 @@ class SupabaseService {
   Future<WorkoutPlan?> getActiveWorkoutPlan() async {
     final user = currentUser;
     if (user == null) return null;
-    final data = await client
-        .from('workout_plans')
-        .select()
-        .eq('user_id', user.id)
-        .eq('is_active', true)
-        .order('created_at', ascending: false)
-        .limit(1)
-        .maybeSingle();
-    return data != null ? WorkoutPlan.fromJson(data) : null;
+    final prefs = await SharedPreferences.getInstance();
+    
+    try {
+      final data = await client
+          .from('workout_plans')
+          .select()
+          .eq('user_id', user.id)
+          .eq('is_active', true)
+          .order('created_at', ascending: false)
+          .limit(1)
+          .maybeSingle();
+      
+      if (data != null) {
+        await prefs.setString('cached_workout_plan', jsonEncode(data));
+        return WorkoutPlan.fromJson(data);
+      }
+      return null;
+    } catch (e) {
+      final cached = prefs.getString('cached_workout_plan');
+      if (cached != null) {
+        return WorkoutPlan.fromJson(jsonDecode(cached));
+      }
+      return null;
+    }
   }
 
   Future<MealPlan?> getActiveMealPlan() async {
     final user = currentUser;
     if (user == null) return null;
-    final data = await client
-        .from('meal_plans')
-        .select()
-        .eq('user_id', user.id)
-        .eq('is_active', true)
-        .order('created_at', ascending: false)
-        .limit(1)
-        .maybeSingle();
-    return data != null ? MealPlan.fromJson(data) : null;
+    final prefs = await SharedPreferences.getInstance();
+    
+    try {
+      final data = await client
+          .from('meal_plans')
+          .select()
+          .eq('user_id', user.id)
+          .eq('is_active', true)
+          .order('created_at', ascending: false)
+          .limit(1)
+          .maybeSingle();
+          
+      if (data != null) {
+        await prefs.setString('cached_meal_plan', jsonEncode(data));
+        return MealPlan.fromJson(data);
+      }
+      return null;
+    } catch (e) {
+      final cached = prefs.getString('cached_meal_plan');
+      if (cached != null) {
+        return MealPlan.fromJson(jsonDecode(cached));
+      }
+      return null;
+    }
   }
 
   Future<List<ProgressLog>> getProgressLogs({int limit = 90}) async {
     final user = currentUser;
     if (user == null) return [];
-    final data = await client
-        .from('progress_logs')
-        .select()
-        .eq('user_id', user.id)
-        .order('log_date', ascending: false)
-        .limit(limit);
-    return (data as List).map((e) => ProgressLog.fromJson(e)).toList();
+    final prefs = await SharedPreferences.getInstance();
+    
+    try {
+      final data = await client
+          .from('progress_logs')
+          .select()
+          .eq('user_id', user.id)
+          .order('log_date', ascending: false)
+          .limit(limit);
+          
+      await prefs.setString('cached_logs', jsonEncode(data));
+      return (data as List).map((e) => ProgressLog.fromJson(e)).toList();
+    } catch (e) {
+      final cached = prefs.getString('cached_logs');
+      if (cached != null) {
+        return (jsonDecode(cached) as List).map((e) => ProgressLog.fromJson(e)).toList();
+      }
+      return [];
+    }
   }
 
   Future<void> upsertProgressLog({
@@ -198,6 +252,10 @@ class SupabaseService {
     final user = currentUser;
     if (user == null) return;
     
+    // Wipe local cache for GDPR compliance
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.clear();
+
     // Delete the user's profile which should cascade to other tables
     await client.from('profiles').delete().eq('id', user.id);
     

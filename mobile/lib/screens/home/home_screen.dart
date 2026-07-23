@@ -35,6 +35,7 @@ class _HomeScreenState extends State<HomeScreen> {
   MealPlan? _meal;
   List<ProgressLog> _logs = [];
   bool _loading = true;
+  bool _isOffline = false;
   Timer? _adTimer;
 
   @override
@@ -93,14 +94,12 @@ class _HomeScreenState extends State<HomeScreen> {
           });
         }
     } catch (e) {
-      debugPrint('Error loading home data: $e');
+      debugPrint('Error loading home data (offline): $e');
       if (mounted) {
         setState(() {
+          _isOffline = true;
           _loading = false;
         });
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Failed to load data: $e')),
-        );
       }
     }
   }
@@ -203,19 +202,57 @@ class _HomeScreenState extends State<HomeScreen> {
           child: ListView(
             padding: const EdgeInsets.fromLTRB(16, 16, 16, 140),
             children: [
+              if (_isOffline)
+                Container(
+                  margin: const EdgeInsets.only(bottom: 16),
+                  padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+                  decoration: BoxDecoration(color: Colors.orangeAccent.withValues(alpha: 0.2), borderRadius: BorderRadius.circular(12)),
+                  child: Row(
+                    children: [
+                      const Icon(Icons.wifi_off, color: Colors.orangeAccent, size: 20),
+                      const SizedBox(width: 12),
+                      const Text('Offline Mode (Showing cached data)', style: TextStyle(color: Colors.orangeAccent, fontWeight: FontWeight.bold)),
+                    ],
+                  ),
+                ).animate().fadeIn(),
+              if (_streak() > 0)
+                Container(
+                  margin: const EdgeInsets.only(bottom: 16),
+                  padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 16),
+                  decoration: BoxDecoration(
+                    gradient: const LinearGradient(colors: [Colors.orangeAccent, Colors.deepOrange]),
+                    borderRadius: BorderRadius.circular(16),
+                    boxShadow: [
+                      BoxShadow(color: Colors.orange.withValues(alpha: 0.3), blurRadius: 12, spreadRadius: 2, offset: const Offset(0, 4)),
+                    ],
+                  ),
+                  child: Row(
+                    children: [
+                      const Text('🔥', style: TextStyle(fontSize: 48)),
+                      const SizedBox(width: 16),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text('${_streak()} Day Streak!', style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Colors.white)),
+                            const Text('Keep it up! You are crushing it.', style: TextStyle(fontSize: 14, color: Colors.white70)),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ).animate().scale(delay: 200.ms, duration: 400.ms, curve: Curves.easeOutBack),
               Row(
                 children: [
-                  Expanded(child: AppCard(child: StreakFire(streak: _streak()))),
-                  const SizedBox(width: 12),
                   Expanded(child: AppCard(child: Center(child: ProgressRing(progress: _weeklyProgress(), label: 'This week')))),
+                  const SizedBox(width: 12),
+                  Expanded(child: _StatCard(title: 'Workouts', value: '${_logs.where((l) => l.workoutCompleted).take(7).length}/7', subtitle: 'this week')),
                 ],
               ),
               const SizedBox(height: 12),
               Row(
                 children: [
                   Expanded(child: _StatCard(title: 'AI Plans Left', value: aiLeft, subtitle: 'this month')),
-                  const SizedBox(width: 12),
-                  Expanded(child: _StatCard(title: 'Workouts', value: '${_logs.where((l) => l.workoutCompleted).take(7).length}/7', subtitle: 'this week')),
                 ],
               ),
               const SizedBox(height: 24),

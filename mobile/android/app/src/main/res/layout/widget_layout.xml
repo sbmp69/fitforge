@@ -1,0 +1,57 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="horizontal"
+    android:background="#0F172A"
+    android:padding="16dp">
+
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="1"
+        android:gravity="center"
+        android:orientation="vertical">
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Water"
+            android:textColor="#94A3B8"
+            android:textSize="12sp"/>
+        <TextView
+            android:id="@+id/widget_water_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="0 ml"
+            android:textColor="#FFFFFF"
+            android:textStyle="bold"
+            android:textSize="24sp"/>
+    </LinearLayout>
+
+    <View
+        android:layout_width="1dp"
+        android:layout_height="match_parent"
+        android:background="#1E293B"
+        android:layout_marginHorizontal="8dp"/>
+
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="1"
+        android:gravity="center"
+        android:orientation="vertical">
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Streak"
+            android:textColor="#94A3B8"
+            android:textSize="12sp"/>
+        <TextView
+            android:id="@+id/widget_streak_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="0 Days"
+            android:textColor="#FFFFFF"
+            android:textStyle="bold"
+            android:textSize="24sp"/>
+    </LinearLayout>
+</LinearLayout>
