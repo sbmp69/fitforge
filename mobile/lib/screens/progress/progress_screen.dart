@@ -27,6 +27,7 @@ class _ProgressScreenState extends State<ProgressScreen> {
   List<ProgressLog> _logs = [];
   bool _loading = true;
   String _insight = '';
+  int _insightsUsed = 0;
 
   final _weight = TextEditingController();
   final _water = TextEditingController(text: '2000');
@@ -41,8 +42,17 @@ class _ProgressScreenState extends State<ProgressScreen> {
 
   Future<void> _load() async {
     final logs = await _supabase.getProgressLogs();
+    final prefs = await SharedPreferences.getInstance();
+    final currentMonth = DateFormat('yyyy-MM').format(DateTime.now());
+    if (prefs.getString('insight_month') != currentMonth) {
+      await prefs.setInt('insights_used', 0);
+      await prefs.setString('insight_month', currentMonth);
+    }
+    final used = prefs.getInt('insights_used') ?? 0;
+
     if (mounted) setState(() {
       _logs = logs;
+      _insightsUsed = used;
       _loading = false;
     });
   }
@@ -85,7 +95,10 @@ class _ProgressScreenState extends State<ProgressScreen> {
     try {
       final text = await _api.getWeeklyInsight();
       await prefs.setInt('insights_used', used + 1);
-      if (mounted) setState(() => _insight = text);
+      if (mounted) setState(() {
+        _insight = text;
+        _insightsUsed = used + 1;
+      });
     } catch (e) {
       if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(e.toString())));
     }
@@ -166,7 +179,14 @@ class _ProgressScreenState extends State<ProgressScreen> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    const Text('Weekly AI Insights', style: TextStyle(fontWeight: FontWeight.w600, color: Colors.white)),
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Text('Weekly AI Insights', style: TextStyle(fontWeight: FontWeight.w600, color: Colors.white)),
+                        if (!SubscriptionService.isPremium)
+                          Text('${(5 - _insightsUsed).clamp(0, 5)} left this month', style: const TextStyle(fontSize: 11, color: AppColors.primary)),
+                      ],
+                    ),
                     TextButton(onPressed: _getInsight, child: const Text('Generate')),
                   ],
                 ),

@@ -194,6 +194,11 @@ class _WorkoutScreenState extends State<WorkoutScreen> {
                     ),
                   ),
                   const SizedBox(height: 24),
+                  if (!SubscriptionService.isPremium)
+                    Padding(
+                      padding: const EdgeInsets.only(bottom: 8),
+                      child: Text('${(5 - (_profile?.aiPlansUsedThisMonth ?? 0)).clamp(0, 5)} AI plans left this month', textAlign: TextAlign.center, style: const TextStyle(color: AppColors.slate400, fontSize: 12)),
+                    ),
                   InkWell(
                     onTap: _loading ? null : _generate,
                     borderRadius: BorderRadius.circular(12),

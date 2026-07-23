@@ -141,8 +141,16 @@ class _CoachScreenState extends State<CoachScreen> {
               ],
             ),
           ),
+          if (!SubscriptionService.isPremium)
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+              child: Align(
+                alignment: Alignment.centerRight,
+                child: Text('${(15 - _messages.where((m) => m.isUser).length).clamp(0, 15)} free messages left', style: const TextStyle(color: AppColors.primary, fontSize: 11, fontWeight: FontWeight.bold)),
+              ),
+            ),
           Padding(
-            padding: EdgeInsets.fromLTRB(12, 12, 12, MediaQuery.of(context).viewInsets.bottom > 0 ? 12 : 120),
+            padding: EdgeInsets.fromLTRB(12, 4, 12, MediaQuery.of(context).viewInsets.bottom > 0 ? 12 : 120),
             child: Row(
               children: [
                 Expanded(
