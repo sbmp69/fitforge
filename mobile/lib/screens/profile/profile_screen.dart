@@ -22,7 +22,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
   final _supabase = SupabaseService();
   Profile? _profile;
   bool _notificationsEnabled = true;
-  TimeOfDay _notificationTime = const TimeOfDay(hour: 17, minute: 0);
 
   @override
   void initState() {
@@ -33,13 +32,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
   Future<void> _load() async {
     final profile = await _supabase.getProfile();
     final prefs = await SharedPreferences.getInstance();
-    final savedHour = prefs.getInt('notification_hour') ?? 17;
-    final savedMin = prefs.getInt('notification_minute') ?? 0;
     
     if (mounted) setState(() {
       _profile = profile;
       _notificationsEnabled = prefs.getBool('notifications_enabled') ?? true;
-      _notificationTime = TimeOfDay(hour: savedHour, minute: savedMin);
     });
   }
 
@@ -212,55 +208,111 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   void _scheduleDynamicNotifications() async {
     await NotificationService().requestPermissions();
-    for (int i = 0; i < 7; i++) {
-      await NotificationService().cancel(i + 1); // clear old
+    for (int i = 1; i <= 21; i++) {
+      await NotificationService().cancel(i); // clear old 21 notifs
     }
 
     final isIndia = _profile?.country == 'India' || _profile?.country == null;
     
-    final indiaNotifs = [
-      {'title': 'Gym nahi jayega bhai? 🏋️‍♂️', 'body': 'Aaj ka workout skip mat karna! Chal uth jaa aur crush it!'},
-      {'title': 'Workout ka time ho gaya boss! ⏰', 'body': 'Pre-workout pi le aur gym nikal. Gains wait nahi karte!'},
-      {'title': 'Bhook lagi hai kya? 🍎', 'body': 'Junk food mat khana! Apne AI coach se aaj ki diet pooch le.'},
-      {'title': 'Kya haal hai champ? 🏆', 'body': 'Consistency is the key, dost! Aaj ka session complete kar.'},
-      {'title': 'So raha hai kya? 😴', 'body': 'Uth jaa aur thoda paseena baha le! Summer body banani hai na?'},
-      {'title': 'Cheat day nahi hai aaj! 🍕', 'body': 'Focus bhai focus! Apne AI workout plan ko follow kar.'},
-      {'title': 'Thak gaya kya? 💪', 'body': 'No pain, no gain! Tera AI coach wait kar raha hai.'},
+    final indiaMornings = [
+      {'title': 'Uth jaa champ! ☀️', 'body': 'Subah ho gayi hai! Aaj ka workout miss nahi karna hai.'},
+      {'title': 'Morning motivation! 🚀', 'body': 'Bistar chhod aur gym bhaag! Gains tera wait kar rahe hain.'},
+      {'title': 'Gym nahi jayega bhai? 🏋️‍♂️', 'body': 'Aaj leg day hai, skip mat karna! Chal uth jaa.'},
+      {'title': 'Good morning fitness freak! ☕', 'body': 'Pre-workout pi le aur workout shuru kar.'},
+      {'title': 'So raha hai kya? 😴', 'body': 'Uth jaa aur thoda paseena baha le! Summer body banani hai!'},
+      {'title': 'Aaj ka din tera hai! 💥', 'body': 'Uth aur apne goals ko crush kar de aaj.'},
+      {'title': 'Aalas chhod dost! 🥱', 'body': '20 min ka workout bhi tujhe aage le jayega.'},
+      {'title': 'Wake up and work out! 🔥', 'body': 'Kal jis body ki tu baat kar raha tha, wo aaj banani hai.'},
     ];
 
-    final globalNotifs = [
-      {'title': 'Missing the gym today? 🥺', 'body': 'Don\'t break your streak! Even a 20-minute home workout counts.'},
-      {'title': 'Your muscles are hungry! 🥩', 'body': 'Time to feed them some iron. Let\'s go crush today\'s workout!'},
-      {'title': 'Time to put in the work! ⚡', 'body': 'No excuses today. Grab your gear and let\'s make it happen!'},
+    final indiaLunches = [
+      {'title': 'Bhook lagi hai kya? 🍎', 'body': 'Junk food mat khana! Apne AI coach se diet pooch le.'},
+      {'title': 'Lunch time boss! 🍛', 'body': 'Protein aur veggies yaad rakhna! Calorie goal hit kar.'},
+      {'title': 'Bahar ka khana cancel! 🍔🚫', 'body': 'Ghar ka khana kha aur macros track kar.'},
+      {'title': 'Cheat day nahi hai aaj! 🍕', 'body': 'Focus bhai focus! Apne diet plan ko strictly follow kar.'},
+      {'title': 'Paani piya kya? 💧', 'body': 'Hydration is key! 3 litre ka goal poora karna hai aaj.'},
+      {'title': 'Snack time? 🥜', 'body': 'Healthy snack liyo, chips nahi!'},
+      {'title': 'Protein shake piya? 🥤', 'body': 'Muscle recovery ke liye protein zaroori hai.'},
+      {'title': 'Diet on track? 🥗', 'body': 'Bina diet ke gym bekaar hai. Sahi kha bhai!'},
+    ];
+
+    final indiaNights = [
+      {'title': 'Aaj ka progress log kiya? 🌙', 'body': 'Sone se pehle apne stats aur workout app me daal de!'},
+      {'title': 'Kya haal hai champ? 🏆', 'body': 'Consistency is the key, dost! Check-in karna mat bhoolna.'},
+      {'title': 'Din kaisa raha? 🌟', 'body': 'Apne AI coach ko bata aaj ka din kaisa tha aur water track kar.'},
+      {'title': 'Thak gaya kya? 💪', 'body': 'No pain, no gain! Tera daily log wait kar raha hai.'},
+      {'title': 'Sone ka time! 🛏️', 'body': 'Recovery utni hi zaroori hai. Progress log karke 8 ghante so jaa.'},
+      {'title': 'Streak tootni nahi chahiye! 🔥', 'body': 'Jaldi app khol aur aaj ka progress update kar de!'},
+      {'title': 'Kal ki taiyaari! 📅', 'body': 'Kal ke workout aur meals app me check kar le soney se pehle.'},
+      {'title': 'Good job today! 👏', 'body': 'Aise hi mehnat karta reh! Ab jaake progress log kar de.'},
+    ];
+
+    final globalMornings = [
+      {'title': 'Rise and grind! ☀️', 'body': 'Time to wake up and hit the gym. Let\'s get those gains!'},
+      {'title': 'Morning motivation! 🚀', 'body': 'Your muscles are hungry. Time to put in the work!'},
       {'title': 'Ready to sweat? 💦', 'body': 'Your AI coach has a killer routine waiting for you.'},
-      {'title': 'Consistency is everything 🏆', 'body': 'Show up for yourself today. You\'ll thank yourself tomorrow!'},
-      {'title': 'Don\'t skip it! 🚫', 'body': 'The only bad workout is the one that didn\'t happen.'},
-      {'title': 'Let\'s get moving! 🏃‍♂️', 'body': 'Time to hit your daily goals and log your progress!'},
+      {'title': 'Don\'t skip it! 🚫', 'body': 'The only bad workout is the one that didn\'t happen. Wake up!'},
+      {'title': 'Let\'s get moving! 🏃‍♂️', 'body': 'Start your day with a win. Get your workout done now!'},
+      {'title': 'Missing the gym today? 🥺', 'body': 'Don\'t break your streak! Even a 20-minute home workout counts.'},
+      {'title': 'Time to crush it! 💪', 'body': 'Grab your gear and let\'s make it happen!'},
     ];
 
-    final notifs = isIndia ? indiaNotifs : globalNotifs;
-    notifs.shuffle(); // random order every time they save
+    final globalLunches = [
+      {'title': 'Lunch time! 🥗', 'body': 'Remember your macros. Feed your body what it needs!'},
+      {'title': 'Feeling hungry? 🍎', 'body': 'Skip the junk. Ask your AI coach for a healthy snack idea.'},
+      {'title': 'Hydration check! 💧', 'body': 'Have you drank enough water today? Go grab a glass right now.'},
+      {'title': 'Stay on track! 🎯', 'body': 'Consistency is everything. Stick to your AI meal plan today!'},
+      {'title': 'Protein time! 🥩', 'body': 'Make sure you are hitting your protein goals for optimal recovery.'},
+      {'title': 'Mid-day check-in! ⚡', 'body': 'How are you feeling? Keep your energy up with a healthy snack.'},
+      {'title': 'Don\'t ruin your progress! 🍔🚫', 'body': 'Say no to the fast food. Stick to the plan!'},
+    ];
 
-    for (int i = 0; i < 7; i++) {
-      // We will schedule one for each day of the week
-      // The NotificationService currently uses DateTimeComponents.time which repeats daily. 
-      // To do daily rotating, we need a slight modification to NotificationService, but for now we can just 
-      // schedule them offset by days if we modify the service. 
-      // Since we just want them to have quirky notifications, we will just pick ONE random one and set it as the daily repeating one for now.
-    }
+    final globalNights = [
+      {'title': 'Log your progress! 🌙', 'body': 'Before you sleep, don\'t forget to update your stats in the app.'},
+      {'title': 'How was today? 🌟', 'body': 'Consistency is everything. Show up for yourself and log your day!'},
+      {'title': 'Time to recover! 🛏️', 'body': 'Sleep is when the gains happen. Log your day and get some rest.'},
+      {'title': 'Don\'t break your streak! 🔥', 'body': 'Keep the fire alive. Log your workout before midnight!'},
+      {'title': 'Plan for tomorrow! 📅', 'body': 'Check your AI meal and workout plan for tomorrow so you\'re ready.'},
+      {'title': 'Great work today! 👏', 'body': 'You crushed it. Log your progress and give yourself a pat on the back.'},
+      {'title': 'End the day right! 💯', 'body': 'Track your water, sleep, and workouts. Your AI coach is waiting.'},
+    ];
+
+    var mornings = isIndia ? indiaMornings : globalMornings;
+    var lunches = isIndia ? indiaLunches : globalLunches;
+    var nights = isIndia ? indiaNights : globalNights;
     
-    // Schedule one random quirky notification to repeat daily at the chosen time
-    await NotificationService().scheduleDailyReminder(
-      id: 1,
-      title: notifs[0]['title']!,
-      body: notifs[0]['body']!,
-      hour: _notificationTime.hour,
-      minute: _notificationTime.minute,
-    );
+    mornings.shuffle();
+    lunches.shuffle();
+    nights.shuffle();
+
+    int idCounter = 1;
+    for (int day = 1; day <= 7; day++) { // 1 = Monday, 7 = Sunday
+      // Morning (8:00 AM)
+      await NotificationService().scheduleWeeklyReminder(
+        id: idCounter++,
+        title: mornings[day % mornings.length]['title']!,
+        body: mornings[day % mornings.length]['body']!,
+        dayOfWeek: day, hour: 8, minute: 0,
+      );
+      // Lunch (1:00 PM)
+      await NotificationService().scheduleWeeklyReminder(
+        id: idCounter++,
+        title: lunches[day % lunches.length]['title']!,
+        body: lunches[day % lunches.length]['body']!,
+        dayOfWeek: day, hour: 13, minute: 0,
+      );
+      // Night (8:00 PM)
+      await NotificationService().scheduleWeeklyReminder(
+        id: idCounter++,
+        title: nights[day % nights.length]['title']!,
+        body: nights[day % nights.length]['body']!,
+        dayOfWeek: day, hour: 20, minute: 0,
+      );
+    }
   }
 
   @override
-  void build(BuildContext context) {
+  Widget build(BuildContext context) {
     final tier = SubscriptionService.isPremium ? 'PRO' : (AppConstants.tierLabels[_profile?.subscriptionTier] ?? 'Free');
     final country = _profile?.country ?? 'India';
     
@@ -351,48 +403,15 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     await prefs.setBool('notifications_enabled', val);
                     if (val) {
                       _scheduleDynamicNotifications();
+                      if (mounted) ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Reminders scheduled!')));
                     } else {
-                      await NotificationService().cancel(1);
+                      for (int i = 1; i <= 21; i++) {
+                        await NotificationService().cancel(i);
+                      }
                     }
                   },
                   activeColor: AppColors.primary,
                 ),
-                if (_notificationsEnabled)
-                  ListTile(
-                    contentPadding: EdgeInsets.zero,
-                    leading: const Icon(Icons.access_time, color: AppColors.primary),
-                    title: const Text('Reminder Time', style: TextStyle(color: Colors.white)),
-                    trailing: Text(_notificationTime.format(context), style: const TextStyle(color: AppColors.primary, fontWeight: FontWeight.bold)),
-                    onTap: () async {
-                      final time = await showTimePicker(
-                        context: context,
-                        initialTime: _notificationTime,
-                        builder: (context, child) {
-                          return Theme(
-                            data: ThemeData.dark().copyWith(
-                              colorScheme: const ColorScheme.dark(
-                                primary: AppColors.primary,
-                                onPrimary: Colors.black,
-                                surface: AppColors.navy800,
-                                onSurface: Colors.white,
-                              ),
-                            ),
-                            child: child!,
-                          );
-                        },
-                      );
-                      if (time != null) {
-                        setState(() => _notificationTime = time);
-                        final prefs = await SharedPreferences.getInstance();
-                        await prefs.setInt('notification_hour', time.hour);
-                        await prefs.setInt('notification_minute', time.minute);
-                        _scheduleDynamicNotifications();
-                        if (mounted) {
-                          ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Reminder set for ${time.format(context)}')));
-                        }
-                      }
-                    },
-                  ),
               ],
             ),
           ),

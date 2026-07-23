@@ -39,21 +39,13 @@ class NotificationService {
     );
   }
 
-  Future<void> scheduleDailyReminder({
+  Future<void> _scheduleZoned({
     required int id,
     required String title,
     required String body,
-    required int hour,
-    required int minute,
+    required tz.TZDateTime scheduledDate,
+    required DateTimeComponents match,
   }) async {
-    if (kIsWeb) return;
-    
-    final now = tz.TZDateTime.now(tz.local);
-    var scheduledDate = tz.TZDateTime(tz.local, now.year, now.month, now.day, hour, minute);
-    if (scheduledDate.isBefore(now)) {
-      scheduledDate = scheduledDate.add(const Duration(days: 1));
-    }
-
     const androidDetails = AndroidNotificationDetails(
       'daily_reminders',
       'Daily Reminders',
@@ -72,11 +64,54 @@ class NotificationService {
         scheduledDate: scheduledDate,
         notificationDetails: details,
         androidScheduleMode: AndroidScheduleMode.inexactAllowWhileIdle,
-        matchDateTimeComponents: DateTimeComponents.time,
+        matchDateTimeComponents: match,
       );
     } catch (e) {
       print('Failed to schedule notification: $e');
     }
+  }
+
+  Future<void> scheduleDailyReminder({
+    required int id,
+    required String title,
+    required String body,
+    required int hour,
+    required int minute,
+  }) async {
+    if (kIsWeb) return;
+    
+    final now = tz.TZDateTime.now(tz.local);
+    var scheduledDate = tz.TZDateTime(tz.local, now.year, now.month, now.day, hour, minute);
+    if (scheduledDate.isBefore(now)) {
+      scheduledDate = scheduledDate.add(const Duration(days: 1));
+    }
+
+    await _scheduleZoned(id: id, title: title, body: body, scheduledDate: scheduledDate, match: DateTimeComponents.time);
+  }
+
+  Future<void> scheduleWeeklyReminder({
+    required int id,
+    required String title,
+    required String body,
+    required int dayOfWeek, // 1 = Monday, 7 = Sunday
+    required int hour,
+    required int minute,
+  }) async {
+    if (kIsWeb) return;
+    
+    final now = tz.TZDateTime.now(tz.local);
+    var scheduledDate = tz.TZDateTime(tz.local, now.year, now.month, now.day, hour, minute);
+    
+    // Adjust to the correct day of the week
+    while (scheduledDate.weekday != dayOfWeek) {
+      scheduledDate = scheduledDate.add(const Duration(days: 1));
+    }
+    
+    if (scheduledDate.isBefore(now)) {
+      scheduledDate = scheduledDate.add(const Duration(days: 7));
+    }
+
+    await _scheduleZoned(id: id, title: title, body: body, scheduledDate: scheduledDate, match: DateTimeComponents.dayOfWeekAndTime);
   }
 
   Future<void> cancel(int id) async {
