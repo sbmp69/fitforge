@@ -8,6 +8,7 @@ import '../../services/api_service.dart';
 import '../../services/supabase_service.dart';
 import '../../services/notification_service.dart';
 import '../../widgets/app_card.dart';
+import 'package:flutter_markdown/flutter_markdown.dart';
 
 class ProgressScreen extends StatefulWidget {
   const ProgressScreen({super.key});
@@ -148,7 +149,16 @@ class _ProgressScreenState extends State<ProgressScreen> {
                   ],
                 ),
                 const SizedBox(height: 8),
-                Text(_insight.isEmpty ? 'Log progress and generate insights.' : _insight, style: const TextStyle(color: AppColors.slate300, height: 1.5)),
+                _insight.isEmpty 
+                    ? const Text('Log progress and generate insights.', style: TextStyle(color: AppColors.slate300, height: 1.5))
+                    : MarkdownBody(
+                        data: _insight,
+                        styleSheet: MarkdownStyleSheet(
+                          p: const TextStyle(color: AppColors.slate300, height: 1.5),
+                          strong: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+                          listBullet: const TextStyle(color: AppColors.slate300),
+                        ),
+                      ),
               ],
             ),
           ),
