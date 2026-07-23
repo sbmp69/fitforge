@@ -45,6 +45,7 @@ export interface DayMeals {
 export interface MealPlanData {
   days: DayMeals[];
   dailyCalorieTarget: number;
+  groceryList?: GroceryItem[];
   summary?: string;
 }
 

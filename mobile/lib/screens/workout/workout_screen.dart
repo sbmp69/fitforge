@@ -28,6 +28,7 @@ class _WorkoutScreenState extends State<WorkoutScreen> {
   final _supabase = SupabaseService();
   final _api = ApiService();
   WorkoutPlan? _plan;
+  Profile? _profile;
   bool _loading = false;
   bool _showForm = false;
   String? _error;
@@ -58,9 +59,9 @@ class _WorkoutScreenState extends State<WorkoutScreen> {
     if (mounted) {
       setState(() {
         _plan = results[0] as WorkoutPlan?;
-        final profile = results[1] as Profile?;
-        if (profile?.primaryGoal != null) _goal = profile!.primaryGoal!;
-        if (profile?.fitnessLevel != null) _level = profile!.fitnessLevel!;
+        _profile = results[1] as Profile?;
+        if (_profile?.primaryGoal != null) _goal = _profile!.primaryGoal!;
+        if (_profile?.fitnessLevel != null) _level = _profile!.fitnessLevel!;
       });
     }
   }

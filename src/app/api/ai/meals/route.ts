@@ -76,11 +76,6 @@ Include breakfast, lunch, dinner, and 1-2 snacks per day with macro breakdowns.`
       userPrompt
     );
 
-    const groceryList = await generateJSON<GroceryItem[]>(
-      GROCERY_SYSTEM_PROMPT,
-      `Generate grocery list from: ${JSON.stringify(planData)}`
-    );
-
     const { data: plan, error } = await supabase
       .from("meal_plans")
       .insert({
@@ -89,7 +84,7 @@ Include breakfast, lunch, dinner, and 1-2 snacks per day with macro breakdowns.`
         dietary_preference: dietaryPreference,
         allergies: allergies || [],
         plan_data: planData,
-        grocery_list: groceryList,
+        grocery_list: planData.groceryList || [],
       })
       .select()
       .single();
