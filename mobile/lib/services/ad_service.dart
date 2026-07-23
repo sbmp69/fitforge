@@ -3,8 +3,8 @@ import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'subscription_service.dart';
 
 class AdService {
-  // Test Interstitial Ad Unit ID for Android
-  static const String _interstitialAdUnitId = 'ca-app-pub-3940256099942544/1033173712';
+  // Production Interstitial Ad Unit ID for Android
+  static const String _interstitialAdUnitId = 'ca-app-pub-7402696944651355/8056244097';
   
   static InterstitialAd? _interstitialAd;
   static bool _isInterstitialAdReady = false;
