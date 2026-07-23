@@ -5,6 +5,10 @@ import '../../core/theme.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../models/progress_log.dart';
 import '../../services/api_service.dart';
+import '../../services/subscription_service.dart';
+import '../paywall/paywall_screen.dart';
+import 'package:flutter_animate/flutter_animate.dart';
+import '../../services/api_service.dart';
 import '../../services/supabase_service.dart';
 import '../../services/notification_service.dart';
 import '../../widgets/app_card.dart';
@@ -73,9 +77,7 @@ class _ProgressScreenState extends State<ProgressScreen> {
     int used = prefs.getInt('insights_used') ?? 0;
     
     // Allow 5 insights per month for free users
-    import '../../services/subscription_service.dart';
     if (!SubscriptionService.isPremium && used >= 5) {
-      import '../paywall/paywall_screen.dart';
       Navigator.push(context, MaterialPageRoute(builder: (_) => const PaywallScreen()));
       return;
     }
