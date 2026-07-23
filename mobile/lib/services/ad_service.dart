@@ -1,6 +1,8 @@
-import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'subscription_service.dart';
+import '../router/app_router.dart';
+import '../screens/paywall/paywall_screen.dart';
 
 class AdService {
   // Production Interstitial Ad Unit ID for Android
@@ -35,6 +37,29 @@ class AdService {
               _isInterstitialAdReady = false;
               // Preload the next ad
               loadInterstitialAd();
+
+              // Show popup
+              final ctx = AppRouter.navigatorKey.currentContext;
+              if (ctx != null) {
+                showDialog(
+                  context: ctx,
+                  builder: (context) => AlertDialog(
+                    backgroundColor: const Color(0xFF1E293B),
+                    title: const Text('Go Ad-Free! 🚀', style: TextStyle(color: Colors.white)),
+                    content: const Text('Tired of ads? Subscribe to PRO for an entirely ad-free experience with unlimited AI generations!', style: TextStyle(color: Colors.white70)),
+                    actions: [
+                      TextButton(onPressed: () => Navigator.pop(context), child: const Text('Maybe Later', style: TextStyle(color: Colors.white54))),
+                      TextButton(
+                        onPressed: () {
+                          Navigator.pop(context);
+                          Navigator.push(context, MaterialPageRoute(builder: (_) => const PaywallScreen()));
+                        },
+                        child: const Text('Upgrade Now', style: TextStyle(color: Colors.orangeAccent, fontWeight: FontWeight.bold)),
+                      ),
+                    ],
+                  ),
+                );
+              }
             },
             onAdFailedToShowFullScreenContent: (ad, error) {
               ad.dispose();

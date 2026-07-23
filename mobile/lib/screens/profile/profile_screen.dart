@@ -212,13 +212,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
     
     String cur = '₹';
     String proPrice = '299';
-    String trainerPrice = '799';
+    String proYearlyPrice = '2999';
 
-    if (country == 'United States') { cur = '\$'; proPrice = '3.99'; trainerPrice = '9.99'; }
-    else if (country == 'United Kingdom') { cur = '£'; proPrice = '3.50'; trainerPrice = '8.99'; }
-    else if (country == 'Europe') { cur = '€'; proPrice = '3.99'; trainerPrice = '9.99'; }
-    else if (country == 'Australia') { cur = 'A\$'; proPrice = '5.99'; trainerPrice = '14.99'; }
-    else if (country != 'India') { cur = '\$'; proPrice = '3.99'; trainerPrice = '9.99'; }
+    if (country == 'United States') { cur = '\$'; proPrice = '3.99'; proYearlyPrice = '39.99'; }
+    else if (country == 'United Kingdom') { cur = '£'; proPrice = '3.50'; proYearlyPrice = '34.99'; }
+    else if (country == 'Europe') { cur = '€'; proPrice = '3.99'; proYearlyPrice = '39.99'; }
+    else if (country == 'Australia') { cur = 'A\$'; proPrice = '5.99'; proYearlyPrice = '59.99'; }
+    else if (country != 'India') { cur = '\$'; proPrice = '3.99'; proYearlyPrice = '39.99'; }
 
     return Scaffold(
       appBar: AppBar(
@@ -267,7 +267,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 const Text('Subscription', style: TextStyle(fontWeight: FontWeight.w600, color: Colors.white)),
                 const SizedBox(height: 8),
                 _PlanRow(name: 'Free', price: '${cur}0', current: tier == 'Free'),
-                _PlanRow(name: 'Pro', price: '$cur$proPrice/mo', current: tier == 'PRO'),
+                _PlanRow(name: 'Pro (Monthly)', price: '$cur$proPrice/mo', current: tier == 'PRO'),
+                _PlanRow(name: 'Pro (Yearly)', price: '$cur$proYearlyPrice/yr', current: false),
                 if (tier == 'Free') ...[
                   const SizedBox(height: 16),
                   ElevatedButton(

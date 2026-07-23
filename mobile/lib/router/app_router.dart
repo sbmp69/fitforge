@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -16,8 +17,11 @@ import '../screens/shell/main_shell.dart';
 import '../screens/workout/workout_screen.dart';
 
 class AppRouter {
+  static final navigatorKey = GlobalKey<NavigatorState>();
+
   static GoRouter create() {
     return GoRouter(
+      navigatorKey: navigatorKey,
       initialLocation: '/',
       redirect: (context, state) async {
         final prefs = await SharedPreferences.getInstance();
