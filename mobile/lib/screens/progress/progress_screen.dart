@@ -2,7 +2,7 @@ import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import '../../core/theme.dart';
-import 'package:flutter_animate/flutter_animate.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../../models/progress_log.dart';
 import '../../services/api_service.dart';
 import '../../services/supabase_service.dart';
@@ -61,8 +61,28 @@ class _ProgressScreenState extends State<ProgressScreen> {
   }
 
   Future<void> _getInsight() async {
+    final prefs = await SharedPreferences.getInstance();
+    final currentMonth = DateFormat('yyyy-MM').format(DateTime.now());
+    final savedMonth = prefs.getString('insight_month');
+    
+    if (savedMonth != currentMonth) {
+      await prefs.setInt('insights_used', 0);
+      await prefs.setString('insight_month', currentMonth);
+    }
+    
+    int used = prefs.getInt('insights_used') ?? 0;
+    
+    // Allow 5 insights per month for free users
+    import '../../services/subscription_service.dart';
+    if (!SubscriptionService.isPremium && used >= 5) {
+      import '../paywall/paywall_screen.dart';
+      Navigator.push(context, MaterialPageRoute(builder: (_) => const PaywallScreen()));
+      return;
+    }
+
     try {
       final text = await _api.getWeeklyInsight();
+      await prefs.setInt('insights_used', used + 1);
       if (mounted) setState(() => _insight = text);
     } catch (e) {
       if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(e.toString())));

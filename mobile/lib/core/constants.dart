@@ -26,7 +26,7 @@ class AppConstants {
   };
 
   static const aiPlanLimits = {
-    'free': 10,
+    'free': 5,
     'pro': 999999,
     'trainer': 999999,
   };

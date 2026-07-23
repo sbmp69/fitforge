@@ -54,9 +54,9 @@ class _CoachScreenState extends State<CoachScreen> {
     final text = _controller.text.trim();
     if (text.isEmpty || _loading) return;
 
-    // Check message limit (Free users get 3 messages total)
+    // Check message limit (Free users get 15 messages total)
     final userMessageCount = _messages.where((m) => m.isUser).length;
-    if (!SubscriptionService.isPremium && userMessageCount >= 3) {
+    if (!SubscriptionService.isPremium && userMessageCount >= 15) {
       Navigator.push(
         context,
         MaterialPageRoute(builder: (_) => const PaywallScreen()),
