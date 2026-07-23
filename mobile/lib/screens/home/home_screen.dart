@@ -215,33 +215,32 @@ class _HomeScreenState extends State<HomeScreen> {
                     ],
                   ),
                 ).animate().fadeIn(),
-              if (_streak() > 0)
-                Container(
-                  margin: const EdgeInsets.only(bottom: 16),
-                  padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 16),
-                  decoration: BoxDecoration(
-                    gradient: const LinearGradient(colors: [Colors.orangeAccent, Colors.deepOrange]),
-                    borderRadius: BorderRadius.circular(16),
-                    boxShadow: [
-                      BoxShadow(color: Colors.orange.withValues(alpha: 0.3), blurRadius: 12, spreadRadius: 2, offset: const Offset(0, 4)),
-                    ],
-                  ),
-                  child: Row(
-                    children: [
-                      const Text('🔥', style: TextStyle(fontSize: 48)),
-                      const SizedBox(width: 16),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text('${_streak()} Day Streak!', style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Colors.white)),
-                            const Text('Keep it up! You are crushing it.', style: TextStyle(fontSize: 14, color: Colors.white70)),
-                          ],
-                        ),
+              Container(
+                margin: const EdgeInsets.only(bottom: 16),
+                padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 16),
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(colors: _streak() > 0 ? [Colors.orangeAccent, Colors.deepOrange] : [AppColors.navy700, AppColors.navy800]),
+                  borderRadius: BorderRadius.circular(16),
+                  boxShadow: _streak() > 0 ? [
+                    BoxShadow(color: Colors.orange.withValues(alpha: 0.3), blurRadius: 12, spreadRadius: 2, offset: const Offset(0, 4)),
+                  ] : [],
+                ),
+                child: Row(
+                  children: [
+                    Text(_streak() > 0 ? '🔥' : '🧊', style: const TextStyle(fontSize: 48)),
+                    const SizedBox(width: 16),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text('${_streak()} Day Streak!', style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: _streak() > 0 ? Colors.white : AppColors.slate300)),
+                          Text(_streak() > 0 ? 'Keep it up! You are crushing it.' : 'Log a workout today to start your streak!', style: TextStyle(fontSize: 14, color: _streak() > 0 ? Colors.white70 : AppColors.slate400)),
+                        ],
                       ),
-                    ],
-                  ),
-                ).animate().scale(delay: 200.ms, duration: 400.ms, curve: Curves.easeOutBack),
+                    ),
+                  ],
+                ),
+              ).animate().scale(delay: 200.ms, duration: 400.ms, curve: Curves.easeOutBack),
               Row(
                 children: [
                   Expanded(child: AppCard(child: Center(child: ProgressRing(progress: _weeklyProgress(), label: 'This week')))),
