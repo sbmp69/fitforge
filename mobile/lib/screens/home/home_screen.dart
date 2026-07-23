@@ -9,6 +9,7 @@ import '../../models/meal_plan.dart';
 import '../../models/profile.dart';
 import '../../models/progress_log.dart';
 import '../../models/workout_plan.dart';
+import '../../services/subscription_service.dart';
 import '../../services/supabase_service.dart';
 import '../../services/notification_service.dart';
 import '../../widgets/app_card.dart';
