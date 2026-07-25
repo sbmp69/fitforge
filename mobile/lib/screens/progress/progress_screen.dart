@@ -60,53 +60,62 @@ class _ProgressScreenState extends State<ProgressScreen> {
   }
 
   Future<void> _save() async {
-    final today = DateFormat('yyyy-MM-dd').format(DateTime.now());
-    await _supabase.upsertProgressLog(
-      logDate: today,
-      weightKg: double.tryParse(_weight.text),
-      workoutCompleted: _workoutDone,
-      waterMl: int.tryParse(_water.text) ?? 0,
-      sleepHours: double.tryParse(_sleep.text),
-    );
-    
-    // Cancel today's reminder since they logged their progress
-    await NotificationService().cancel(1);
-    
-    await _load();
-    if (mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Saved!')));
+    try {
+      final todayStr = DateFormat('yyyy-MM-dd').format(DateTime.now());
+      await _supabase.upsertProgressLog(
+        logDate: todayStr,
+        weightKg: double.tryParse(_weight.text),
+        workoutCompleted: _workoutDone,
+        waterMl: int.tryParse(_water.text) ?? 0,
+        sleepHours: double.tryParse(_sleep.text),
+      );
       
-      // Calculate streak to pass to flex card
-      var streak = 0;
-      final today = DateTime.now();
-      for (var i = 0; i < 365; i++) {
-        final date = DateFormat('yyyy-MM-dd').format(today.subtract(Duration(days: i)));
-        final matches = _logs.where((l) => l.logDate == date);
-        final log = matches.isEmpty ? null : matches.first;
-        if (log?.workoutCompleted == true) {
-          streak++;
-        } else if (i > 0) {
-          break;
-        }
-      }
-      
-      final currentLog = _logs.firstWhere((l) => l.logDate == DateFormat('yyyy-MM-dd').format(today));
-      final profile = await _supabase.getProfile();
-
-      // Sync data to native Home Widget (Android)
       try {
-        await HomeWidget.saveWidgetData<String>('water_ml', currentLog.waterMl.toString());
-        await HomeWidget.saveWidgetData<String>('streak_count', streak.toString());
-        await HomeWidget.updateWidget(name: 'FitForgeWidgetReceiver');
+        await NotificationService().cancel(1);
       } catch (e) {
-        debugPrint('Error updating home widget: $e');
+        debugPrint('Notif cancel failed: $e');
       }
+      
+      await _load();
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Saved!')));
+        
+        var streak = 0;
+        final today = DateTime.now();
+        for (var i = 0; i < 365; i++) {
+          final date = DateFormat('yyyy-MM-dd').format(today.subtract(Duration(days: i)));
+          final matches = _logs.where((l) => l.logDate == date);
+          final log = matches.isEmpty ? null : matches.first;
+          if (log?.workoutCompleted == true) {
+            streak++;
+          } else if (i > 0) {
+            break;
+          }
+        }
+        
+        final currentLogMatches = _logs.where((l) => l.logDate == todayStr);
+        if (currentLogMatches.isEmpty) {
+          throw Exception("Log not found after saving.");
+        }
+        final currentLog = currentLogMatches.first;
+        final profile = await _supabase.getProfile();
 
-      Navigator.push(context, MaterialPageRoute(builder: (_) => FlexCardScreen(
-        log: currentLog, 
-        currentStreak: streak,
-        userName: profile?.fullName?.split(' ').first ?? 'Athlete',
-      )));
+        try {
+          await HomeWidget.saveWidgetData<String>('water_ml', currentLog.waterMl.toString());
+          await HomeWidget.saveWidgetData<String>('streak_count', streak.toString());
+          await HomeWidget.updateWidget(name: 'FitForgeWidgetReceiver');
+        } catch (e) {
+          debugPrint('Error updating home widget: $e');
+        }
+
+        showDialog(context: context, builder: (_) => FlexCardScreen(
+          log: currentLog, 
+          currentStreak: streak,
+          userName: profile?.fullName?.split(' ').first ?? 'Athlete',
+        ));
+      }
+    } catch (e) {
+      if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Error saving: $e')));
     }
   }
 

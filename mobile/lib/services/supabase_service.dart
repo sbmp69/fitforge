@@ -176,7 +176,7 @@ class SupabaseService {
       'workout_completed': workoutCompleted,
       'water_ml': waterMl,
       'sleep_hours': sleepHours,
-    });
+    }, onConflict: 'user_id, log_date');
   }
 
   Future<List<Program>> getPublishedPrograms() async {

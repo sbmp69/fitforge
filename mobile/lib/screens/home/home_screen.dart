@@ -72,13 +72,7 @@ class _HomeScreenState extends State<HomeScreen> {
       
       final notifs = NotificationService();
       await notifs.requestPermissions();
-      await notifs.scheduleDailyReminder(
-        id: 1, 
-        title: 'Time to crush it! 💪', 
-        body: 'Don\'t forget to complete your workout today and log your progress!', 
-        hour: 17, // 5 PM
-        minute: 0,
-      );
+      await notifs.scheduleSmartCycling(_profile?.country);
         if (mounted) {
           final profile = results[0] as Profile?;
           if (profile != null && profile.heightCm == null) {
