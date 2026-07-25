@@ -190,7 +190,8 @@ class NotificationService {
     // First, cancel all previous notifications to prevent overlap
     await _plugin.cancelAll();
 
-    final List<String> pool = List<String>.from((country?.toLowerCase() == 'india') ? hinglishMessages : englishMessages);
+    final isIndia = country != null && country.toLowerCase().contains('india');
+    final List<String> pool = List<String>.from(isIndia ? hinglishMessages : englishMessages);
     pool.shuffle(); // Shuffle for randomness
 
     final now = tz.TZDateTime.now(tz.local);
