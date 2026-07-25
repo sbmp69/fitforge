@@ -16,6 +16,7 @@ import '../../widgets/workout_timer.dart';
 import '../paywall/paywall_screen.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import '../../widgets/ai_outage_dialog.dart';
 
 class WorkoutScreen extends StatefulWidget {
   const WorkoutScreen({super.key});
@@ -31,7 +32,6 @@ class _WorkoutScreenState extends State<WorkoutScreen> {
   Profile? _profile;
   bool _loading = false;
   bool _showForm = false;
-  String? _error;
   int? _activeRest;
   final TextEditingController _customEquipmentController = TextEditingController();
 
@@ -71,7 +71,7 @@ class _WorkoutScreenState extends State<WorkoutScreen> {
     AdService.showInterstitialAd();
     setState(() {
       _loading = true;
-      _error = null;
+      _loading = true;
     });
 
     if (!SubscriptionService.isPremium) {
@@ -115,7 +115,12 @@ class _WorkoutScreenState extends State<WorkoutScreen> {
       if (e.toString().toLowerCase().contains('limit')) {
         if (mounted) Navigator.of(context).push(MaterialPageRoute(builder: (_) => const PaywallScreen()));
       } else {
-        if (mounted) setState(() => _error = e.toString());
+        if (mounted) {
+          showDialog(
+            context: context,
+            builder: (context) => const AiOutageDialog(),
+          );
+        }
       }
     } finally {
       if (mounted) setState(() => _loading = false);
@@ -139,13 +144,6 @@ class _WorkoutScreenState extends State<WorkoutScreen> {
           ListView(
         padding: const EdgeInsets.fromLTRB(16, 16, 16, 140),
         children: [
-          if (_error != null)
-            Container(
-              padding: const EdgeInsets.all(12),
-              margin: const EdgeInsets.only(bottom: 12),
-              decoration: BoxDecoration(color: Colors.red.withValues(alpha: 0.1), borderRadius: BorderRadius.circular(12)),
-              child: Text(_error!, style: const TextStyle(color: Colors.redAccent)),
-            ),
           if (_showForm) ...[
             AppCard(
               child: Column(

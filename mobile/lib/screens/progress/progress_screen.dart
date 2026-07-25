@@ -15,6 +15,7 @@ import '../../widgets/app_card.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:home_widget/home_widget.dart';
 import 'flex_card_screen.dart';
+import '../../widgets/ai_outage_dialog.dart';
 
 class ProgressScreen extends StatefulWidget {
   const ProgressScreen({super.key});
@@ -145,7 +146,12 @@ class _ProgressScreenState extends State<ProgressScreen> {
         _insightsUsed = used + 1;
       });
     } catch (e) {
-      if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(e.toString())));
+      if (mounted) {
+        showDialog(
+          context: context,
+          builder: (context) => const AiOutageDialog(),
+        );
+      }
     }
   }
 

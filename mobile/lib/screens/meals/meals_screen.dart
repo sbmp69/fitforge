@@ -14,6 +14,7 @@ import 'package:flutter_animate/flutter_animate.dart';
 import '../../models/profile.dart';
 import '../paywall/paywall_screen.dart';
 import 'package:google_fonts/google_fonts.dart';
+import '../../widgets/ai_outage_dialog.dart';
 
 class MealsScreen extends StatefulWidget {
   const MealsScreen({super.key});
@@ -30,7 +31,6 @@ class _MealsScreenState extends State<MealsScreen> {
   int _dayIndex = 0;
   bool _loading = false;
   bool _showForm = false;
-  String? _error;
 
   String _diet = 'non_veg';
   final _allergies = TextEditingController();
@@ -81,7 +81,6 @@ class _MealsScreenState extends State<MealsScreen> {
 
     setState(() {
       _loading = true;
-      _error = null;
     });
     try {
       final data = await _api.generateMeals(
@@ -98,7 +97,12 @@ class _MealsScreenState extends State<MealsScreen> {
       if (e.toString().toLowerCase().contains('limit')) {
         if (mounted) Navigator.of(context).push(MaterialPageRoute(builder: (_) => const PaywallScreen()));
       } else {
-        if (mounted) setState(() => _error = e.toString());
+        if (mounted) {
+          showDialog(
+            context: context,
+            builder: (context) => const AiOutageDialog(),
+          );
+        }
       }
     } finally {
       if (mounted) setState(() => _loading = false);
@@ -121,13 +125,6 @@ class _MealsScreenState extends State<MealsScreen> {
           ListView(
         padding: const EdgeInsets.fromLTRB(16, 16, 16, 140),
         children: [
-          if (_error != null)
-            Container(
-              padding: const EdgeInsets.all(12),
-              margin: const EdgeInsets.only(bottom: 12),
-              decoration: BoxDecoration(color: Colors.red.withValues(alpha: 0.1), borderRadius: BorderRadius.circular(12)),
-              child: Text(_error!, style: const TextStyle(color: Colors.redAccent)),
-            ),
           if (_showForm)
             AppCard(
               child: Column(

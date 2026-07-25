@@ -9,6 +9,7 @@ import 'package:flutter_markdown/flutter_markdown.dart';
 import '../../widgets/animated_mesh_background.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import '../paywall/paywall_screen.dart';
+import '../../widgets/ai_outage_dialog.dart';
 
 class CoachScreen extends StatefulWidget {
   const CoachScreen({super.key});
@@ -91,7 +92,12 @@ class _CoachScreenState extends State<CoachScreen> {
       final prefs = await SharedPreferences.getInstance();
       await prefs.setString('cached_chat_messages', jsonEncode(_messages.map((m) => m.toJson()).toList()));
     } catch (e) {
-      if (mounted) setState(() => _messages.add(_Msg(false, 'Sorry, try again.')));
+      if (mounted) {
+        showDialog(
+          context: context,
+          builder: (context) => const AiOutageDialog(),
+        );
+      }
     } finally {
       if (mounted) setState(() => _loading = false);
     }
