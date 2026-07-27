@@ -150,9 +150,9 @@ class _HomeScreenState extends State<HomeScreen> {
 
     final name = _profile?.fullName?.split(' ').first ?? 'Athlete';
     final tier = SubscriptionService.isPremium ? 'PRO' : (AppConstants.tierLabels[_profile?.subscriptionTier] ?? 'Free');
-    final aiLimit = SubscriptionService.isPremium ? 999999 : (AppConstants.aiPlanLimits[_profile?.subscriptionTier] ?? 5);
-    final aiUsed = _profile?.aiPlansUsedThisMonth ?? 0;
-    final aiLeft = aiLimit > 1000 ? '∞' : '${(aiLimit - aiUsed).clamp(0, aiLimit)}';
+    final todayStr = DateFormat('yyyy-MM-dd').format(DateTime.now());
+    final todayLogMatches = _logs.where((l) => l.logDate == todayStr);
+    final todayLog = todayLogMatches.isEmpty ? null : todayLogMatches.first;
 
     return Scaffold(
       appBar: AppBar(
@@ -245,7 +245,9 @@ class _HomeScreenState extends State<HomeScreen> {
               const SizedBox(height: 12),
               Row(
                 children: [
-                  Expanded(child: _StatCard(title: 'AI Plans Left', value: aiLeft, subtitle: 'this month')),
+                  Expanded(child: _StatCard(title: 'Water Today', value: '${todayLog?.waterMl ?? 0} ml', subtitle: 'stay hydrated')),
+                  const SizedBox(width: 12),
+                  Expanded(child: _StatCard(title: 'Sleep', value: '${todayLog?.sleepHours?.toStringAsFixed(1) ?? "0"} hrs', subtitle: 'last night')),
                 ],
               ),
               const SizedBox(height: 24),

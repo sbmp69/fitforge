@@ -1,9 +1,10 @@
 import 'package:flutter/foundation.dart';
 import 'package:purchases_flutter/purchases_flutter.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 class SubscriptionService {
-  // TODO: Replace with your actual RevenueCat Public App-Specific API Key
-  static const String _revenueCatApiKey = 'goog_XXXXXXXXXXXXXXXXXXXXXXXXX';
+  // The key is loaded from the .env file for security
+  static String get _revenueCatApiKey => dotenv.env['REVENUECAT_API_KEY_ANDROID'] ?? '';
 
   static bool _isPremium = false;
   static bool get isPremium => _isPremium;

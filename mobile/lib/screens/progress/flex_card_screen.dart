@@ -121,7 +121,7 @@ class _FlexCardScreenState extends State<FlexCardScreen> {
                             ),
                             const Spacer(),
                             const Center(
-                              child: Text('Get the app at FitForge.ai', style: TextStyle(fontSize: 11, color: AppColors.slate400)),
+                              child: Text("Search 'FitForge' on Google Play", style: TextStyle(fontSize: 11, color: AppColors.slate400)),
                             ),
                           ],
                         ),
