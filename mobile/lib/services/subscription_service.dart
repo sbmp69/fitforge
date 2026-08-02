@@ -61,4 +61,17 @@ class SubscriptionService {
     }
     return false;
   }
+
+  static Future<bool> restorePurchases() async {
+    try {
+      final customerInfo = await Purchases.restorePurchases();
+      if (customerInfo.entitlements.all['premium']?.isActive == true) {
+        _isPremium = true;
+        return true;
+      }
+    } catch (e) {
+      debugPrint('Failed to restore purchases: $e');
+    }
+    return false;
+  }
 }

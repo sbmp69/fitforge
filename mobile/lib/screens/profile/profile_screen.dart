@@ -10,6 +10,7 @@ import '../../services/supabase_service.dart';
 import '../../services/notification_service.dart';
 import '../../widgets/app_card.dart';
 import '../paywall/paywall_screen.dart';
+import '../../services/ad_service.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -26,7 +27,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
   @override
   void initState() {
     super.initState();
+    AdService.suppressAds = true;
     _load();
+  }
+
+  @override
+  void dispose() {
+    AdService.suppressAds = false;
+    super.dispose();
   }
 
   Future<void> _load() async {

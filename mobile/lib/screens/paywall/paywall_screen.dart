@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:purchases_flutter/purchases_flutter.dart';
 import '../../core/theme.dart';
 import '../../services/subscription_service.dart';
+import '../../services/ad_service.dart';
 
 class PaywallScreen extends StatefulWidget {
   const PaywallScreen({super.key});
@@ -17,7 +18,14 @@ class _PaywallScreenState extends State<PaywallScreen> {
   @override
   void initState() {
     super.initState();
+    AdService.suppressAds = true;
     _fetchOfferings();
+  }
+
+  @override
+  void dispose() {
+    AdService.suppressAds = false;
+    super.dispose();
   }
 
   Future<void> _fetchOfferings() async {
@@ -43,6 +51,24 @@ class _PaywallScreenState extends State<PaywallScreen> {
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Purchase failed or cancelled.'), backgroundColor: Colors.red),
+        );
+      }
+    }
+  }
+
+  Future<void> _restorePurchases() async {
+    setState(() => _isLoading = true);
+    final success = await SubscriptionService.restorePurchases();
+    if (mounted) {
+      setState(() => _isLoading = false);
+      if (success) {
+        Navigator.of(context).pop(); 
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Purchases restored successfully! Welcome back to PRO.'), backgroundColor: AppColors.primary),
+        );
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('No active subscriptions found to restore.'), backgroundColor: Colors.red),
         );
       }
     }
@@ -98,6 +124,16 @@ class _PaywallScreenState extends State<PaywallScreen> {
               }).toList()
             else
               const Text('No subscription packages available right now.', textAlign: TextAlign.center, style: TextStyle(color: Colors.white)),
+              
+            const SizedBox(height: 24),
+            TextButton(
+              onPressed: _restorePurchases,
+              child: const Text(
+                'Restore Purchases',
+                style: TextStyle(color: Colors.white70, decoration: TextDecoration.underline),
+              ),
+            ),
+            const SizedBox(height: 24),
           ],
         ),
       ),
@@ -126,6 +162,10 @@ class _PaywallScreenState extends State<PaywallScreen> {
     required bool isPopular,
     required VoidCallback onTap,
   }) {
+    // Google Play appends the app name in parentheses, e.g., "Monthly (FitForge: AI Fitness & Diet)"
+    // Let's strip out anything inside parentheses for a cleaner UI.
+    String cleanTitle = title.replaceAll(RegExp(r'\s*\(.*?\)'), '');
+
     return GestureDetector(
       onTap: onTap,
       child: Container(
@@ -141,20 +181,29 @@ class _PaywallScreenState extends State<PaywallScreen> {
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  title,
-                  style: TextStyle(color: isPopular ? AppColors.primary : Colors.white, fontSize: 18, fontWeight: FontWeight.bold),
-                ),
-                if (isPopular)
-                  const Padding(
-                    padding: EdgeInsets.only(top: 4.0),
-                    child: Text('BEST VALUE', style: TextStyle(color: AppColors.primary, fontSize: 12, fontWeight: FontWeight.w800, letterSpacing: 1.2)),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    cleanTitle,
+                    style: TextStyle(
+                      color: isPopular ? AppColors.primary : Colors.white, 
+                      fontSize: 18, 
+                      fontWeight: FontWeight.bold
+                    ),
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
                   ),
-              ],
+                  if (isPopular)
+                    const Padding(
+                      padding: EdgeInsets.only(top: 4.0),
+                      child: Text('BEST VALUE', style: TextStyle(color: AppColors.primary, fontSize: 12, fontWeight: FontWeight.w800, letterSpacing: 1.2)),
+                    ),
+                ],
+              ),
             ),
+            const SizedBox(width: 16),
             Text(price, style: const TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold)),
           ],
         ),

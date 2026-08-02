@@ -13,6 +13,9 @@ class AdService {
   static InterstitialAd? _interstitialAd;
   static bool _isInterstitialAdReady = false;
   static Timer? _adLoopTimer;
+  
+  // Flag to temporarily suppress ads (e.g. when on Paywall or Profile screen)
+  static bool suppressAds = false;
 
   static Future<void> initialize() async {
     if (kIsWeb) return;
@@ -28,6 +31,10 @@ class AdService {
         timer.cancel();
         return;
       }
+      
+      // Do not show ad if currently suppressed by a screen
+      if (suppressAds) return;
+
       showInterstitialAd();
     });
   }
