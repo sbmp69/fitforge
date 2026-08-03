@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:shimmer/shimmer.dart';
 import 'package:intl/intl.dart';
+import 'package:upgrader/upgrader.dart';
 import '../../core/constants.dart';
 import '../../core/theme.dart';
 import '../../models/meal_plan.dart';
@@ -46,7 +47,7 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   void _startAdTimer() {
-    _adTimer = Timer.periodic(const Duration(seconds: 60), (timer) {
+    _adTimer = Timer.periodic(const Duration(seconds: 150), (timer) {
       if (!SubscriptionService.isPremium) {
         AdService.showInterstitialAd();
       } else {
@@ -62,6 +63,8 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Future<void> _load() async {
+    if (!mounted) return;
+    
     try {
       final results = await Future.wait([
         _supabase.getProfile(),
@@ -154,7 +157,9 @@ class _HomeScreenState extends State<HomeScreen> {
     final todayLogMatches = _logs.where((l) => l.logDate == todayStr);
     final todayLog = todayLogMatches.isEmpty ? null : todayLogMatches.first;
 
-    return Scaffold(
+    return UpgradeAlert(
+      upgrader: Upgrader(),
+      child: Scaffold(
       appBar: AppBar(
         title: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -297,6 +302,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 ).animate().fadeIn(duration: 400.ms, delay: 100.ms).slideY(begin: 0.1, curve: Curves.easeOut),
             ],
           ),
+        ),
         ),
       ),
     );

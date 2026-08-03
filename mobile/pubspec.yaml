@@ -33,6 +33,7 @@ dependencies:
   screenshot: ^3.0.0
   home_widget: ^0.9.3
   flutter_timezone: ^5.1.0
+  upgrader: ^13.6.0
 
 dev_dependencies:
   flutter_test:

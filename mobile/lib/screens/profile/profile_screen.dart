@@ -97,8 +97,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
     final nameCtrl = TextEditingController(text: _profile!.fullName);
     final goalCtrl = TextEditingController(text: _profile!.primaryGoal);
     final levelCtrl = TextEditingController(text: _profile!.fitnessLevel);
-    final countryCtrl = TextEditingController(text: _profile!.country ?? 'India');
-    final mealCtrl = TextEditingController(text: _profile!.mealPreference ?? 'Indian');
+    String country = _profile!.country ?? 'India';
+    if (!AppConstants.allCountries.contains(country)) country = AppConstants.allCountries.first;
+    String meal = _profile!.mealPreference ?? 'Indian';
+    if (!AppConstants.popularCuisines.contains(meal)) meal = AppConstants.popularCuisines.first;
+    double heightCm = (_profile!.heightCm ?? 175).toDouble();
+    double weightKg = _profile!.weightKg ?? 70.0;
+    DateTime? dateOfBirth = _profile!.dateOfBirth;
+    String gender = _profile!.gender ?? 'Male';
     bool saving = false;
 
     List<String> goals = ['Weight Loss', 'Muscle Gain', 'Endurance', 'General Fitness'];
@@ -138,46 +144,65 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   onChanged: (val) => levelCtrl.text = val!,
                 ),
                 const SizedBox(height: 16),
-                Autocomplete<String>(
-                  initialValue: TextEditingValue(text: countryCtrl.text),
-                  optionsBuilder: (TextEditingValue val) {
-                    if (val.text.isEmpty) return AppConstants.allCountries;
-                    return AppConstants.allCountries.where((option) => option.toLowerCase().contains(val.text.toLowerCase()));
-                  },
-                  onSelected: (selection) => countryCtrl.text = selection,
-                  fieldViewBuilder: (context, controller, focusNode, onFieldSubmitted) {
-                    return TextFormField(
-                      controller: controller,
-                      focusNode: focusNode,
-                      decoration: const InputDecoration(
-                        labelText: 'Country',
-                        hintText: 'Search your country...',
-                        suffixIcon: Icon(Icons.search, color: AppColors.slate400),
-                      ),
-                      onChanged: (v) => countryCtrl.text = v,
+                Text('Height: ${heightCm.round()} cm', style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.white)),
+                Slider(
+                  value: heightCm,
+                  min: 140,
+                  max: 220,
+                  divisions: 80,
+                  onChanged: (v) => setModalState(() => heightCm = v),
+                ),
+                const SizedBox(height: 16),
+                Text('Weight: ${weightKg.toStringAsFixed(1)} kg', style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.white)),
+                Slider(
+                  value: weightKg,
+                  min: 40,
+                  max: 150,
+                  divisions: 220,
+                  onChanged: (v) => setModalState(() => weightKg = v),
+                ),
+                const SizedBox(height: 16),
+                DropdownButtonFormField<String>(
+                  value: country,
+                  isExpanded: true,
+                  decoration: const InputDecoration(labelText: 'Country'),
+                  items: AppConstants.allCountries.map((e) => DropdownMenuItem(value: e, child: Text(e, overflow: TextOverflow.ellipsis))).toList(),
+                  onChanged: (v) => setModalState(() => country = v!),
+                ),
+                const SizedBox(height: 16),
+                DropdownButtonFormField<String>(
+                  value: meal,
+                  isExpanded: true,
+                  decoration: const InputDecoration(labelText: 'Meal Preference / Cuisine'),
+                  items: AppConstants.popularCuisines.map((e) => DropdownMenuItem(value: e, child: Text(e, overflow: TextOverflow.ellipsis))).toList(),
+                  onChanged: (v) => setModalState(() => meal = v!),
+                ),
+                const SizedBox(height: 16),
+                ListTile(
+                  contentPadding: EdgeInsets.zero,
+                  title: const Text('Date of Birth', style: TextStyle(color: Colors.white, fontSize: 16)),
+                  subtitle: Text(
+                    dateOfBirth == null ? 'Select your birthday' : '${dateOfBirth!.year}-${dateOfBirth!.month.toString().padLeft(2, '0')}-${dateOfBirth!.day.toString().padLeft(2, '0')}',
+                    style: TextStyle(color: dateOfBirth == null ? AppColors.slate400 : AppColors.primary),
+                  ),
+                  trailing: const Icon(Icons.calendar_today, color: AppColors.slate400),
+                  onTap: () async {
+                    final date = await showDatePicker(
+                      context: context,
+                      initialDate: dateOfBirth ?? DateTime(2000, 1, 1),
+                      firstDate: DateTime(1920),
+                      lastDate: DateTime.now(),
                     );
+                    if (date != null) setModalState(() => dateOfBirth = date);
                   },
                 ),
                 const SizedBox(height: 16),
-                Autocomplete<String>(
-                  initialValue: TextEditingValue(text: mealCtrl.text),
-                  optionsBuilder: (TextEditingValue val) {
-                    if (val.text.isEmpty) return AppConstants.popularCuisines;
-                    return AppConstants.popularCuisines.where((option) => option.toLowerCase().contains(val.text.toLowerCase()));
-                  },
-                  onSelected: (selection) => mealCtrl.text = selection,
-                  fieldViewBuilder: (context, controller, focusNode, onFieldSubmitted) {
-                    return TextFormField(
-                      controller: controller,
-                      focusNode: focusNode,
-                      decoration: const InputDecoration(
-                        labelText: 'Meal Preference / Cuisine',
-                        hintText: 'Type any cuisine (e.g. Vegan Keto, Indian)',
-                        suffixIcon: Icon(Icons.edit, color: AppColors.slate400),
-                      ),
-                      onChanged: (v) => mealCtrl.text = v,
-                    );
-                  },
+                DropdownButtonFormField<String>(
+                  value: gender,
+                  isExpanded: true,
+                  decoration: const InputDecoration(labelText: 'Gender'),
+                  items: ['Male', 'Female', 'Other'].map((e) => DropdownMenuItem(value: e, child: Text(e))).toList(),
+                  onChanged: (v) => setModalState(() => gender = v!),
                 ),
                 const SizedBox(height: 24),
                 ElevatedButton(
@@ -189,8 +214,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         fullName: nameCtrl.text.trim(),
                         goal: goalCtrl.text,
                         level: levelCtrl.text,
-                        country: countryCtrl.text,
-                        mealPreference: mealCtrl.text,
+                        country: country,
+                        mealPreference: meal,
+                        heightCm: heightCm.round(),
+                        weightKg: weightKg,
+                        dateOfBirth: dateOfBirth,
+                        gender: gender,
                       );
                       await _load();
                       if (context.mounted) Navigator.pop(context);
@@ -383,16 +412,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 _PlanRow(name: 'Free', price: '${cur}0', current: tier == 'Free'),
                 _PlanRow(name: 'Pro (Monthly)', price: '$cur$proPrice/mo', current: tier == 'PRO'),
                 _PlanRow(name: 'Pro (Yearly)', price: '$cur$proYearlyPrice/yr', current: false),
-                if (tier == 'Free') ...[
-                  const SizedBox(height: 16),
-                  ElevatedButton(
-                    onPressed: () => Navigator.of(context).push(MaterialPageRoute(builder: (_) => const PaywallScreen())),
-                    style: ElevatedButton.styleFrom(
-                      minimumSize: const Size(double.infinity, 48),
-                    ),
-                    child: const Text('Upgrade to PRO ⚡', style: TextStyle(fontWeight: FontWeight.bold)),
+                const SizedBox(height: 16),
+                ElevatedButton(
+                  onPressed: () => Navigator.of(context).push(MaterialPageRoute(builder: (_) => const PaywallScreen())),
+                  style: ElevatedButton.styleFrom(
+                    minimumSize: const Size(double.infinity, 48),
                   ),
-                ],
+                  child: Text(tier == 'Free' ? 'Upgrade to PRO ⚡' : 'Change Plan ⚡', style: const TextStyle(fontWeight: FontWeight.bold)),
+                ),
               ],
             ),
           ),

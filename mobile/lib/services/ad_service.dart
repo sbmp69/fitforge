@@ -10,6 +10,9 @@ class AdService {
   // Production Interstitial Ad Unit ID for Android
   static const String _interstitialAdUnitId = 'ca-app-pub-7402696944651355/8056244097';
   
+  // Test Banner Ad Unit ID
+  static const String _bannerAdUnitId = 'ca-app-pub-3940256099942544/6300978111';
+  
   static InterstitialAd? _interstitialAd;
   static bool _isInterstitialAdReady = false;
   static Timer? _adLoopTimer;
@@ -26,7 +29,7 @@ class AdService {
 
   static void startAdLoop() {
     _adLoopTimer?.cancel();
-    _adLoopTimer = Timer.periodic(const Duration(seconds: 60), (timer) {
+    _adLoopTimer = Timer.periodic(const Duration(seconds: 120), (timer) {
       if (SubscriptionService.isPremium) {
         timer.cancel();
         return;
@@ -104,5 +107,21 @@ class AdService {
       _interstitialAd = null;
       _isInterstitialAdReady = false;
     }
+  }
+
+  static BannerAd? loadBannerAd({required Function(Ad) onLoaded, required Function(Ad, LoadAdError) onFailed}) {
+    if (kIsWeb || SubscriptionService.isPremium) return null;
+
+    final bannerAd = BannerAd(
+      adUnitId: _bannerAdUnitId,
+      size: AdSize.banner,
+      request: const AdRequest(),
+      listener: BannerAdListener(
+        onAdLoaded: onLoaded,
+        onAdFailedToLoad: onFailed,
+      ),
+    );
+    bannerAd.load();
+    return bannerAd;
   }
 }

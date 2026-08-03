@@ -11,6 +11,7 @@ import '../models/profile.dart';
 import '../models/program.dart';
 import '../models/progress_log.dart';
 import '../models/workout_plan.dart';
+import 'subscription_service.dart';
 
 class SupabaseService {
   final client = Supabase.instance.client;
@@ -41,6 +42,10 @@ class SupabaseService {
     required String level,
     String? country,
     String? mealPreference,
+    int? heightCm,
+    double? weightKg,
+    DateTime? dateOfBirth,
+    String? gender,
   }) async {
     final user = currentUser;
     if (user == null) return;
@@ -55,6 +60,10 @@ class SupabaseService {
     };
     if (country != null) updateData['country'] = country;
     if (mealPreference != null) updateData['meal_preference'] = mealPreference;
+    if (heightCm != null) updateData['height_cm'] = heightCm;
+    if (weightKg != null) updateData['weight_kg'] = weightKg;
+    if (dateOfBirth != null) updateData['date_of_birth'] = dateOfBirth.toIso8601String().split('T')[0];
+    if (gender != null) updateData['gender'] = gender;
 
     await client.from('profiles').update(updateData).eq('id', user.id);
   }
@@ -66,6 +75,8 @@ class SupabaseService {
     required String level,
     required String country,
     required String mealPreference,
+    required DateTime dateOfBirth,
+    required String gender,
   }) async {
     final user = currentUser;
     if (user == null) return;
@@ -76,6 +87,8 @@ class SupabaseService {
       'fitness_level': level,
       'country': country,
       'meal_preference': mealPreference,
+      'date_of_birth': dateOfBirth.toIso8601String().split('T')[0],
+      'gender': gender,
     }).eq('id', user.id);
   }
 
@@ -189,7 +202,10 @@ class SupabaseService {
   }
 
   Future<void> signIn(String email, String password) async {
-    await client.auth.signInWithPassword(email: email, password: password);
+    final res = await client.auth.signInWithPassword(email: email, password: password);
+    if (res.user != null) {
+      await SubscriptionService.logIn(res.user!.id);
+    }
   }
 
   Future<void> signUp(String email, String password, String fullName, String role) async {
@@ -211,7 +227,10 @@ class SupabaseService {
     }
 
     // Login after successful creation
-    await client.auth.signInWithPassword(email: email, password: password);
+    final res = await client.auth.signInWithPassword(email: email, password: password);
+    if (res.user != null) {
+      await SubscriptionService.logIn(res.user!.id);
+    }
   }
 
   Future<void> signInWithGoogle() async {
@@ -242,10 +261,13 @@ class SupabaseService {
 
     if (idToken == null) throw 'No ID Token found.';
 
-    await client.auth.signInWithIdToken(
+    final res = await client.auth.signInWithIdToken(
       provider: OAuthProvider.google,
       idToken: idToken,
     );
+    if (res.user != null) {
+      await SubscriptionService.logIn(res.user!.id);
+    }
   }
 
   Future<void> deleteAccount() async {
@@ -260,8 +282,12 @@ class SupabaseService {
     await client.from('profiles').delete().eq('id', user.id);
     
     // Log the user out of the app locally
+    await SubscriptionService.logOut();
     await client.auth.signOut();
   }
 
-  Future<void> signOut() => client.auth.signOut();
+  Future<void> signOut() async {
+    await SubscriptionService.logOut();
+    return client.auth.signOut();
+  }
 }

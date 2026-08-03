@@ -23,6 +23,8 @@ class _PhysiqueOnboardingScreenState extends State<PhysiqueOnboardingScreen> {
   String _fitnessLevel = 'intermediate';
   String _country = 'India';
   String _mealPreference = 'Indian';
+  DateTime? _dateOfBirth;
+  String _gender = 'Male';
 
   Future<void> _submit() async {
     setState(() {
@@ -37,6 +39,8 @@ class _PhysiqueOnboardingScreenState extends State<PhysiqueOnboardingScreen> {
         level: _fitnessLevel,
         country: _country,
         mealPreference: _mealPreference,
+        dateOfBirth: _dateOfBirth ?? DateTime(2000, 1, 1),
+        gender: _gender,
       );
       if (mounted) context.go('/home');
     } catch (e) {
@@ -104,50 +108,51 @@ class _PhysiqueOnboardingScreenState extends State<PhysiqueOnboardingScreen> {
                 onChanged: (v) => setState(() => _fitnessLevel = v!),
               ),
               const SizedBox(height: 16),
-              Autocomplete<String>(
-                initialValue: TextEditingValue(text: _country),
-                optionsBuilder: (TextEditingValue val) {
-                  if (val.text.isEmpty) return AppConstants.allCountries;
-                  return AppConstants.allCountries.where((option) => option.toLowerCase().contains(val.text.toLowerCase()));
-                },
-                onSelected: (selection) => setState(() => _country = selection),
-                fieldViewBuilder: (context, controller, focusNode, onFieldSubmitted) {
-                  return TextFormField(
-                    controller: controller,
-                    focusNode: focusNode,
-                    decoration: const InputDecoration(
-                      labelText: 'Country',
-                      hintText: 'Search your country...',
-                      suffixIcon: Icon(Icons.search, color: AppColors.slate400),
-                    ),
-                    onChanged: (v) => setState(() => _country = v),
+              DropdownButtonFormField<String>(
+                value: AppConstants.allCountries.contains(_country) ? _country : AppConstants.allCountries.first,
+                isExpanded: true,
+                decoration: const InputDecoration(labelText: 'Country'),
+                items: AppConstants.allCountries.map((e) => DropdownMenuItem(value: e, child: Text(e, overflow: TextOverflow.ellipsis))).toList(),
+                onChanged: (v) => setState(() => _country = v!),
+              ),
+              const SizedBox(height: 16),
+              DropdownButtonFormField<String>(
+                value: AppConstants.popularCuisines.contains(_mealPreference) ? _mealPreference : AppConstants.popularCuisines.first,
+                isExpanded: true,
+                decoration: const InputDecoration(labelText: 'Meal Preference / Cuisine'),
+                items: AppConstants.popularCuisines.map((e) => DropdownMenuItem(value: e, child: Text(e, overflow: TextOverflow.ellipsis))).toList(),
+                onChanged: (v) => setState(() => _mealPreference = v!),
+              ),
+              const SizedBox(height: 16),
+              ListTile(
+                contentPadding: EdgeInsets.zero,
+                title: const Text('Date of Birth', style: TextStyle(color: Colors.white, fontSize: 16)),
+                subtitle: Text(
+                  _dateOfBirth == null ? 'Select your birthday' : '${_dateOfBirth!.year}-${_dateOfBirth!.month.toString().padLeft(2, '0')}-${_dateOfBirth!.day.toString().padLeft(2, '0')}',
+                  style: TextStyle(color: _dateOfBirth == null ? AppColors.slate400 : AppColors.primary),
+                ),
+                trailing: const Icon(Icons.calendar_today, color: AppColors.slate400),
+                onTap: () async {
+                  final date = await showDatePicker(
+                    context: context,
+                    initialDate: _dateOfBirth ?? DateTime(2000, 1, 1),
+                    firstDate: DateTime(1920),
+                    lastDate: DateTime.now(),
                   );
+                  if (date != null) setState(() => _dateOfBirth = date);
                 },
               ),
               const SizedBox(height: 16),
-              Autocomplete<String>(
-                initialValue: TextEditingValue(text: _mealPreference),
-                optionsBuilder: (TextEditingValue val) {
-                  if (val.text.isEmpty) return AppConstants.popularCuisines;
-                  return AppConstants.popularCuisines.where((option) => option.toLowerCase().contains(val.text.toLowerCase()));
-                },
-                onSelected: (selection) => setState(() => _mealPreference = selection),
-                fieldViewBuilder: (context, controller, focusNode, onFieldSubmitted) {
-                  return TextFormField(
-                    controller: controller,
-                    focusNode: focusNode,
-                    decoration: const InputDecoration(
-                      labelText: 'Meal Preference / Cuisine',
-                      hintText: 'Type any cuisine (e.g. Vegan Keto, Indian)',
-                      suffixIcon: Icon(Icons.edit, color: AppColors.slate400),
-                    ),
-                    onChanged: (v) => setState(() => _mealPreference = v),
-                  );
-                },
+              DropdownButtonFormField<String>(
+                value: _gender,
+                isExpanded: true,
+                decoration: const InputDecoration(labelText: 'Gender'),
+                items: ['Male', 'Female', 'Other'].map((e) => DropdownMenuItem(value: e, child: Text(e))).toList(),
+                onChanged: (v) => setState(() => _gender = v!),
               ),
               const SizedBox(height: 32),
               ElevatedButton(
-                onPressed: _loading ? null : _submit,
+                onPressed: _loading || _dateOfBirth == null ? null : _submit,
                 child: _loading ? const CircularProgressIndicator() : const Text('Continue to App'),
               ),
             ],

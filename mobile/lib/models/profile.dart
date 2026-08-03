@@ -14,6 +14,8 @@ class Profile {
   final String? fitnessLevel;
   final String? country;
   final String? mealPreference;
+  final DateTime? dateOfBirth;
+  final String? gender;
 
   const Profile({
     required this.id,
@@ -31,6 +33,8 @@ class Profile {
     this.fitnessLevel,
     this.country,
     this.mealPreference,
+    this.dateOfBirth,
+    this.gender,
   });
 
   factory Profile.fromJson(Map<String, dynamic> json) => Profile(
@@ -49,5 +53,7 @@ class Profile {
         fitnessLevel: json['fitness_level'] as String?,
         country: json['country'] as String?,
         mealPreference: json['meal_preference'] as String?,
+        dateOfBirth: json['date_of_birth'] != null ? DateTime.tryParse(json['date_of_birth'] as String) : null,
+        gender: json['gender'] as String?,
       );
 }

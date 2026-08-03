@@ -1,6 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:purchases_flutter/purchases_flutter.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 class SubscriptionService {
   // The key is loaded from the .env file for security
@@ -19,9 +20,32 @@ class SubscriptionService {
         await Purchases.configure(configuration);
       }
       
+      final currentUserId = Supabase.instance.client.auth.currentUser?.id;
+      if (currentUserId != null) {
+        await Purchases.logIn(currentUserId);
+      }
+      
       await updatePremiumStatus();
     } catch (e) {
       debugPrint('Failed to initialize RevenueCat: $e');
+    }
+  }
+
+  static Future<void> logIn(String userId) async {
+    try {
+      final logInResult = await Purchases.logIn(userId);
+      _isPremium = logInResult.customerInfo.entitlements.all['premium']?.isActive == true;
+    } catch (e) {
+      debugPrint('Failed to log in to RevenueCat: $e');
+    }
+  }
+
+  static Future<void> logOut() async {
+    try {
+      await Purchases.logOut();
+      _isPremium = false;
+    } catch (e) {
+      debugPrint('Failed to log out of RevenueCat: $e');
     }
   }
 

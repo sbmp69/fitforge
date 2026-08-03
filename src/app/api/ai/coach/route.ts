@@ -39,6 +39,13 @@ export async function POST(request: NextRequest) {
 
     let hyperContext = `--- USER PROFILE ---\n`;
     if (profile) {
+      let ageText = 'Unknown';
+      if (profile.date_of_birth) {
+        const dob = new Date(profile.date_of_birth);
+        const diff = Date.now() - dob.getTime();
+        ageText = `${Math.abs(new Date(diff).getUTCFullYear() - 1970)}`;
+      }
+      hyperContext += `Age: ${ageText}, Gender: ${profile.gender ?? 'Unknown'}\n`;
       hyperContext += `Height: ${profile.height_cm ?? 'Unknown'}cm, Weight: ${profile.weight_kg ?? 'Unknown'}kg\n`;
       hyperContext += `Goal: ${profile.primary_goal ?? 'Unknown'}, Level: ${profile.fitness_level ?? 'Unknown'}\n`;
     }

@@ -48,7 +48,14 @@ export async function POST(request: NextRequest) {
 
     let userPrompt: string;
 
-    const physiqueContext = `Physique Data: Height: ${profile.height_cm || 'Not provided'}cm, Weight: ${profile.weight_kg || 'Not provided'}kg.`;
+    let ageText = 'Unknown';
+    if (profile.date_of_birth) {
+      const dob = new Date(profile.date_of_birth);
+      const diff = Date.now() - dob.getTime();
+      ageText = `${Math.abs(new Date(diff).getUTCFullYear() - 1970)}`;
+    }
+
+    const physiqueContext = `Physique Data: Age ${ageText}, Gender ${profile.gender || 'Unknown'}, Height: ${profile.height_cm || 'Not provided'}cm, Weight: ${profile.weight_kg || 'Not provided'}kg.`;
 
     if (regenerateDay && existingPlan) {
       userPrompt = `Regenerate only the "${regenerateDay}" workout in this plan. Keep other days unchanged.
