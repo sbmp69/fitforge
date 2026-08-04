@@ -90,6 +90,7 @@ class _MealsScreenState extends State<MealsScreen> {
       if (mounted) {
         setState(() {
           _plan = MealPlan.fromJson(data['plan']);
+          _dayIndex = 0;
           _showForm = false;
         });
       }

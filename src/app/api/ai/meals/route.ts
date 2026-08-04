@@ -61,7 +61,7 @@ Allergies: ${allergies?.join(", ") || "none"}
 Ensure the meal uses authentic regional ingredients for this cuisine/country.
 Return a single meal object JSON with name, calories, protein, carbs, fat, ingredients.`;
     } else {
-      userPrompt = `Create a 3-day meal plan (Day 1 to Day 3) that is highly diverse. The user will automatically rotate these 3 days to form a full week.
+      userPrompt = `Create a 7-day meal plan.
 User Profile: Age ${ageText}, Gender ${profile.gender || 'Unknown'}, Height ${profile.height_cm}cm, Weight ${profile.weight_kg}kg, Fitness Level: ${profile.fitness_level}.
 Primary Goal: ${profile.primary_goal} (If missing, assume healthy maintenance).
 Instructions: First, calculate the required daily caloric intake for this specific user based on their metrics and goal (assume statistical average for age/gender if needed). Then, generate a meal plan that strictly matches those calculated daily calories.

@@ -80,23 +80,20 @@ Structure:
 {
   "days": [{
     "day": "Day 1",
-    "breakfast": { "name": "Vanilla Berry Protein Oats", "calories": 450, "protein": 35, "carbs": 50, "fat": 12, "ingredients": ["1/2 cup rolled oats", "1 scoop vanilla whey protein", "1/2 cup mixed berries"] },
-    "lunch": { "name": "...", "calories": 0, "protein": 0, "carbs": 0, "fat": 0, "ingredients": [] },
-    "dinner": { "name": "...", "calories": 0, "protein": 0, "carbs": 0, "fat": 0, "ingredients": [] },
+    "breakfast": { "name": "Vanilla Berry Protein Oats", "calories": 450, "protein": 35, "carbs": 50, "fat": 12 },
+    "lunch": { "name": "...", "calories": 0, "protein": 0, "carbs": 0, "fat": 0 },
+    "dinner": { "name": "...", "calories": 0, "protein": 0, "carbs": 0, "fat": 0 },
     "snacks": [{ "name": "Greek Yogurt & Almonds", "calories": 200, "protein": 15, "carbs": 10, "fat": 11 }]
   }],
   "dailyCalorieTarget": 2200,
-  "groceryList": [{ "item": "Chicken breast", "quantity": "500g", "category": "Protein" }],
   "summary": "This plan follows a strict 40/30/30 macro split (target: 3L water/day)."
 }
 
 CRITICAL RULES:
-1. Name the meals so they sound appetizing and gourmet (e.g., "Lemon Herb Grilled Chicken Bowl").
+1. Name the meals so they sound appetizing and gourmet.
 2. Ensure the mathematical sum of calories from all meals exactly matches the dailyCalorieTarget (Protein=4kcal/g, Carbs=4kcal/g, Fat=9kcal/g).
-3. The ingredients array must contain exact measurements (e.g., "150g chicken breast", "1 tbsp olive oil") to act as a recipe guide.
-4. Strictly enforce all dietary preferences and allergies.
-5. CRITICAL: If a specific Country or Cuisine is requested, you MUST strictly generate authentic, everyday recipes and ingredients from that exact culture. EVERY single meal (breakfast, lunch, dinner, snacks) MUST consist entirely of native, locally accessible foods. COMPLETELY ELIMINATE generic western bodybuilding foods (like oatmeal, whey protein, chicken breast with broccoli) unless they are natively eaten in that region. Ensure the meals reflect what normal people in that country have access to everyday.
-6. Extract a consolidated grocery list from all ingredients and include it in the JSON under the groceryList key.`;
+3. Strictly enforce all dietary preferences and allergies.
+4. CRITICAL: If a specific Country or Cuisine is requested, you MUST strictly generate authentic, everyday meals highly familiar to that region. COMPLETELY ELIMINATE generic western bodybuilding foods unless they are natively eaten there.`;
 
 export const GROCERY_SYSTEM_PROMPT = `Extract a consolidated grocery list from meal plan ingredients as JSON array:
 [{ "item": "Chicken breast", "quantity": "500g", "category": "Protein" }]
