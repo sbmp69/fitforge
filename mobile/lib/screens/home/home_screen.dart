@@ -161,7 +161,6 @@ class _HomeScreenState extends State<HomeScreen> {
       upgrader: Upgrader(),
       showIgnore: false,
       showLater: false,
-      canDismissDialog: false,
       child: Scaffold(
       appBar: AppBar(
         title: Column(
