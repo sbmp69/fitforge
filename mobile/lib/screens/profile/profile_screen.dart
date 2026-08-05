@@ -409,9 +409,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
               children: [
                 const Text('Subscription', style: TextStyle(fontWeight: FontWeight.w600, color: Colors.white)),
                 const SizedBox(height: 8),
-                _PlanRow(name: 'Free', price: '${cur}0', current: tier == 'Free'),
-                _PlanRow(name: 'Pro (Monthly)', price: '$cur$proPrice/mo', current: tier == 'PRO'),
-                _PlanRow(name: 'Pro (Yearly)', price: '$cur$proYearlyPrice/yr', current: false),
+                _PlanRow(name: 'Free', price: '', current: tier == 'Free'),
+                _PlanRow(name: 'Pro', price: '', current: tier == 'PRO'),
+                _PlanRow(name: 'Pro+', price: '', current: false),
                 const SizedBox(height: 16),
                 ElevatedButton(
                   onPressed: () => Navigator.of(context).push(MaterialPageRoute(builder: (_) => const PaywallScreen())),
