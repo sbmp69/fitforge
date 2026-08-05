@@ -158,11 +158,10 @@ class _HomeScreenState extends State<HomeScreen> {
     final todayLog = todayLogMatches.isEmpty ? null : todayLogMatches.first;
 
     return UpgradeAlert(
-      upgrader: Upgrader(
-        showIgnore: false,
-        showLater: false,
-        canDismissDialog: false,
-      ),
+      upgrader: Upgrader(),
+      showIgnore: false,
+      showLater: false,
+      canDismissDialog: false,
       child: Scaffold(
       appBar: AppBar(
         title: Column(
