@@ -18,7 +18,7 @@ class AdService {
   static Timer? _adLoopTimer;
   
   // Flag to temporarily suppress ads (e.g. when on Paywall or Profile screen)
-  static bool suppressAds = false;
+  static bool suppressAds = true;
 
   static Future<void> initialize() async {
     if (kIsWeb) return;
@@ -29,7 +29,7 @@ class AdService {
 
   static void startAdLoop() {
     _adLoopTimer?.cancel();
-    _adLoopTimer = Timer.periodic(const Duration(seconds: 45), (timer) {
+    _adLoopTimer = Timer.periodic(const Duration(seconds: 60), (timer) {
       if (SubscriptionService.isPremium) {
         timer.cancel();
         return;

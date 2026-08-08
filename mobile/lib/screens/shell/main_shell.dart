@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
 import 'dart:ui';
+import '../../services/ad_service.dart';
 import '../../core/theme.dart';
 
 class MainShell extends StatelessWidget {
@@ -11,6 +12,7 @@ class MainShell extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    AdService.suppressAds = (navigationShell.currentIndex == 5);
     return Scaffold(
       resizeToAvoidBottomInset: false,
       extendBody: true,
