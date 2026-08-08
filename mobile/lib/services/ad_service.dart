@@ -29,7 +29,7 @@ class AdService {
 
   static void startAdLoop() {
     _adLoopTimer?.cancel();
-    _adLoopTimer = Timer.periodic(const Duration(seconds: 120), (timer) {
+    _adLoopTimer = Timer.periodic(const Duration(seconds: 45), (timer) {
       if (SubscriptionService.isPremium) {
         timer.cancel();
         return;
