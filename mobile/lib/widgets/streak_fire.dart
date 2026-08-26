@@ -18,9 +18,9 @@ class StreakFire extends StatelessWidget {
           children: [
             Text(
               '$streak',
-              style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Colors.white),
+              style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: AppColors.textHeader),
             ),
-            const Text('day streak', style: TextStyle(fontSize: 12, color: AppColors.slate400)),
+            const Text('day streak', style: TextStyle(fontSize: 12, color: AppColors.textSecondary)),
           ],
         ),
       ],

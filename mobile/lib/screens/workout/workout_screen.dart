@@ -9,7 +9,7 @@ import '../../services/api_service.dart';
 import '../../services/supabase_service.dart';
 import '../../widgets/app_card.dart';
 import '../../widgets/loading_overlay.dart';
-import '../../services/ad_service.dart';
+
 import '../../services/subscription_service.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import '../../widgets/workout_timer.dart';
@@ -68,7 +68,7 @@ class _WorkoutScreenState extends State<WorkoutScreen> {
 
   Future<void> _generate() async {
     HapticFeedback.lightImpact();
-    AdService.showInterstitialAd();
+
     setState(() {
       _loading = true;
       _loading = true;
@@ -169,7 +169,7 @@ class _WorkoutScreenState extends State<WorkoutScreen> {
                   const SizedBox(height: 12),
                   Text('Days per week: ${_days.round()}'),
                   Slider(value: _days, min: 1, max: 7, divisions: 6, onChanged: (v) => setState(() => _days = v)),
-                  const Text('Equipment', style: TextStyle(color: AppColors.slate400)),
+                  const Text('Equipment', style: TextStyle(color: AppColors.textSecondary)),
                   Wrap(
                     spacing: 8,
                     runSpacing: 8,
@@ -196,7 +196,7 @@ class _WorkoutScreenState extends State<WorkoutScreen> {
                   if (!SubscriptionService.isPremium)
                     Padding(
                       padding: const EdgeInsets.only(bottom: 8),
-                      child: Text('${(5 - (_profile?.aiPlansUsedThisMonth ?? 0)).clamp(0, 5)} AI plans left this month', textAlign: TextAlign.center, style: const TextStyle(color: AppColors.slate400, fontSize: 12)),
+                      child: Text('${(5 - (_profile?.aiPlansUsedThisMonth ?? 0)).clamp(0, 5)} AI plans left this month', textAlign: TextAlign.center, style: const TextStyle(color: AppColors.textSecondary, fontSize: 12)),
                     ),
                   InkWell(
                     onTap: _loading ? null : _generate,
@@ -212,9 +212,9 @@ class _WorkoutScreenState extends State<WorkoutScreen> {
                         ],
                       ),
                       alignment: Alignment.center,
-                      child: const Text('Generate AI Plan ⚡', style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold)),
+                      child: const Text('Generate AI Plan ⚡', style: TextStyle(color: AppColors.textHeader, fontSize: 16, fontWeight: FontWeight.bold)),
                     ),
-                  ).animate(onPlay: (c) => c.repeat(reverse: true)).shimmer(duration: 2.seconds, color: Colors.white24),
+                  ).animate(onPlay: (c) => c.repeat(reverse: true)).shimmer(duration: 2.seconds, color: Colors.black26),
                 ],
               ),
             ),
@@ -231,7 +231,7 @@ class _WorkoutScreenState extends State<WorkoutScreen> {
                   children: [
                     const Text('Active Plan', style: TextStyle(color: AppColors.primary, fontWeight: FontWeight.w600)),
                     const SizedBox(height: 8),
-                    Text(_plan!.title, style: GoogleFonts.playfairDisplay(fontSize: 24, fontStyle: FontStyle.italic, fontWeight: FontWeight.bold, color: Colors.white)),
+                    Text(_plan!.title, style: GoogleFonts.playfairDisplay(fontSize: 24, fontStyle: FontStyle.italic, fontWeight: FontWeight.bold, color: AppColors.textHeader)),
                   ],
                 ),
               ),
@@ -246,7 +246,7 @@ class _WorkoutScreenState extends State<WorkoutScreen> {
               child: Center(
                 child: Padding(
                   padding: EdgeInsets.all(24),
-                  child: Text('No workout plan yet', style: TextStyle(color: AppColors.slate400)),
+                  child: Text('No workout plan yet', style: TextStyle(color: AppColors.textSecondary)),
                 ),
               ),
             ),
@@ -293,12 +293,12 @@ class _DayCardState extends State<_DayCard> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text(widget.day.day, style: const TextStyle(fontWeight: FontWeight.w600, color: Colors.white)),
+                          Text(widget.day.day, style: const TextStyle(fontWeight: FontWeight.w600, color: AppColors.textHeader)),
                           Text(widget.day.focus, style: const TextStyle(color: AppColors.primary)),
                         ],
                       ),
                     ),
-                    Icon(_expanded ? Icons.expand_less : Icons.expand_more, color: AppColors.slate400),
+                    Icon(_expanded ? Icons.expand_less : Icons.expand_more, color: AppColors.textSecondary),
                   ],
                 ),
               ),
@@ -312,8 +312,8 @@ class _DayCardState extends State<_DayCard> {
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Text(ex.name, style: const TextStyle(color: Colors.white)),
-                              Text('${ex.sets} sets × ${ex.reps}', style: const TextStyle(fontSize: 12, color: AppColors.slate400)),
+                              Text(ex.name, style: const TextStyle(color: AppColors.textHeader)),
+                              Text('${ex.sets} sets × ${ex.reps}', style: const TextStyle(fontSize: 12, color: AppColors.textSecondary)),
                               const SizedBox(height: 8),
                               OutlinedButton.icon(
                                 onPressed: () async {

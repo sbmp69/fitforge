@@ -34,11 +34,11 @@ class ProgressRing extends StatelessWidget {
                 style: const TextStyle(
                   fontSize: 22,
                   fontWeight: FontWeight.bold,
-                  color: Colors.white,
+                  color: AppColors.textHeader,
                 ),
               ),
               if (label != null)
-                Text(label!, style: const TextStyle(fontSize: 11, color: AppColors.slate400)),
+                Text(label!, style: const TextStyle(fontSize: 11, color: AppColors.textSecondary)),
             ],
           ),
         ],
@@ -59,7 +59,7 @@ class _RingPainter extends CustomPainter {
     const stroke = 8.0;
 
     final bg = Paint()
-      ..color = AppColors.navy700
+      ..color = AppColors.border
       ..style = PaintingStyle.stroke
       ..strokeWidth = stroke;
     canvas.drawCircle(center, radius, bg);

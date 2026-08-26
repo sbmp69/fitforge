@@ -8,7 +8,7 @@ import '../../services/api_service.dart';
 import '../../services/supabase_service.dart';
 import '../../widgets/app_card.dart';
 import '../../widgets/loading_overlay.dart';
-import '../../services/ad_service.dart';
+
 import '../../services/subscription_service.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import '../../models/profile.dart';
@@ -56,7 +56,7 @@ class _MealsScreenState extends State<MealsScreen> {
 
   Future<void> _generate() async {
     HapticFeedback.lightImpact();
-    AdService.showInterstitialAd();
+
     setState(() => _loading = true);
     
     if (!SubscriptionService.isPremium) {
@@ -144,7 +144,7 @@ class _MealsScreenState extends State<MealsScreen> {
                   if (!SubscriptionService.isPremium)
                     Padding(
                       padding: const EdgeInsets.only(bottom: 8),
-                      child: Text('${(5 - (_profile?.aiPlansUsedThisMonth ?? 0)).clamp(0, 5)} AI plans left this month', textAlign: TextAlign.center, style: const TextStyle(color: AppColors.slate400, fontSize: 12)),
+                      child: Text('${(5 - (_profile?.aiPlansUsedThisMonth ?? 0)).clamp(0, 5)} AI plans left this month', textAlign: TextAlign.center, style: const TextStyle(color: AppColors.textSecondary, fontSize: 12)),
                     ),
                   InkWell(
                     onTap: _loading ? null : _generate,
@@ -160,9 +160,9 @@ class _MealsScreenState extends State<MealsScreen> {
                         ],
                       ),
                       alignment: Alignment.center,
-                      child: const Text('Generate Meal Plan ⚡', style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold)),
+                      child: const Text('Generate Meal Plan ⚡', style: TextStyle(color: AppColors.textHeader, fontSize: 16, fontWeight: FontWeight.bold)),
                     ),
-                  ).animate(onPlay: (c) => c.repeat(reverse: true)).shimmer(duration: 2.seconds, color: Colors.white24),
+                  ).animate(onPlay: (c) => c.repeat(reverse: true)).shimmer(duration: 2.seconds, color: Colors.black26),
                 ],
               ),
             ),
@@ -175,7 +175,7 @@ class _MealsScreenState extends State<MealsScreen> {
                   children: [
                     const Text('Active Plan', style: TextStyle(color: AppColors.amber, fontWeight: FontWeight.w600)),
                     const SizedBox(height: 8),
-                    Text(_plan!.title, style: GoogleFonts.playfairDisplay(fontSize: 24, fontStyle: FontStyle.italic, fontWeight: FontWeight.bold, color: Colors.white)),
+                    Text(_plan!.title, style: GoogleFonts.playfairDisplay(fontSize: 24, fontStyle: FontStyle.italic, fontWeight: FontWeight.bold, color: AppColors.textHeader)),
                   ],
                 ),
               ),
@@ -204,7 +204,7 @@ class _MealsScreenState extends State<MealsScreen> {
               ...day.snacks.asMap().entries.map((e) => _MealCard(title: 'Snack ${e.key + 1}', meal: e.value)),
             ],
           ] else if (!_showForm)
-            const AppCard(child: Center(child: Padding(padding: EdgeInsets.all(24), child: Text('No meal plan yet', style: TextStyle(color: AppColors.slate400))))),
+            const AppCard(child: Center(child: Padding(padding: EdgeInsets.all(24), child: Text('No meal plan yet', style: TextStyle(color: AppColors.textSecondary))))),
         ],
       ),
           if (_loading) const LoadingOverlay(text: 'Forging your meal plan... ⚡'),
@@ -233,9 +233,9 @@ class _MealCard extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(title, style: const TextStyle(fontSize: 12, color: AppColors.slate400)),
+              Text(title, style: const TextStyle(fontSize: 12, color: AppColors.textSecondary)),
               const SizedBox(height: 4),
-              Text(meal.name, style: const TextStyle(fontWeight: FontWeight.w600, color: Colors.white)),
+              Text(meal.name, style: const TextStyle(fontWeight: FontWeight.w600, color: AppColors.textHeader)),
               Text('${meal.calories} kcal', style: const TextStyle(color: AppColors.amber)),
               const SizedBox(height: 8),
               Row(
@@ -266,7 +266,7 @@ class _Macro extends StatelessWidget {
     return Column(
       children: [
         Text('${value}g', style: TextStyle(fontWeight: FontWeight.bold, color: color)),
-        Text(label, style: const TextStyle(fontSize: 11, color: AppColors.slate400)),
+        Text(label, style: const TextStyle(fontSize: 11, color: AppColors.textSecondary)),
       ],
     );
   }

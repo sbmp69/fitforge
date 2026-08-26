@@ -113,7 +113,7 @@ class _CoachScreenState extends State<CoachScreen> {
           children: [
             Expanded(
             child: _messages.isEmpty
-                ? const Center(child: Text('Ask anything about fitness & nutrition', style: TextStyle(color: AppColors.slate400)))
+                ? const Center(child: Text('Ask anything about fitness & nutrition', style: TextStyle(color: AppColors.textSecondary)))
                 : ListView.builder(
                     reverse: true,
                     padding: const EdgeInsets.only(left: 16, right: 16, bottom: 16, top: kToolbarHeight + 16),
@@ -127,15 +127,15 @@ class _CoachScreenState extends State<CoachScreen> {
                           padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
                           constraints: BoxConstraints(maxWidth: MediaQuery.of(context).size.width * 0.75),
                           decoration: BoxDecoration(
-                            color: m.isUser ? AppColors.primary : AppColors.navy700,
+                            color: m.isUser ? AppColors.primary : AppColors.border,
                             borderRadius: BorderRadius.circular(16),
                           ),
                           child: MarkdownBody(
                             data: m.text,
                             styleSheet: MarkdownStyleSheet(
-                              p: TextStyle(color: m.isUser ? AppColors.navy900 : Colors.white),
-                              listBullet: TextStyle(color: m.isUser ? AppColors.navy900 : Colors.white),
-                              strong: TextStyle(color: m.isUser ? AppColors.navy900 : Colors.white, fontWeight: FontWeight.bold),
+                              p: TextStyle(color: m.isUser ? AppColors.background : AppColors.textHeader),
+                              listBullet: TextStyle(color: m.isUser ? AppColors.background : AppColors.textHeader),
+                              strong: TextStyle(color: m.isUser ? AppColors.background : AppColors.textHeader, fontWeight: FontWeight.bold),
                             ),
                           ),
                         ).animate(key: ValueKey(m.text)).fadeIn(duration: 400.ms).slideY(begin: 0.2, curve: Curves.easeOut),
@@ -148,7 +148,7 @@ class _CoachScreenState extends State<CoachScreen> {
               padding: EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
               child: Align(
                 alignment: Alignment.centerLeft,
-                child: Text('Coach is typing...', style: TextStyle(color: AppColors.slate400, fontStyle: FontStyle.italic)),
+                child: Text('Coach is typing...', style: TextStyle(color: AppColors.textSecondary, fontStyle: FontStyle.italic)),
               ),
             ),
           SingleChildScrollView(
@@ -218,7 +218,7 @@ class _QuickChip extends StatelessWidget {
       child: ActionChip(
         label: Text(label, style: const TextStyle(fontSize: 12)),
         onPressed: onTap,
-        backgroundColor: AppColors.navy700,
+        backgroundColor: AppColors.border,
         side: BorderSide.none,
       ),
     );

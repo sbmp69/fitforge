@@ -90,7 +90,7 @@ class _SignupScreenState extends State<SignupScreen> {
                 decoration: InputDecoration(
                   labelText: 'Password',
                   suffixIcon: IconButton(
-                    icon: Icon(_obscurePassword ? Icons.visibility_off : Icons.visibility, color: AppColors.slate400),
+                    icon: Icon(_obscurePassword ? Icons.visibility_off : Icons.visibility, color: AppColors.textSecondary),
                     onPressed: () => setState(() => _obscurePassword = !_obscurePassword),
                   ),
                 ),
@@ -109,22 +109,22 @@ class _SignupScreenState extends State<SignupScreen> {
               const SizedBox(height: 24),
               Row(
                 children: [
-                  const Expanded(child: Divider(color: AppColors.navy700)),
+                  const Expanded(child: Divider(color: AppColors.border)),
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 16),
-                    child: Text('OR', style: TextStyle(color: AppColors.slate400, fontSize: 12)),
+                    child: Text('OR', style: TextStyle(color: AppColors.textSecondary, fontSize: 12)),
                   ),
-                  const Expanded(child: Divider(color: AppColors.navy700)),
+                  const Expanded(child: Divider(color: AppColors.border)),
                 ],
               ),
               const SizedBox(height: 24),
               OutlinedButton.icon(
                 onPressed: _loading ? null : _googleSignup,
-                icon: const Text('G', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.white)),
-                label: const Text('Continue with Google', style: TextStyle(color: Colors.white, fontSize: 16)),
+                icon: const Text('G', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: AppColors.textHeader)),
+                label: const Text('Continue with Google', style: TextStyle(color: AppColors.textHeader, fontSize: 16)),
                 style: OutlinedButton.styleFrom(
                   padding: const EdgeInsets.symmetric(vertical: 16),
-                  side: const BorderSide(color: AppColors.navy700),
+                  side: const BorderSide(color: AppColors.border),
                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                 ),
               ),

@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
 import 'dart:ui';
-import '../../services/ad_service.dart';
+
 import '../../core/theme.dart';
 
 class MainShell extends StatelessWidget {
@@ -12,7 +12,7 @@ class MainShell extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    AdService.suppressAds = (navigationShell.currentIndex == 5);
+
     return Scaffold(
       resizeToAvoidBottomInset: false,
       extendBody: true,
@@ -25,7 +25,7 @@ class MainShell extends StatelessWidget {
             child: BackdropFilter(
               filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
               child: Container(
-                color: AppColors.navy900.withValues(alpha: 0.7),
+                color: AppColors.background.withValues(alpha: 0.7),
                 child: NavigationBar(
                   backgroundColor: Colors.transparent,
                   indicatorColor: AppColors.primary.withValues(alpha: 0.2),

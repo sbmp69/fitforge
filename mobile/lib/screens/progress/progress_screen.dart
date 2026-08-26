@@ -172,7 +172,7 @@ class _ProgressScreenState extends State<ProgressScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                const Text("Today's Log", style: TextStyle(fontWeight: FontWeight.w600, color: Colors.white)),
+                const Text("Today's Log", style: TextStyle(fontWeight: FontWeight.w600, color: AppColors.textHeader)),
                 const SizedBox(height: 12),
                 TextField(controller: _weight, keyboardType: TextInputType.number, decoration: const InputDecoration(labelText: 'Weight (kg)')),
                 const SizedBox(height: 8),
@@ -185,7 +185,7 @@ class _ProgressScreenState extends State<ProgressScreen> {
                   title: const Text('Workout completed'),
                   contentPadding: EdgeInsets.zero,
                 ),
-                ElevatedButton(onPressed: _save, child: const Text('Save')).animate(onPlay: (c) => c.repeat(reverse: true)).shimmer(duration: 2.seconds, color: Colors.white24),
+                ElevatedButton(onPressed: _save, child: const Text('Save')).animate(onPlay: (c) => c.repeat(reverse: true)).shimmer(duration: 2.seconds, color: Colors.black26),
               ],
             ),
           ),
@@ -194,16 +194,16 @@ class _ProgressScreenState extends State<ProgressScreen> {
             child: SizedBox(
               height: 200,
               child: weightData.isEmpty
-                  ? const Center(child: Text('Log weight to see chart', style: TextStyle(color: AppColors.slate400)))
+                  ? const Center(child: Text('Log weight to see chart', style: TextStyle(color: AppColors.textSecondary)))
                   : LineChart(
                       LineChartData(
-                        gridData: FlGridData(show: true, drawVerticalLine: false, getDrawingHorizontalLine: (_) => const FlLine(color: AppColors.navy700)),
+                        gridData: FlGridData(show: true, drawVerticalLine: false, getDrawingHorizontalLine: (_) => const FlLine(color: AppColors.border)),
                         titlesData: FlTitlesData(
-                          leftTitles: AxisTitles(sideTitles: SideTitles(showTitles: true, reservedSize: 40, getTitlesWidget: (v, _) => Text(v.toStringAsFixed(0), style: const TextStyle(fontSize: 10, color: AppColors.slate400)))),
+                          leftTitles: AxisTitles(sideTitles: SideTitles(showTitles: true, reservedSize: 40, getTitlesWidget: (v, _) => Text(v.toStringAsFixed(0), style: const TextStyle(fontSize: 10, color: AppColors.textSecondary)))),
                           bottomTitles: AxisTitles(sideTitles: SideTitles(showTitles: true, getTitlesWidget: (v, meta) {
                             final i = v.toInt();
                             if (i < 0 || i >= weightData.length) return const SizedBox();
-                            return Text(DateFormat('MMM d').format(DateTime.parse(weightData[i].logDate)), style: const TextStyle(fontSize: 9, color: AppColors.slate400));
+                            return Text(DateFormat('MMM d').format(DateTime.parse(weightData[i].logDate)), style: const TextStyle(fontSize: 9, color: AppColors.textSecondary));
                           })),
                           rightTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
                           topTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
@@ -233,7 +233,7 @@ class _ProgressScreenState extends State<ProgressScreen> {
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const Text('Weekly AI Insights', style: TextStyle(fontWeight: FontWeight.w600, color: Colors.white)),
+                        const Text('Weekly AI Insights', style: TextStyle(fontWeight: FontWeight.w600, color: AppColors.textHeader)),
                         if (!SubscriptionService.isPremium)
                           Text('${(5 - _insightsUsed).clamp(0, 5)} left this month', style: const TextStyle(fontSize: 11, color: AppColors.primary)),
                       ],
@@ -243,13 +243,13 @@ class _ProgressScreenState extends State<ProgressScreen> {
                 ),
                 const SizedBox(height: 8),
                 _insight.isEmpty 
-                    ? const Text('Log progress and generate insights.', style: TextStyle(color: AppColors.slate300, height: 1.5))
+                    ? const Text('Log progress and generate insights.', style: TextStyle(color: AppColors.textBody, height: 1.5))
                     : MarkdownBody(
                         data: _insight,
                         styleSheet: MarkdownStyleSheet(
-                          p: const TextStyle(color: AppColors.slate300, height: 1.5),
-                          strong: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
-                          listBullet: const TextStyle(color: AppColors.slate300),
+                          p: const TextStyle(color: AppColors.textBody, height: 1.5),
+                          strong: const TextStyle(color: AppColors.textHeader, fontWeight: FontWeight.bold),
+                          listBullet: const TextStyle(color: AppColors.textBody),
                         ),
                       ),
               ],

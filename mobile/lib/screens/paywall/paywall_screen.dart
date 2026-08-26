@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:purchases_flutter/purchases_flutter.dart';
 import '../../core/theme.dart';
 import '../../services/subscription_service.dart';
-import '../../services/ad_service.dart';
+
 
 class PaywallScreen extends StatefulWidget {
   const PaywallScreen({super.key});
@@ -18,13 +18,13 @@ class _PaywallScreenState extends State<PaywallScreen> {
   @override
   void initState() {
     super.initState();
-    AdService.suppressAds = true;
+
     _fetchOfferings();
   }
 
   @override
   void dispose() {
-    AdService.suppressAds = false;
+
     super.dispose();
   }
 
@@ -77,12 +77,12 @@ class _PaywallScreenState extends State<PaywallScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.navy900,
+      backgroundColor: AppColors.background,
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.close, color: Colors.white),
+          icon: const Icon(Icons.close, color: AppColors.textHeader),
           onPressed: () => Navigator.of(context).pop(),
         ),
       ),
@@ -98,7 +98,7 @@ class _PaywallScreenState extends State<PaywallScreen> {
             const Text(
               'Unlock Your Full Potential with FitForge PRO',
               textAlign: TextAlign.center,
-              style: TextStyle(color: Colors.white, fontSize: 28, fontWeight: FontWeight.bold, height: 1.2),
+              style: TextStyle(color: AppColors.textHeader, fontSize: 28, fontWeight: FontWeight.bold, height: 1.2),
             ),
             const SizedBox(height: 40),
             _buildFeatureRow(Icons.fitness_center, 'Unlimited AI Workout Generations'),
@@ -123,14 +123,14 @@ class _PaywallScreenState extends State<PaywallScreen> {
                 );
               }).toList()
             else
-              const Text('No subscription packages available right now.', textAlign: TextAlign.center, style: TextStyle(color: Colors.white)),
+              const Text('No subscription packages available right now.', textAlign: TextAlign.center, style: TextStyle(color: AppColors.textHeader)),
               
             const SizedBox(height: 24),
             TextButton(
               onPressed: _restorePurchases,
               child: const Text(
                 'Restore Purchases',
-                style: TextStyle(color: Colors.white70, decoration: TextDecoration.underline),
+                style: TextStyle(color: AppColors.textSecondary, decoration: TextDecoration.underline),
               ),
             ),
             const SizedBox(height: 24),
@@ -148,7 +148,7 @@ class _PaywallScreenState extends State<PaywallScreen> {
         Expanded(
           child: Text(
             text,
-            style: const TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.w500),
+            style: const TextStyle(color: AppColors.textHeader, fontSize: 16, fontWeight: FontWeight.w500),
           ),
         ),
       ],
@@ -171,10 +171,10 @@ class _PaywallScreenState extends State<PaywallScreen> {
       child: Container(
         padding: const EdgeInsets.all(20),
         decoration: BoxDecoration(
-          color: isPopular ? AppColors.primary.withOpacity(0.1) : AppColors.navy800,
+          color: isPopular ? AppColors.primary.withOpacity(0.1) : AppColors.surface,
           borderRadius: BorderRadius.circular(16),
           border: Border.all(
-            color: isPopular ? AppColors.primary : AppColors.navy700,
+            color: isPopular ? AppColors.primary : AppColors.border,
             width: isPopular ? 2 : 1,
           ),
         ),
@@ -188,7 +188,7 @@ class _PaywallScreenState extends State<PaywallScreen> {
                   Text(
                     cleanTitle,
                     style: TextStyle(
-                      color: isPopular ? AppColors.primary : Colors.white, 
+                      color: isPopular ? AppColors.primary : AppColors.textHeader, 
                       fontSize: 18, 
                       fontWeight: FontWeight.bold
                     ),
@@ -204,7 +204,7 @@ class _PaywallScreenState extends State<PaywallScreen> {
               ),
             ),
             const SizedBox(width: 16),
-            Text(price, style: const TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold)),
+            Text(price, style: const TextStyle(color: AppColors.textHeader, fontSize: 20, fontWeight: FontWeight.bold)),
           ],
         ),
       ),

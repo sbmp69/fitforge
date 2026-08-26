@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter_animate/flutter_animate.dart';
+import '../core/theme.dart';
 
 class AiOutageDialog extends StatelessWidget {
   const AiOutageDialog({super.key});
@@ -13,15 +14,15 @@ class AiOutageDialog extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.all(24),
         decoration: BoxDecoration(
-          color: const Color(0xFF142419),
+          color: AppColors.surface,
           borderRadius: BorderRadius.circular(24),
           border: Border.all(
-            color: const Color(0xFF39FF14).withOpacity(0.3),
+            color: AppColors.border,
             width: 1,
           ),
           boxShadow: [
             BoxShadow(
-              color: const Color(0xFF39FF14).withOpacity(0.1),
+              color: Colors.black.withValues(alpha: 0.1),
               blurRadius: 20,
               spreadRadius: -5,
             ),
@@ -33,7 +34,7 @@ class AiOutageDialog extends StatelessWidget {
             Container(
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
-                color: const Color(0xFF39FF14).withOpacity(0.1),
+                color: AppColors.primary.withValues(alpha: 0.1),
                 shape: BoxShape.circle,
               ),
               child: const Text(
@@ -46,7 +47,7 @@ class AiOutageDialog extends StatelessWidget {
               'Our AI Coach is Catching Its Breath!',
               textAlign: TextAlign.center,
               style: GoogleFonts.outfit(
-                color: Colors.white,
+                color: AppColors.textHeader,
                 fontSize: 24,
                 fontWeight: FontWeight.bold,
                 height: 1.2,
@@ -57,7 +58,7 @@ class AiOutageDialog extends StatelessWidget {
               'Wow, you guys are working out so hard today that our AI servers needed a quick water break! We are currently experiencing a slight delay.\n\nGrab a sip of water, stretch for a minute, and try again shortly!',
               textAlign: TextAlign.center,
               style: TextStyle(
-                color: Colors.grey[400],
+                color: AppColors.textSecondary,
                 fontSize: 15,
                 height: 1.5,
               ),
@@ -69,8 +70,8 @@ class AiOutageDialog extends StatelessWidget {
               child: ElevatedButton(
                 onPressed: () => Navigator.pop(context),
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFF39FF14),
-                  foregroundColor: Colors.black,
+                  backgroundColor: AppColors.primary,
+                  foregroundColor: Colors.white,
                   elevation: 0,
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(16),

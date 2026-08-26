@@ -14,7 +14,7 @@ class AnimatedMeshBackground extends StatelessWidget {
     return Stack(
       children: [
         // Base dark background
-        Container(color: AppColors.navy900),
+        Container(color: AppColors.background),
         
         // Floating Mesh Orbs
         Positioned(

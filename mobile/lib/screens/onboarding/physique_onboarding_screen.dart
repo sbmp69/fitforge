@@ -62,7 +62,7 @@ class _PhysiqueOnboardingScreenState extends State<PhysiqueOnboardingScreen> {
             children: [
               const Text(
                 'Help us customize your AI workouts by providing your starting stats.',
-                style: TextStyle(color: AppColors.slate400),
+                style: TextStyle(color: AppColors.textSecondary),
               ),
               const SizedBox(height: 24),
               if (_error != null)
@@ -72,7 +72,7 @@ class _PhysiqueOnboardingScreenState extends State<PhysiqueOnboardingScreen> {
                   decoration: BoxDecoration(color: Colors.red.withValues(alpha: 0.1), borderRadius: BorderRadius.circular(12)),
                   child: Text(_error!, style: const TextStyle(color: Colors.redAccent)),
                 ),
-              Text('Height: ${_heightCm.round()} cm', style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.white)),
+              Text('Height: ${_heightCm.round()} cm', style: const TextStyle(fontWeight: FontWeight.bold, color: AppColors.textHeader)),
               Slider(
                 value: _heightCm,
                 min: 140,
@@ -81,7 +81,7 @@ class _PhysiqueOnboardingScreenState extends State<PhysiqueOnboardingScreen> {
                 onChanged: (v) => setState(() => _heightCm = v),
               ),
               const SizedBox(height: 16),
-              Text('Weight: ${_weightKg.toStringAsFixed(1)} kg', style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.white)),
+              Text('Weight: ${_weightKg.toStringAsFixed(1)} kg', style: const TextStyle(fontWeight: FontWeight.bold, color: AppColors.textHeader)),
               Slider(
                 value: _weightKg,
                 min: 40,
@@ -126,12 +126,12 @@ class _PhysiqueOnboardingScreenState extends State<PhysiqueOnboardingScreen> {
               const SizedBox(height: 16),
               ListTile(
                 contentPadding: EdgeInsets.zero,
-                title: const Text('Date of Birth', style: TextStyle(color: Colors.white, fontSize: 16)),
+                title: const Text('Date of Birth', style: TextStyle(color: AppColors.textHeader, fontSize: 16)),
                 subtitle: Text(
                   _dateOfBirth == null ? 'Select your birthday' : '${_dateOfBirth!.year}-${_dateOfBirth!.month.toString().padLeft(2, '0')}-${_dateOfBirth!.day.toString().padLeft(2, '0')}',
-                  style: TextStyle(color: _dateOfBirth == null ? AppColors.slate400 : AppColors.primary),
+                  style: TextStyle(color: _dateOfBirth == null ? AppColors.textSecondary : AppColors.primary),
                 ),
-                trailing: const Icon(Icons.calendar_today, color: AppColors.slate400),
+                trailing: const Icon(Icons.calendar_today, color: AppColors.textSecondary),
                 onTap: () async {
                   final date = await showDatePicker(
                     context: context,

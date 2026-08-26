@@ -28,18 +28,18 @@ class _AppCardState extends State<AppCard> {
         child: Container(
           decoration: BoxDecoration(
             color: Theme.of(context).cardTheme.color,
-            borderRadius: BorderRadius.circular(16),
-            border: Border.all(color: const Color(0xFF334155)), // navy700
+            borderRadius: BorderRadius.circular(24), // Softer corners
+            border: Border.all(color: const Color(0xFFE2E8F0)), // Light border
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withValues(alpha: 0.2),
-                blurRadius: 10,
-                offset: const Offset(0, 4),
+                color: Colors.black.withValues(alpha: 0.04), // Very soft floating shadow
+                blurRadius: 24,
+                offset: const Offset(0, 8),
               ),
             ],
           ),
           child: Padding(
-            padding: widget.padding ?? const EdgeInsets.all(16),
+            padding: widget.padding ?? const EdgeInsets.all(20), // More breathing room
             child: widget.child,
           ),
         ),

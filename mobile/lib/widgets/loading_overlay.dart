@@ -41,7 +41,7 @@ class _LoadingOverlayState extends State<LoadingOverlay> with SingleTickerProvid
   Widget build(BuildContext context) {
     return Positioned.fill(
       child: Container(
-        color: AppColors.navy900.withOpacity(0.95),
+        color: AppColors.background.withOpacity(0.95),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
@@ -79,7 +79,7 @@ class _LoadingOverlayState extends State<LoadingOverlay> with SingleTickerProvid
             Text(
               widget.text,
               style: const TextStyle(
-                color: Colors.white,
+                color: AppColors.textHeader,
                 fontSize: 20,
                 fontWeight: FontWeight.bold,
                 letterSpacing: 1.2,
@@ -90,7 +90,7 @@ class _LoadingOverlayState extends State<LoadingOverlay> with SingleTickerProvid
               'Analyzing your profile & goals...\nThis process usually takes 15-30 seconds.',
               textAlign: TextAlign.center,
               style: TextStyle(
-                color: AppColors.slate400,
+                color: AppColors.textSecondary,
                 fontSize: 14,
                 height: 1.5,
               ),

@@ -10,7 +10,7 @@ import '../../services/supabase_service.dart';
 import '../../services/notification_service.dart';
 import '../../widgets/app_card.dart';
 import '../paywall/paywall_screen.dart';
-import '../../services/ad_service.dart';
+
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -27,13 +27,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
   @override
   void initState() {
     super.initState();
-    AdService.suppressAds = true;
+
     _load();
   }
 
   @override
   void dispose() {
-    AdService.suppressAds = false;
+
     super.dispose();
   }
 
@@ -56,13 +56,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
     final confirm = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
-        backgroundColor: AppColors.navy800,
-        title: const Text('Delete Account', style: TextStyle(color: Colors.white)),
-        content: const Text('Are you sure you want to permanently delete your account and all associated data? This action cannot be undone.', style: TextStyle(color: AppColors.slate400)),
+        backgroundColor: AppColors.surface,
+        title: const Text('Delete Account', style: TextStyle(color: AppColors.textHeader)),
+        content: const Text('Are you sure you want to permanently delete your account and all associated data? This action cannot be undone.', style: TextStyle(color: AppColors.textSecondary)),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx, false),
-            child: const Text('Cancel', style: TextStyle(color: Colors.white)),
+            child: const Text('Cancel', style: TextStyle(color: AppColors.textHeader)),
           ),
           TextButton(
             onPressed: () => Navigator.pop(ctx, true),
@@ -116,7 +116,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
       context: context,
       isScrollControlled: true,
       useRootNavigator: true,
-      backgroundColor: AppColors.navy800,
+      backgroundColor: AppColors.surface,
       shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(24))),
       builder: (context) => StatefulBuilder(
         builder: (context, setModalState) {
@@ -126,7 +126,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                const Text('Edit Profile', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.white)),
+                const Text('Edit Profile', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: AppColors.textHeader)),
                 const SizedBox(height: 24),
                 TextField(controller: nameCtrl, decoration: const InputDecoration(labelText: 'Full Name')),
                 const SizedBox(height: 16),
@@ -144,7 +144,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   onChanged: (val) => levelCtrl.text = val!,
                 ),
                 const SizedBox(height: 16),
-                Text('Height: ${heightCm.round()} cm', style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.white)),
+                Text('Height: ${heightCm.round()} cm', style: const TextStyle(fontWeight: FontWeight.bold, color: AppColors.textHeader)),
                 Slider(
                   value: heightCm,
                   min: 140,
@@ -153,7 +153,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   onChanged: (v) => setModalState(() => heightCm = v),
                 ),
                 const SizedBox(height: 16),
-                Text('Weight: ${weightKg.toStringAsFixed(1)} kg', style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.white)),
+                Text('Weight: ${weightKg.toStringAsFixed(1)} kg', style: const TextStyle(fontWeight: FontWeight.bold, color: AppColors.textHeader)),
                 Slider(
                   value: weightKg,
                   min: 40,
@@ -180,12 +180,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 const SizedBox(height: 16),
                 ListTile(
                   contentPadding: EdgeInsets.zero,
-                  title: const Text('Date of Birth', style: TextStyle(color: Colors.white, fontSize: 16)),
+                  title: const Text('Date of Birth', style: TextStyle(color: AppColors.textHeader, fontSize: 16)),
                   subtitle: Text(
                     dateOfBirth == null ? 'Select your birthday' : '${dateOfBirth!.year}-${dateOfBirth!.month.toString().padLeft(2, '0')}-${dateOfBirth!.day.toString().padLeft(2, '0')}',
-                    style: TextStyle(color: dateOfBirth == null ? AppColors.slate400 : AppColors.primary),
+                    style: TextStyle(color: dateOfBirth == null ? AppColors.textSecondary : AppColors.primary),
                   ),
-                  trailing: const Icon(Icons.calendar_today, color: AppColors.slate400),
+                  trailing: const Icon(Icons.calendar_today, color: AppColors.textSecondary),
                   onTap: () async {
                     final date = await showDatePicker(
                       context: context,
@@ -392,8 +392,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(_profile?.fullName ?? 'User', style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.white)),
-                      Text(_profile?.email ?? '', style: const TextStyle(color: AppColors.slate400)),
+                      Text(_profile?.fullName ?? 'User', style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: AppColors.textHeader)),
+                      Text(_profile?.email ?? '', style: const TextStyle(color: AppColors.textSecondary)),
                       const SizedBox(height: 4),
                       Chip(label: Text(tier), backgroundColor: AppColors.primary.withValues(alpha: 0.15)),
                     ],
@@ -407,7 +407,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text('Subscription', style: TextStyle(fontWeight: FontWeight.w600, color: Colors.white)),
+                const Text('Subscription', style: TextStyle(fontWeight: FontWeight.w600, color: AppColors.textHeader)),
                 const SizedBox(height: 8),
                 _PlanRow(name: 'Free', price: '', current: tier == 'Free'),
                 _PlanRow(name: 'Pro', price: '', current: tier == 'PRO'),
@@ -429,8 +429,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
               children: [
                 SwitchListTile(
                   contentPadding: EdgeInsets.zero,
-                  title: const Text('Daily Reminders', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
-                  subtitle: const Text('Get fun, personalized motivation!', style: TextStyle(color: AppColors.slate400, fontSize: 12)),
+                  title: const Text('Daily Reminders', style: TextStyle(color: AppColors.textHeader, fontWeight: FontWeight.bold)),
+                  subtitle: const Text('Get fun, personalized motivation!', style: TextStyle(color: AppColors.textSecondary, fontSize: 12)),
                   value: _notificationsEnabled,
                   onChanged: (val) async {
                     setState(() => _notificationsEnabled = val);
@@ -485,8 +485,8 @@ class _PlanRow extends StatelessWidget {
       padding: const EdgeInsets.symmetric(vertical: 6),
       child: Row(
         children: [
-          Expanded(child: Text(name, style: const TextStyle(color: Colors.white))),
-          Text(price, style: const TextStyle(color: AppColors.slate400)),
+          Expanded(child: Text(name, style: const TextStyle(color: AppColors.textHeader))),
+          Text(price, style: const TextStyle(color: AppColors.textSecondary)),
           if (current) ...[
             const SizedBox(width: 8),
             const Icon(Icons.check_circle, color: AppColors.primary, size: 18),

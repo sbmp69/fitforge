@@ -70,7 +70,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                   margin: const EdgeInsets.symmetric(horizontal: 4),
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
-                    color: i == _page ? AppColors.primary : AppColors.navy700,
+                    color: i == _page ? AppColors.primary : AppColors.border,
                   ),
                 ),
               ),
@@ -133,13 +133,13 @@ class _OnboardPage extends StatelessWidget {
           Text(
             title,
             textAlign: TextAlign.center,
-            style: const TextStyle(fontSize: 28, fontWeight: FontWeight.bold, color: Colors.white),
+            style: const TextStyle(fontSize: 28, fontWeight: FontWeight.bold, color: AppColors.textHeader),
           ),
           const SizedBox(height: 12),
           Text(
             subtitle,
             textAlign: TextAlign.center,
-            style: const TextStyle(fontSize: 16, color: AppColors.slate400, height: 1.5),
+            style: const TextStyle(fontSize: 16, color: AppColors.textSecondary, height: 1.5),
           ),
         ],
       ),

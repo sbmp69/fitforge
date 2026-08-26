@@ -69,14 +69,14 @@ class _WorkoutTimerState extends State<WorkoutTimer> {
         padding: const EdgeInsets.all(20),
         child: Column(
           children: [
-            const Text('Rest Timer', style: TextStyle(color: AppColors.slate400)),
+            const Text('Rest Timer', style: TextStyle(color: AppColors.textSecondary)),
             const SizedBox(height: 12),
             Text(
               '$mins:${secs.toString().padLeft(2, '0')}',
               style: TextStyle(
                 fontSize: 40,
                 fontWeight: FontWeight.bold,
-                color: isUrgent ? Colors.redAccent : Colors.white,
+                color: isUrgent ? Colors.redAccent : AppColors.textHeader,
               ),
             ),
             const SizedBox(height: 12),

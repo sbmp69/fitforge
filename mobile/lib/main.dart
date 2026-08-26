@@ -6,7 +6,7 @@ import 'core/theme.dart';
 import 'router/app_router.dart';
 import 'services/notification_service.dart';
 import 'services/subscription_service.dart';
-import 'services/ad_service.dart';
+
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -27,7 +27,7 @@ Future<void> main() async {
   );
 
   await SubscriptionService.initialize();
-  await AdService.initialize();
+
 
   runApp(const FitForgeApp());
 }
@@ -39,7 +39,7 @@ class MisconfiguredApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      theme: AppTheme.dark,
+      theme: AppTheme.light,
       home: Scaffold(
         body: SafeArea(
           child: Padding(
@@ -51,13 +51,13 @@ class MisconfiguredApp extends StatelessWidget {
                 SizedBox(height: 16),
                 Text(
                   'Supabase not configured',
-                  style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Colors.white),
+                  style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: AppColors.textHeader),
                 ),
                 SizedBox(height: 12),
                 Text(
                   'Edit mobile/.env with your real Supabase project URL and anon key from:\n'
                   'Supabase Dashboard → Project Settings → API',
-                  style: TextStyle(color: AppColors.slate400, height: 1.5),
+                  style: TextStyle(color: AppColors.textSecondary, height: 1.5),
                 ),
                 SizedBox(height: 12),
                 Text(
@@ -83,7 +83,7 @@ class FitForgeApp extends StatelessWidget {
     return MaterialApp.router(
       title: 'FitForge AI Coach',
       debugShowCheckedModeBanner: false,
-      theme: AppTheme.dark,
+      theme: AppTheme.light,
       routerConfig: AppRouter.create(),
     );
   }

@@ -14,7 +14,7 @@ import '../../models/workout_plan.dart';
 import '../../services/subscription_service.dart';
 import '../../services/supabase_service.dart';
 import '../../services/notification_service.dart';
-import '../../services/ad_service.dart';
+
 import '../../widgets/app_card.dart';
 import '../../widgets/progress_ring.dart';
 import '../../widgets/streak_fire.dart';
@@ -49,7 +49,7 @@ class _HomeScreenState extends State<HomeScreen> {
   void _startAdTimer() {
     _adTimer = Timer.periodic(const Duration(seconds: 150), (timer) {
       if (!SubscriptionService.isPremium) {
-        AdService.showInterstitialAd();
+
       } else {
         timer.cancel();
       }
@@ -134,15 +134,15 @@ class _HomeScreenState extends State<HomeScreen> {
           child: Padding(
             padding: const EdgeInsets.all(16),
             child: Shimmer.fromColors(
-              baseColor: AppColors.navy800,
-              highlightColor: AppColors.navy700,
+              baseColor: AppColors.surface,
+              highlightColor: AppColors.border,
               child: Column(
                 children: [
-                  Container(height: 60, decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(16))),
+                  Container(height: 60, decoration: BoxDecoration(color: AppColors.textHeader, borderRadius: BorderRadius.circular(16))),
                   const SizedBox(height: 16),
-                  Container(height: 200, decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(16))),
+                  Container(height: 200, decoration: BoxDecoration(color: AppColors.textHeader, borderRadius: BorderRadius.circular(16))),
                   const SizedBox(height: 16),
-                  Container(height: 100, decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(16))),
+                  Container(height: 100, decoration: BoxDecoration(color: AppColors.textHeader, borderRadius: BorderRadius.circular(16))),
                 ],
               ),
             ),
@@ -166,10 +166,10 @@ class _HomeScreenState extends State<HomeScreen> {
         title: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('Hello $name 👋', style: const TextStyle(fontSize: 14, color: AppColors.slate300)),
+            Text('Hello $name 👋', style: const TextStyle(fontSize: 14, color: AppColors.textBody)),
             RichText(
               text: TextSpan(
-                style: const TextStyle(fontSize: 24, fontWeight: FontWeight.w600, color: AppColors.slate50),
+                style: const TextStyle(fontSize: 24, fontWeight: FontWeight.w600, color: AppColors.textHeader),
                 children: [
                   const TextSpan(text: 'Build '),
                   TextSpan(
@@ -192,7 +192,7 @@ class _HomeScreenState extends State<HomeScreen> {
               gradient: const LinearGradient(colors: [AppColors.primary, AppColors.accent]),
               borderRadius: BorderRadius.circular(20),
             ),
-            child: Text(tier.toUpperCase(), style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: Colors.white)),
+            child: Text(tier.toUpperCase(), style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: AppColors.textHeader)),
           ),
           const SizedBox(width: 16),
         ],
@@ -220,7 +220,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 margin: const EdgeInsets.only(bottom: 16),
                 padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 16),
                 decoration: BoxDecoration(
-                  gradient: LinearGradient(colors: _streak() > 0 ? [Colors.orangeAccent, Colors.deepOrange] : [AppColors.navy700, AppColors.navy800]),
+                  gradient: LinearGradient(colors: _streak() > 0 ? [Colors.orangeAccent, Colors.deepOrange] : [AppColors.border, AppColors.surface]),
                   borderRadius: BorderRadius.circular(16),
                   boxShadow: _streak() > 0 ? [
                     BoxShadow(color: Colors.orange.withValues(alpha: 0.3), blurRadius: 12, spreadRadius: 2, offset: const Offset(0, 4)),
@@ -234,8 +234,8 @@ class _HomeScreenState extends State<HomeScreen> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text('${_streak()} Day Streak!', style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: _streak() > 0 ? Colors.white : AppColors.slate300)),
-                          Text(_streak() > 0 ? 'Keep it up! You are crushing it.' : 'Log a workout today to start your streak!', style: TextStyle(fontSize: 14, color: _streak() > 0 ? Colors.white70 : AppColors.slate400)),
+                          Text('${_streak()} Day Streak!', style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: _streak() > 0 ? AppColors.textHeader : AppColors.textBody)),
+                          Text(_streak() > 0 ? 'Keep it up! You are crushing it.' : 'Log a workout today to start your streak!', style: TextStyle(fontSize: 14, color: _streak() > 0 ? AppColors.textSecondary : AppColors.textSecondary)),
                         ],
                       ),
                     ),
@@ -258,12 +258,19 @@ class _HomeScreenState extends State<HomeScreen> {
                 ],
               ),
               const SizedBox(height: 24),
-              const Text('Quick Actions', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600, color: Colors.white)),
+              const Text('Quick Actions', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600, color: AppColors.textHeader)),
               const SizedBox(height: 12),
-              _QuickAction(icon: Icons.fitness_center, label: "Today's Workout", color: AppColors.primary, onTap: () => context.go('/workout')),
-              _QuickAction(icon: Icons.restaurant, label: 'Meal Plan', color: AppColors.amber, onTap: () => context.go('/meals')),
-              _QuickAction(icon: Icons.trending_up, label: 'Log Progress', color: Colors.blueAccent, onTap: () => context.go('/progress')),
-              _QuickAction(icon: Icons.chat_bubble_outline, label: 'AI Coach', color: Colors.purpleAccent, onTap: () => context.go('/coach')),
+              AppCard(
+                padding: EdgeInsets.zero,
+                child: Column(
+                  children: [
+                    _QuickAction(icon: Icons.fitness_center, label: "Today's Workout", color: AppColors.primary, onTap: () => context.go('/workout'), showDivider: true),
+                    _QuickAction(icon: Icons.restaurant, label: 'Meal Plan', color: AppColors.amber, onTap: () => context.go('/meals'), showDivider: true),
+                    _QuickAction(icon: Icons.trending_up, label: 'Log Progress', color: Colors.blueAccent, onTap: () => context.go('/progress'), showDivider: true),
+                    _QuickAction(icon: Icons.chat_bubble_outline, label: 'AI Coach', color: Colors.purpleAccent, onTap: () => context.go('/coach'), showDivider: false),
+                  ],
+                ),
+              ),
               const SizedBox(height: 24),
               if (_workout != null)
                 Hero(
@@ -273,11 +280,11 @@ class _HomeScreenState extends State<HomeScreen> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const Text('Active Workout', style: TextStyle(fontWeight: FontWeight.w600, color: Colors.white)),
+                        const Text('Active Workout', style: TextStyle(fontWeight: FontWeight.w600, color: AppColors.textHeader)),
                         const SizedBox(height: 8),
                         Text(
                           _workout?.title ?? 'No plan yet — generate one',
-                          style: TextStyle(color: _workout != null ? AppColors.primary : AppColors.slate400),
+                          style: TextStyle(color: _workout != null ? AppColors.primary : AppColors.textSecondary),
                         ),
                       ],
                     ),
@@ -292,11 +299,11 @@ class _HomeScreenState extends State<HomeScreen> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const Text('Active Meal Plan', style: TextStyle(fontWeight: FontWeight.w600, color: Colors.white)),
+                        const Text('Active Meal Plan', style: TextStyle(fontWeight: FontWeight.w600, color: AppColors.textHeader)),
                         const SizedBox(height: 8),
                         Text(
                           _meal?.title ?? 'No plan yet — generate one',
-                          style: TextStyle(color: _meal != null ? AppColors.amber : AppColors.slate400),
+                          style: TextStyle(color: _meal != null ? AppColors.amber : AppColors.textSecondary),
                         ),
                       ],
                     ),
@@ -324,10 +331,10 @@ class _StatCard extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(title, style: const TextStyle(fontSize: 12, color: AppColors.slate400)),
+          Text(title, style: const TextStyle(fontSize: 12, color: AppColors.textSecondary)),
           const SizedBox(height: 4),
-          Text(value, style: const TextStyle(fontSize: 28, fontWeight: FontWeight.bold, color: Colors.white)),
-          Text(subtitle, style: const TextStyle(fontSize: 11, color: AppColors.slate400)),
+          Text(value, style: const TextStyle(fontSize: 28, fontWeight: FontWeight.bold, color: AppColors.textHeader)),
+          Text(subtitle, style: const TextStyle(fontSize: 11, color: AppColors.textSecondary)),
         ],
       ),
     );
@@ -339,51 +346,43 @@ class _QuickAction extends StatelessWidget {
   final String label;
   final Color color;
   final VoidCallback onTap;
+  final bool showDivider;
 
-  const _QuickAction({required this.icon, required this.label, required this.color, required this.onTap});
+  const _QuickAction({required this.icon, required this.label, required this.color, required this.onTap, this.showDivider = false});
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 12),
-      child: Container(
-        decoration: BoxDecoration(
-          color: AppColors.navy800,
-          borderRadius: BorderRadius.circular(30),
-          border: Border.all(color: color.withValues(alpha: 0.3)),
-          boxShadow: [
-            BoxShadow(
-              color: color.withValues(alpha: 0.1),
-              blurRadius: 10,
-              spreadRadius: 1,
-            ),
-          ]
-        ),
-        child: Material(
-          color: Colors.transparent,
-          child: InkWell(
-            onTap: onTap,
-            borderRadius: BorderRadius.circular(30),
-            child: Padding(
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: onTap,
+        child: Column(
+          children: [
+            Padding(
               padding: const EdgeInsets.all(16),
               child: Row(
                 children: [
                   Container(
-                    padding: const EdgeInsets.all(12),
+                    padding: const EdgeInsets.all(10),
                     decoration: BoxDecoration(
-                      color: color.withValues(alpha: 0.15),
-                      shape: BoxShape.circle,
+                      color: color.withValues(alpha: 0.1),
+                      borderRadius: BorderRadius.circular(12),
                     ),
-                    child: Icon(icon, color: color, size: 24),
+                    child: Icon(icon, color: color, size: 22),
                   ),
                   const SizedBox(width: 16),
-                  Text(label, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600, color: AppColors.slate50)),
+                  Text(label, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600, color: AppColors.textHeader)),
                   const Spacer(),
-                  const Icon(Icons.chevron_right, color: AppColors.slate400),
+                  const Icon(Icons.chevron_right, color: AppColors.border, size: 20),
                 ],
               ),
             ),
-          ),
+            if (showDivider)
+              const Padding(
+                padding: EdgeInsets.only(left: 60),
+                child: Divider(height: 1, thickness: 1, color: AppColors.border),
+              ),
+          ],
         ),
       ),
     );
