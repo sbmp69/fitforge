@@ -58,9 +58,8 @@ class _HomeScreenState extends State<HomeScreen> {
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: const Text('Update your FitForge app'),
+              content: const Text('Update your FitForge app', style: TextStyle(color: Colors.black)),
               backgroundColor: Colors.white,
-              textColor: Colors.black,
               duration: const Duration(days: 1), 
               action: SnackBarAction(
                 label: 'Restart',
