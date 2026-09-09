@@ -19,6 +19,35 @@ const nextConfig = {
       },
     ];
   },
+  async redirects() {
+    return [
+      {
+        source: '/privacy-policy.html',
+        destination: '/privacy-policy',
+        permanent: true,
+      },
+      {
+        source: '/terms-of-service.html',
+        destination: '/terms-of-service',
+        permanent: true,
+      },
+      {
+        source: '/account-deletion.html',
+        destination: '/delete-account',
+        permanent: true,
+      },
+      {
+        source: '/delete-account.html',
+        destination: '/delete-account',
+        permanent: true,
+      },
+      {
+        source: '/account-deletion',
+        destination: '/delete-account',
+        permanent: true,
+      },
+    ];
+  },
 };
 
 export default nextConfig;
