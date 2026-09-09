@@ -3,9 +3,9 @@ import 'package:flutter/foundation.dart';
 import 'package:unity_ads_plugin/unity_ads_plugin.dart';
 
 class AdService {
-  // TODO: Replace these with your real Unity Game IDs from the dashboard
-  static final String _androidGameId = '85460d4'; 
-  static final String _iosGameId = '8545d44';
+  // Real Unity Game IDs from dashboard
+  static final String _androidGameId = '800370432'; 
+  static final String _iosGameId = '8545d44'; // Keep test for iOS until created
 
   // TODO: Replace these with your real Interstitial Ad Unit IDs
   static final String _androidInterstitial = 'Interstitial_Android';
@@ -21,7 +21,7 @@ class AdService {
   static void init() {
     UnityAds.init(
       gameId: _gameId,
-      testMode: true, // TODO: Set to false before releasing to production!
+      testMode: false,
       onComplete: () => debugPrint('Unity Ads Initialization Complete'),
       onFailed: (error, message) => debugPrint('Unity Ads Initialization Failed: $error $message'),
     );
