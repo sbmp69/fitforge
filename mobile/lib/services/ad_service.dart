@@ -20,6 +20,8 @@ class AdService {
   static String get _interstitialId => Platform.isAndroid ? _androidInterstitial : _iosInterstitial;
   static String get bannerId => Platform.isAndroid ? _androidBanner : _iosBanner;
 
+  static DateTime? _lastAdTime;
+
   static void init() {
     UnityAds.init(
       gameId: _gameId,
@@ -30,6 +32,14 @@ class AdService {
   }
 
   static void showInterstitialAd(Function onAdClosed) {
+    // 2 Minute Cooldown for full-screen ads
+    final now = DateTime.now();
+    if (_lastAdTime != null && now.difference(_lastAdTime!).inMinutes < 2) {
+      debugPrint('Ad skipped: 2 minute cooldown active.');
+      onAdClosed();
+      return;
+    }
+
     bool closedHandled = false;
 
     void handleClose() {
@@ -46,14 +56,17 @@ class AdService {
       onClick: (placementId) => debugPrint('Unity Ad Clicked: $placementId'),
       onSkipped: (placementId) {
         debugPrint('Unity Ad Skipped: $placementId');
+        _lastAdTime = DateTime.now();
         handleClose();
       },
       onComplete: (placementId) {
         debugPrint('Unity Ad Completed: $placementId');
+        _lastAdTime = DateTime.now();
         handleClose();
       },
       onFailed: (placementId, error, message) {
         debugPrint('Unity Ad Failed: $error $message');
+        // Do not update _lastAdTime if it failed, so it can try again
         handleClose();
       },
     );
