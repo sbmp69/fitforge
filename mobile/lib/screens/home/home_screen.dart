@@ -1,6 +1,8 @@
 import 'dart:ui';
 import 'dart:async';
 import 'package:flutter/material.dart';
+import 'dart:io';
+import 'package:in_app_update/in_app_update.dart';
 import 'package:go_router/go_router.dart';
 import 'package:shimmer/shimmer.dart';
 import 'package:intl/intl.dart';
@@ -44,6 +46,36 @@ class _HomeScreenState extends State<HomeScreen> {
     super.initState();
     _load();
     _startAdTimer();
+    _checkForUpdate();
+  }
+
+  Future<void> _checkForUpdate() async {
+    if (!Platform.isAndroid) return;
+    try {
+      final info = await InAppUpdate.checkForUpdate();
+      if (info.updateAvailability == UpdateAvailability.updateAvailable) {
+        await InAppUpdate.startFlexibleUpdate();
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: const Text('Update your FitForge app'),
+              backgroundColor: Colors.white,
+              textColor: Colors.black,
+              duration: const Duration(days: 1), 
+              action: SnackBarAction(
+                label: 'Restart',
+                textColor: AppColors.primary,
+                onPressed: () {
+                  InAppUpdate.completeFlexibleUpdate();
+                },
+              ),
+            ),
+          );
+        }
+      }
+    } catch (e) {
+      debugPrint('Failed to check for update: $e');
+    }
   }
 
   void _startAdTimer() {
