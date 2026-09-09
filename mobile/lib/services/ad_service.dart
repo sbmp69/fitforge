@@ -10,9 +10,13 @@ class AdService {
   // TODO: Replace these with your real Interstitial Ad Unit IDs
   static final String _androidInterstitial = 'Interstitial_Android';
   static final String _iosInterstitial = 'Interstitial_iOS';
+  
+  static final String _androidBanner = 'Banner_Android';
+  static final String _iosBanner = 'Banner_iOS';
 
   static String get _gameId => Platform.isAndroid ? _androidGameId : _iosGameId;
   static String get _interstitialId => Platform.isAndroid ? _androidInterstitial : _iosInterstitial;
+  static String get bannerId => Platform.isAndroid ? _androidBanner : _iosBanner;
 
   static void init() {
     UnityAds.init(

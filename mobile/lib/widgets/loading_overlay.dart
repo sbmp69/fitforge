@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import '../../core/theme.dart';
+import '../../services/subscription_service.dart';
+import '../../services/ad_service.dart';
+import 'package:unity_ads_plugin/unity_ads_plugin.dart';
 
 class LoadingOverlay extends StatefulWidget {
   final String text;
@@ -45,6 +48,15 @@ class _LoadingOverlayState extends State<LoadingOverlay> with SingleTickerProvid
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
+            if (!SubscriptionService.isPremium) ...[
+              UnityBannerAd(
+                placementId: AdService.bannerId,
+                onLoad: (placementId) => debugPrint('Banner loaded: $placementId'),
+                onClick: (placementId) => debugPrint('Banner clicked: $placementId'),
+                onFailed: (placementId, error, message) => debugPrint('Banner Ad $placementId failed: $error $message'),
+              ),
+              const SizedBox(height: 48),
+            ],
             AnimatedBuilder(
               animation: _controller,
               builder: (context, child) {
