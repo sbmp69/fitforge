@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'dart:async';
 import 'package:flutter/foundation.dart';
 import 'package:unity_ads_plugin/unity_ads_plugin.dart';
 
@@ -21,6 +22,7 @@ class AdService {
   static String get bannerId => Platform.isAndroid ? _androidBanner : _iosBanner;
 
   static DateTime? _lastAdTime;
+  static Timer? _adTimer;
 
   static void init() {
     UnityAds.init(
@@ -29,6 +31,15 @@ class AdService {
       onComplete: () => debugPrint('Unity Ads Initialization Complete'),
       onFailed: (error, message) => debugPrint('Unity Ads Initialization Failed: $error $message'),
     );
+  }
+
+  static void startAdTimer() {
+    _adTimer?.cancel();
+    _adTimer = Timer.periodic(const Duration(minutes: 2), (timer) {
+      if (!SubscriptionService.isPremium) {
+        showInterstitialAd(() {});
+      }
+    });
   }
 
   static void showInterstitialAd(Function onAdClosed) {

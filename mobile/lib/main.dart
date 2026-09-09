@@ -28,6 +28,7 @@ Future<void> main() async {
 
   await SubscriptionService.initialize();
   AdService.init();
+  AdService.startAdTimer();
 
   runApp(const FitForgeApp());
 }
