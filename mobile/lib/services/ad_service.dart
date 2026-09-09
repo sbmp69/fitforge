@@ -2,9 +2,11 @@ import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:unity_ads_plugin/unity_ads_plugin.dart';
 
+import 'package:flutter_dotenv/flutter_dotenv.dart';
+
 class AdService {
-  // Real Unity Game IDs from dashboard
-  static final String _androidGameId = '800370432'; 
+  // Real Unity Game IDs from environment variables
+  static String get _androidGameId => dotenv.env['UNITY_ANDROID_GAME_ID'] ?? '800370432'; 
   static final String _iosGameId = '8545d44'; // Keep test for iOS until created
 
   // TODO: Replace these with your real Interstitial Ad Unit IDs
