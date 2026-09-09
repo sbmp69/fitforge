@@ -11,6 +11,7 @@ import '../../widgets/app_card.dart';
 import '../../widgets/loading_overlay.dart';
 
 import '../../services/subscription_service.dart';
+import '../../services/ad_service.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import '../../widgets/workout_timer.dart';
 import '../paywall/paywall_screen.dart';
@@ -92,6 +93,8 @@ class _WorkoutScreenState extends State<WorkoutScreen> {
         }
         return;
       }
+      
+      AdService.showInterstitialAd(() {});
     }
     try {
       final custom = _customEquipmentController.text.trim();

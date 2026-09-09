@@ -6,7 +6,7 @@ import 'core/theme.dart';
 import 'router/app_router.dart';
 import 'services/notification_service.dart';
 import 'services/subscription_service.dart';
-
+import 'services/ad_service.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -27,7 +27,7 @@ Future<void> main() async {
   );
 
   await SubscriptionService.initialize();
-
+  AdService.init();
 
   runApp(const FitForgeApp());
 }

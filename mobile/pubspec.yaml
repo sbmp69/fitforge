@@ -33,6 +33,7 @@ dependencies:
   home_widget: ^0.9.3
   flutter_timezone: ^5.1.0
   upgrader: ^13.6.0
+  unity_ads_plugin: ^0.5.0
 
 dev_dependencies:
   flutter_test:
