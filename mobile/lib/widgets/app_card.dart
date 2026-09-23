@@ -4,8 +4,9 @@ class AppCard extends StatefulWidget {
   final Widget child;
   final EdgeInsetsGeometry? padding;
   final VoidCallback? onTap;
+  final Color? color;
 
-  const AppCard({super.key, required this.child, this.padding, this.onTap});
+  const AppCard({super.key, required this.child, this.padding, this.onTap, this.color});
 
   @override
   State<AppCard> createState() => _AppCardState();
@@ -27,7 +28,7 @@ class _AppCardState extends State<AppCard> {
         curve: Curves.easeInOut,
         child: Container(
           decoration: BoxDecoration(
-            color: Theme.of(context).cardTheme.color,
+            color: widget.color ?? Theme.of(context).cardTheme.color,
             borderRadius: BorderRadius.circular(24), // Softer corners
             border: Border.all(color: const Color(0xFFE2E8F0)), // Light border
             boxShadow: [

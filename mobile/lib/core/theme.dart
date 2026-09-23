@@ -2,13 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 class AppColors {
-  // Soft Accents
-  static const primary = Color(0xFF84A98C); // Sage Green
-  static const primaryLight = Color(0xFFCAD2C5);
-  static const accent = Color(0xFF52796F);
+  // Soft Accents (Pastel Colorful Theme)
+  static const primary = Color(0xFF9EA8FF); // Soft Periwinkle/Indigo
+  static const primaryLight = Color(0xFFE0E7FF);
+  static const accent = Color(0xFFFFB3B3); // Soft Coral/Pink
   
   // Backgrounds
-  static const background = Color(0xFFF8F9FA); // Off-white
+  static const background = Color(0xFFF7F9FC); // Very light cool grey/blue
   static const surface = Color(0xFFFFFFFF); // Pure white
   static const border = Color(0xFFE2E8F0); // Light gray
   
@@ -18,7 +18,15 @@ class AppColors {
   static const textHeader = Color(0xFF0F172A); // Slate 900
   
   // Warning/Secondary
-  static const amber = Color(0xFFF59E0B);
+  static const amber = Color(0xFFFFD6A5); // Soft Orange/Peach
+  
+  // Extra Soft Colors for UI
+  static const softBlue = Color(0xFFE3F2FD);
+  static const softGreen = Color(0xFFE8F5E9);
+  static const softPink = Color(0xFFFCE4EC);
+  static const softPurple = Color(0xFFF3E5F5);
+  static const softYellow = Color(0xFFFFF9C4);
+  static const softOrange = Color(0xFFFFF3E0);
 }
 
 class AppTheme {

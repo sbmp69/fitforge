@@ -275,17 +275,17 @@ class _HomeScreenState extends State<HomeScreen> {
               ).animate().scale(delay: 200.ms, duration: 400.ms, curve: Curves.easeOutBack),
               Row(
                 children: [
-                  Expanded(child: AppCard(child: Center(child: ProgressRing(progress: _weeklyProgress(), label: 'This week')))),
+                  Expanded(child: AppCard(color: AppColors.softBlue, child: Center(child: ProgressRing(progress: _weeklyProgress(), label: 'This week')))),
                   const SizedBox(width: 12),
-                  Expanded(child: _StatCard(title: 'Workouts', value: '${_logs.where((l) => l.workoutCompleted).take(7).length}/7', subtitle: 'this week')),
+                  Expanded(child: _StatCard(bgColor: AppColors.softGreen, title: 'Workouts', value: '${_logs.where((l) => l.workoutCompleted).take(7).length}/7', subtitle: 'this week')),
                 ],
               ),
               const SizedBox(height: 12),
               Row(
                 children: [
-                  Expanded(child: _StatCard(title: 'Water Today', value: '${todayLog?.waterMl ?? 0} ml', subtitle: 'stay hydrated')),
+                  Expanded(child: _StatCard(bgColor: AppColors.softPink, title: 'Water Today', value: '${todayLog?.waterMl ?? 0} ml', subtitle: 'stay hydrated')),
                   const SizedBox(width: 12),
-                  Expanded(child: _StatCard(title: 'Sleep', value: '${todayLog?.sleepHours?.toStringAsFixed(1) ?? "0"} hrs', subtitle: 'last night')),
+                  Expanded(child: _StatCard(bgColor: AppColors.softYellow, title: 'Sleep', value: '${todayLog?.sleepHours?.toStringAsFixed(1) ?? "0"} hrs', subtitle: 'last night')),
                 ],
               ),
               const SizedBox(height: 24),
@@ -307,6 +307,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 Hero(
                   tag: 'workout_card',
                   child: AppCard(
+                    color: AppColors.softPurple,
                     onTap: () => context.go('/workout'),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -326,6 +327,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 Hero(
                   tag: 'meal_card',
                   child: AppCard(
+                    color: AppColors.softOrange,
                     onTap: () => context.go('/meals'),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -353,12 +355,14 @@ class _StatCard extends StatelessWidget {
   final String title;
   final String value;
   final String subtitle;
+  final Color? bgColor;
 
-  const _StatCard({required this.title, required this.value, required this.subtitle});
+  const _StatCard({required this.title, required this.value, required this.subtitle, this.bgColor});
 
   @override
   Widget build(BuildContext context) {
     return AppCard(
+      color: bgColor,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
