@@ -5,7 +5,7 @@ class AppColors {
   // Soft Accents (Pastel Colorful Theme)
   static const primary = Color(0xFF9EA8FF); // Soft Periwinkle/Indigo
   static const primaryLight = Color(0xFFE0E7FF);
-  static const accent = Color(0xFFFFB3B3); // Soft Coral/Pink
+  static const accent = Color(0xFF80CBC4); // Soft Teal/Mint
   
   // Backgrounds
   static const background = Color(0xFFF7F9FC); // Very light cool grey/blue
@@ -23,7 +23,7 @@ class AppColors {
   // Extra Soft Colors for UI
   static const softBlue = Color(0xFFE3F2FD);
   static const softGreen = Color(0xFFE8F5E9);
-  static const softPink = Color(0xFFFCE4EC);
+  static const softTeal = Color(0xFFE0F2F1);
   static const softPurple = Color(0xFFF3E5F5);
   static const softYellow = Color(0xFFFFF9C4);
   static const softOrange = Color(0xFFFFF3E0);

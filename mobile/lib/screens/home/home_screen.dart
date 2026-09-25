@@ -283,7 +283,7 @@ class _HomeScreenState extends State<HomeScreen> {
               const SizedBox(height: 12),
               Row(
                 children: [
-                  Expanded(child: _StatCard(bgColor: AppColors.softPink, title: 'Water Today', value: '${todayLog?.waterMl ?? 0} ml', subtitle: 'stay hydrated')),
+                  Expanded(child: _StatCard(bgColor: AppColors.softTeal, title: 'Water Today', value: '${todayLog?.waterMl ?? 0} ml', subtitle: 'stay hydrated')),
                   const SizedBox(width: 12),
                   Expanded(child: _StatCard(bgColor: AppColors.softYellow, title: 'Sleep', value: '${todayLog?.sleepHours?.toStringAsFixed(1) ?? "0"} hrs', subtitle: 'last night')),
                 ],
