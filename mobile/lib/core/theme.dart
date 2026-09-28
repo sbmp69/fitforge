@@ -2,20 +2,23 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 class AppColors {
-  // Soft Accents
-  static const primary = Color(0xFF84A98C); // Sage Green
-  static const primaryLight = Color(0xFFCAD2C5);
-  static const accent = Color(0xFF52796F);
+  // Soft Accents for New UI
+  static const primary = Color(0xFF416B58); // Forest Green for buttons
+  static const primaryLight = Color(0xFFEAF1EB); // Light green for cards
+  static const accent = Color(0xFF84A98C); // Sage Green
+  static const gradientStart = Color(0xFF759C82);
+  static const gradientEnd = Color(0xFF416B58);
   
   // Backgrounds
-  static const background = Color(0xFFF8F9FA); // Off-white
+  static const background = Color(0xFFF9FAF9); // Off-white/light green tint
   static const surface = Color(0xFFFFFFFF); // Pure white
-  static const border = Color(0xFFE2E8F0); // Light gray
+  static const border = Color(0xFFE8EBE9); // Light gray
   
   // Text
-  static const textSecondary = Color(0xFF64748B); // Slate 500
+  static const textSecondary = Color(0xFF7B8B82); // Slate 500
   static const textBody = Color(0xFF475569); // Slate 600
-  static const textHeader = Color(0xFF0F172A); // Slate 900
+  static const textHeader = Color(0xFF1E2823); // Slate 900
+
   
   // Warning/Secondary
   static const amber = Color(0xFFF59E0B);

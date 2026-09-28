@@ -48,6 +48,7 @@ flutter:
   assets:
     - .env
     - assets/logo.png
+    - assets/images/
 
 flutter_native_splash:
   color: "#0F172A"

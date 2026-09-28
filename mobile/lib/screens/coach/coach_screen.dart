@@ -123,22 +123,34 @@ class _CoachScreenState extends State<CoachScreen> {
                       return Align(
                         alignment: m.isUser ? Alignment.centerRight : Alignment.centerLeft,
                         child: Container(
-                          margin: const EdgeInsets.only(bottom: 8),
-                          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-                          constraints: BoxConstraints(maxWidth: MediaQuery.of(context).size.width * 0.75),
+                          margin: const EdgeInsets.only(bottom: 12),
+                          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                          constraints: BoxConstraints(maxWidth: MediaQuery.of(context).size.width * 0.8),
                           decoration: BoxDecoration(
-                            color: m.isUser ? AppColors.primary : AppColors.border,
-                            borderRadius: BorderRadius.circular(16),
+                            color: m.isUser ? AppColors.primaryLight : AppColors.surface,
+                            borderRadius: BorderRadius.only(
+                              topLeft: const Radius.circular(20),
+                              topRight: const Radius.circular(20),
+                              bottomLeft: Radius.circular(m.isUser ? 20 : 4),
+                              bottomRight: Radius.circular(m.isUser ? 4 : 20),
+                            ),
+                            border: m.isUser ? null : Border.all(color: AppColors.border),
+                            boxShadow: [
+                              if (!m.isUser) BoxShadow(color: Colors.black.withOpacity(0.03), blurRadius: 8, offset: const Offset(0, 4)),
+                            ],
                           ),
                           child: MarkdownBody(
                             data: m.text,
                             styleSheet: MarkdownStyleSheet(
-                              p: TextStyle(color: m.isUser ? AppColors.background : AppColors.textHeader),
-                              listBullet: TextStyle(color: m.isUser ? AppColors.background : AppColors.textHeader),
-                              strong: TextStyle(color: m.isUser ? AppColors.background : AppColors.textHeader, fontWeight: FontWeight.bold),
+                              p: const TextStyle(color: AppColors.textHeader, fontSize: 15, height: 1.4),
+                              listBullet: const TextStyle(color: AppColors.primary, fontWeight: FontWeight.bold),
+                              strong: const TextStyle(color: AppColors.textHeader, fontWeight: FontWeight.w700),
+                              h1: const TextStyle(color: AppColors.textHeader, fontWeight: FontWeight.bold),
+                              h2: const TextStyle(color: AppColors.textHeader, fontWeight: FontWeight.bold),
+                              h3: const TextStyle(color: AppColors.textHeader, fontWeight: FontWeight.bold),
                             ),
                           ),
-                        ).animate(key: ValueKey(m.text)).fadeIn(duration: 400.ms).slideY(begin: 0.2, curve: Curves.easeOut),
+                        ).animate(key: ValueKey(m.text)).fadeIn(duration: 400.ms).slideY(begin: 0.1, curve: Curves.easeOut),
                       );
                     },
                   ),
@@ -153,36 +165,65 @@ class _CoachScreenState extends State<CoachScreen> {
             ),
           SingleChildScrollView(
             scrollDirection: Axis.horizontal,
-            padding: const EdgeInsets.symmetric(horizontal: 12),
+            padding: const EdgeInsets.symmetric(horizontal: 16),
             child: Row(
               children: [
-                _QuickChip(label: 'Swap an exercise', onTap: () => _sendQuick('I need to swap an exercise in my workout.')),
-                _QuickChip(label: 'What is my next meal?', onTap: () => _sendQuick('Based on my meal plan, what should I eat next?')),
-                _QuickChip(label: 'I feel too sore', onTap: () => _sendQuick('I feel too sore to train today, what should I do?')),
+                _QuickChip(label: 'Swap an exercise', icon: Icons.swap_horiz, onTap: () => _sendQuick('I need to swap an exercise in my workout.')),
+                _QuickChip(label: 'What is my next meal?', icon: Icons.restaurant, onTap: () => _sendQuick('Based on my meal plan, what should I eat next?')),
+                _QuickChip(label: 'I feel too sore', icon: Icons.healing, onTap: () => _sendQuick('I feel too sore to train today, what should I do?')),
               ],
             ),
           ),
           if (!SubscriptionService.isPremium)
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
               child: Align(
                 alignment: Alignment.centerRight,
-                child: Text('${(15 - _messages.where((m) => m.isUser).length).clamp(0, 15)} free messages left', style: const TextStyle(color: AppColors.primary, fontSize: 11, fontWeight: FontWeight.bold)),
+                child: Text('${(15 - _messages.where((m) => m.isUser).length).clamp(0, 15)} free messages left', style: const TextStyle(color: AppColors.primary, fontSize: 12, fontWeight: FontWeight.bold)),
               ),
             ),
           Padding(
-            padding: EdgeInsets.fromLTRB(12, 4, 12, MediaQuery.of(context).viewInsets.bottom > 0 ? 12 : 120),
+            padding: EdgeInsets.fromLTRB(16, 8, 16, MediaQuery.of(context).viewInsets.bottom > 0 ? 12 : 110),
             child: Row(
               children: [
                 Expanded(
-                  child: TextField(
-                    controller: _controller,
-                    decoration: const InputDecoration(hintText: 'Ask your coach...'),
-                    onSubmitted: (_) => _send(),
+                  child: Container(
+                    decoration: BoxDecoration(
+                      color: AppColors.surface,
+                      borderRadius: BorderRadius.circular(30),
+                      border: Border.all(color: AppColors.border),
+                      boxShadow: [
+                        BoxShadow(color: Colors.black.withOpacity(0.04), blurRadius: 10, offset: const Offset(0, 4)),
+                      ],
+                    ),
+                    child: TextField(
+                      controller: _controller,
+                      decoration: const InputDecoration(
+                        hintText: 'Ask your coach...',
+                        hintStyle: TextStyle(color: AppColors.textSecondary),
+                        prefixIcon: Icon(Icons.auto_awesome, color: AppColors.primary),
+                        border: InputBorder.none,
+                        enabledBorder: InputBorder.none,
+                        focusedBorder: InputBorder.none,
+                        filled: false,
+                        contentPadding: EdgeInsets.symmetric(horizontal: 20, vertical: 14),
+                      ),
+                      onSubmitted: (_) => _send(),
+                    ),
                   ),
                 ),
                 const SizedBox(width: 8),
-                IconButton(onPressed: _send, icon: const Icon(Icons.send, color: AppColors.primary)),
+                GestureDetector(
+                  onTap: _send,
+                  child: Container(
+                    padding: const EdgeInsets.all(12),
+                    decoration: const BoxDecoration(
+                      color: AppColors.primary,
+                      shape: BoxShape.circle,
+                    ),
+                    child: const Icon(Icons.arrow_upward, color: Colors.white),
+                  ),
+                ),
               ],
             ),
           ),
@@ -208,18 +249,21 @@ class _Msg {
 class _QuickChip extends StatelessWidget {
   final String label;
   final VoidCallback onTap;
+  final IconData? icon;
   
-  const _QuickChip({required this.label, required this.onTap});
+  const _QuickChip({required this.label, required this.onTap, this.icon});
 
   @override
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.only(right: 8.0),
       child: ActionChip(
-        label: Text(label, style: const TextStyle(fontSize: 12)),
+        avatar: icon != null ? Icon(icon, color: AppColors.primary, size: 16) : null,
+        label: Text(label, style: const TextStyle(fontSize: 13, color: AppColors.primary, fontWeight: FontWeight.w600)),
         onPressed: onTap,
-        backgroundColor: AppColors.border,
-        side: BorderSide.none,
+        backgroundColor: AppColors.surface,
+        side: const BorderSide(color: AppColors.primaryLight, width: 1.5),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
       ),
     );
   }

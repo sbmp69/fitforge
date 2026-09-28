@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'dart:async';
 import 'package:flutter/services.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../../core/constants.dart';
@@ -72,8 +73,13 @@ class _WorkoutScreenState extends State<WorkoutScreen> {
 
     setState(() {
       _loading = true;
-      _loading = true;
     });
+
+    final completer = Completer<void>();
+    AdService.showInterstitialAd(() {
+      completer.complete();
+    });
+    await completer.future;
 
     if (!SubscriptionService.isPremium) {
       int aiUsed = 0;
@@ -85,7 +91,7 @@ class _WorkoutScreenState extends State<WorkoutScreen> {
         } catch (_) {}
       }
 
-      final aiLimit = 10;
+      const int aiLimit = 10;
       if (aiUsed >= aiLimit) {
         if (mounted) {
           setState(() => _loading = false);
@@ -138,7 +144,10 @@ class _WorkoutScreenState extends State<WorkoutScreen> {
         actions: [
           TextButton(
             onPressed: () => setState(() => _showForm = !_showForm),
-            child: Text(_plan == null ? 'Generate' : 'New Plan'),
+            child: Text(
+              _plan == null ? 'Generate' : 'New Plan',
+              style: const TextStyle(color: AppColors.primary, fontWeight: FontWeight.bold),
+            ),
           ),
         ],
       ),
@@ -153,7 +162,7 @@ class _WorkoutScreenState extends State<WorkoutScreen> {
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
                   DropdownButtonFormField<String>(
-                    value: _goal,
+                    initialValue: _goal,
                     decoration: const InputDecoration(labelText: 'Goal'),
                     items: AppConstants.goalLabels.entries
                         .map((e) => DropdownMenuItem(value: e.key, child: Text(e.value)))
@@ -162,7 +171,8 @@ class _WorkoutScreenState extends State<WorkoutScreen> {
                   ),
                   const SizedBox(height: 12),
                   DropdownButtonFormField<String>(
-                    value: _level,
+                    initialValue: _level,
+
                     decoration: const InputDecoration(labelText: 'Level'),
                     items: AppConstants.levelLabels.entries
                         .map((e) => DropdownMenuItem(value: e.key, child: Text(e.value)))
@@ -228,18 +238,42 @@ class _WorkoutScreenState extends State<WorkoutScreen> {
           if (_plan != null) ...[
             Hero(
               tag: 'workout_card',
-              child: AppCard(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+              child: Container(
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: AppColors.primaryLight,
+                  borderRadius: BorderRadius.circular(24),
+                ),
+                child: Row(
                   children: [
-                    const Text('Active Plan', style: TextStyle(color: AppColors.primary, fontWeight: FontWeight.w600)),
-                    const SizedBox(height: 8),
-                    Text(_plan!.title, style: GoogleFonts.playfairDisplay(fontSize: 24, fontStyle: FontStyle.italic, fontWeight: FontWeight.bold, color: AppColors.textHeader)),
+                    Container(
+                      padding: const EdgeInsets.all(12),
+                      decoration: const BoxDecoration(
+                        color: AppColors.primary,
+                        shape: BoxShape.circle,
+                      ),
+                      child: const Icon(Icons.fitness_center, color: Colors.white),
+                    ),
+                    const SizedBox(width: 16),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const Text('Active Plan', style: TextStyle(color: AppColors.primary, fontWeight: FontWeight.w600, fontSize: 12)),
+                          const SizedBox(height: 4),
+                          Text(
+                            _plan!.title,
+                            style: GoogleFonts.playfairDisplay(fontSize: 18, fontStyle: FontStyle.italic, fontWeight: FontWeight.bold, color: AppColors.textHeader),
+                          ),
+                        ],
+                      ),
+                    ),
+                    const Icon(Icons.chevron_right, color: AppColors.primary),
                   ],
                 ),
               ),
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: 24),
             ..._plan!.days.map((day) => _DayCard(
                   day: day,
                   onRest: (s) => setState(() => _activeRest = s),
@@ -255,7 +289,7 @@ class _WorkoutScreenState extends State<WorkoutScreen> {
             ),
         ],
       ),
-          if (_loading) LoadingOverlay(text: 'Forging your workout... ⚡'),
+          if (_loading) const LoadingOverlay(text: 'Forging your workout... ⚡'),
         ],
       ),
     );
@@ -278,72 +312,125 @@ class _DayCardState extends State<_DayCard> {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.only(bottom: 12),
-      child: AppCard(
-        child: Container(
-          decoration: const BoxDecoration(
-            border: Border(left: BorderSide(color: AppColors.accent, width: 4)),
+      padding: const EdgeInsets.only(bottom: 24),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          InkWell(
+            onTap: () => setState(() => _expanded = !_expanded),
+            borderRadius: BorderRadius.circular(12),
+            child: Padding(
+              padding: const EdgeInsets.symmetric(vertical: 8),
+              child: Row(
+                children: [
+                  Container(
+                    width: 12,
+                    height: 12,
+                    decoration: const BoxDecoration(
+                      color: AppColors.primary,
+                      shape: BoxShape.circle,
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Text(
+                      '${widget.day.day} ${widget.day.focus}',
+                      style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: AppColors.primary),
+                    ),
+                  ),
+                  Icon(_expanded ? Icons.expand_less : Icons.expand_more, color: AppColors.primary),
+                ],
+              ),
+            ),
           ),
-          padding: const EdgeInsets.only(left: 12),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              InkWell(
-                onTap: () => setState(() => _expanded = !_expanded),
-                child: Row(
-                  children: [
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
+          if (_expanded) ...[
+            const SizedBox(height: 16),
+            ...widget.day.exercises.map((ex) => Padding(
+                  padding: const EdgeInsets.only(left: 5, bottom: 12),
+                  child: Container(
+                    decoration: const BoxDecoration(
+                      border: Border(left: BorderSide(color: AppColors.border, width: 2)),
+                    ),
+                    padding: const EdgeInsets.only(left: 19),
+                    child: Container(
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(16),
+                        border: Border.all(color: AppColors.border),
+                      ),
+                      padding: const EdgeInsets.all(12),
+                      child: Row(
                         children: [
-                          Text(widget.day.day, style: const TextStyle(fontWeight: FontWeight.w600, color: AppColors.textHeader)),
-                          Text(widget.day.focus, style: const TextStyle(color: AppColors.primary)),
+                            ClipRRect(
+                              borderRadius: BorderRadius.circular(12),
+                              child: Builder(
+                                builder: (context) {
+                                  final fitnessImgs = [
+                                    '1581009146145-b5ef050c2e1e', '1534438327276-14e5300c3a48', 
+                                    '1517836357463-d25dfeac3438', '1571019614242-c5c5dee9f50b', 
+                                    '1599058917212-d750089bc07e', '1571019613454-1cb2f99b2d8b',
+                                    '1518611012118-696072aa579a'
+                                  ];
+                                  final imgId = fitnessImgs[ex.name.hashCode.abs() % fitnessImgs.length];
+                                  return Image.network(
+                                    'https://images.unsplash.com/photo-$imgId?q=80&w=200',
+                                    width: 60,
+                                    height: 60,
+                                    fit: BoxFit.cover,
+                                errorBuilder: (context, error, stackTrace) => Container(
+                                  width: 60,
+                                  height: 60,
+                                  color: AppColors.border,
+                                  child: const Icon(Icons.fitness_center, color: AppColors.textSecondary, size: 24),
+                                ),
+                              );
+                                },
+                              ),
+                            ),
+                          const SizedBox(width: 12),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(ex.name, style: const TextStyle(fontWeight: FontWeight.bold, color: AppColors.textHeader, fontSize: 14)),
+                                const SizedBox(height: 4),
+                                Text('${ex.sets} sets × ${ex.reps}', style: const TextStyle(fontSize: 12, color: AppColors.textSecondary)),
+                                const SizedBox(height: 8),
+                                InkWell(
+                                  onTap: () async {
+                                    final url = Uri.parse('https://www.youtube.com/results?search_query=how+to+do+${Uri.encodeComponent(ex.name)}+exercise+tutorial');
+                                    launchUrl(url, mode: LaunchMode.externalApplication).catchError((_) => false);
+                                  },
+                                  child: const Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      Icon(Icons.play_circle_fill, size: 16, color: AppColors.primary),
+                                      SizedBox(width: 4),
+                                      Text('Watch Tutorial', style: TextStyle(fontSize: 12, color: AppColors.primary, fontWeight: FontWeight.w600)),
+                                    ],
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                          InkWell(
+                            onTap: () => widget.onRest(ex.restSeconds),
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                              decoration: BoxDecoration(
+                                color: AppColors.primaryLight,
+                                borderRadius: BorderRadius.circular(16),
+                              ),
+                              child: Text('${ex.restSeconds}s', style: const TextStyle(color: AppColors.primary, fontWeight: FontWeight.bold, fontSize: 12)),
+                            ),
+                          ),
                         ],
                       ),
                     ),
-                    Icon(_expanded ? Icons.expand_less : Icons.expand_more, color: AppColors.textSecondary),
-                  ],
-                ),
-              ),
-            if (_expanded) ...[
-              const Divider(height: 24),
-              ...widget.day.exercises.map((ex) => Padding(
-                    padding: const EdgeInsets.only(bottom: 8),
-                    child: Row(
-                      children: [
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(ex.name, style: const TextStyle(color: AppColors.textHeader)),
-                              Text('${ex.sets} sets × ${ex.reps}', style: const TextStyle(fontSize: 12, color: AppColors.textSecondary)),
-                              const SizedBox(height: 8),
-                              OutlinedButton.icon(
-                                onPressed: () async {
-                                  final url = Uri.parse('https://www.youtube.com/results?search_query=how+to+do+${Uri.encodeComponent(ex.name)}+exercise+tutorial');
-                                  launchUrl(url, mode: LaunchMode.externalApplication).catchError((_) => false);
-                                },
-                                icon: const Icon(Icons.play_circle_outline, size: 16),
-                                label: const Text('Watch Tutorial 🎥', style: TextStyle(fontSize: 12)),
-                                style: OutlinedButton.styleFrom(
-                                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 0),
-                                  minimumSize: const Size(0, 32),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                        TextButton(
-                          onPressed: () => widget.onRest(ex.restSeconds),
-                          child: Text('${ex.restSeconds}s'),
-                        ),
-                      ],
-                    ),
-                  )),
-            ],
+                  ),
+                )),
           ],
-        ),
-        ),
+        ],
       ),
     );
   }

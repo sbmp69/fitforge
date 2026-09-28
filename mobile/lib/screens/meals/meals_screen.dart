@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'dart:async';
 import 'package:flutter/services.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../../core/constants.dart';
@@ -59,6 +60,12 @@ class _MealsScreenState extends State<MealsScreen> {
     HapticFeedback.lightImpact();
 
     setState(() => _loading = true);
+
+    final completer = Completer<void>();
+    AdService.showInterstitialAd(() {
+      completer.complete();
+    });
+    await completer.future;
     
     if (!SubscriptionService.isPremium) {
       int aiUsed = _profile?.aiPlansUsedThisMonth ?? 0;
@@ -115,101 +122,130 @@ class _MealsScreenState extends State<MealsScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final day = _plan != null && _plan!.days.isNotEmpty ? _plan!.days[_dayIndex] : null;
-
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Meal Plan'),
+        title: const Text('Meals'),
         actions: [
-          TextButton(onPressed: () => setState(() => _showForm = !_showForm), child: const Text('New Plan')),
+          TextButton(
+            onPressed: () => setState(() => _showForm = !_showForm),
+            child: const Text('New Plan', style: TextStyle(color: AppColors.primary, fontWeight: FontWeight.bold)),
+          ),
         ],
       ),
       body: Stack(
         children: [
           ListView(
-        padding: const EdgeInsets.fromLTRB(16, 16, 16, 140),
-        children: [
-          if (_showForm)
-            AppCard(
-              child: Column(
-                children: [
-                  DropdownButtonFormField<String>(
-                    value: _diet,
-                    decoration: const InputDecoration(labelText: 'Diet'),
-                    items: AppConstants.dietLabels.entries
-                        .map((e) => DropdownMenuItem(value: e.key, child: Text(e.value)))
-                        .toList(),
-                    onChanged: (v) => setState(() => _diet = v!),
+            padding: const EdgeInsets.fromLTRB(16, 16, 16, 140),
+            children: [
+              if (_showForm)
+                AppCard(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      DropdownButtonFormField<String>(
+                        value: _diet,
+                        decoration: const InputDecoration(labelText: 'Diet'),
+                        items: AppConstants.dietLabels.entries
+                            .map((e) => DropdownMenuItem(value: e.key, child: Text(e.value)))
+                            .toList(),
+                        onChanged: (v) => setState(() => _diet = v!),
+                      ),
+                      const SizedBox(height: 12),
+                      TextField(controller: _allergies, decoration: const InputDecoration(labelText: 'Allergies (comma-separated)')),
+                      const SizedBox(height: 24),
+                      if (!SubscriptionService.isPremium)
+                        Padding(
+                          padding: const EdgeInsets.only(bottom: 8),
+                          child: Text('${(5 - (_profile?.aiPlansUsedThisMonth ?? 0)).clamp(0, 5)} AI plans left this month', textAlign: TextAlign.center, style: const TextStyle(color: AppColors.textSecondary, fontSize: 12)),
+                        ),
+                      ElevatedButton(
+                        onPressed: _loading ? null : _generate,
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: AppColors.primary,
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
+                          padding: const EdgeInsets.symmetric(vertical: 16),
+                        ),
+                        child: const Text('Generate Meal Plan', style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold)),
+                      ),
+                    ],
                   ),
-                  const SizedBox(height: 12),
-                  TextField(controller: _allergies, decoration: const InputDecoration(labelText: 'Allergies (comma-separated)')),
-                  const SizedBox(height: 24),
-                  if (!SubscriptionService.isPremium)
-                    Padding(
-                      padding: const EdgeInsets.only(bottom: 8),
-                      child: Text('${(5 - (_profile?.aiPlansUsedThisMonth ?? 0)).clamp(0, 5)} AI plans left this month', textAlign: TextAlign.center, style: const TextStyle(color: AppColors.textSecondary, fontSize: 12)),
+                ),
+              if (_plan != null && _plan!.days.isNotEmpty) ...[
+                if (_showForm) const SizedBox(height: 24),
+                Hero(
+                  tag: 'meal_card',
+                  child: Container(
+                    decoration: BoxDecoration(
+                      color: AppColors.primaryLight,
+                      borderRadius: BorderRadius.circular(24),
                     ),
-                  InkWell(
-                    onTap: _loading ? null : _generate,
-                    borderRadius: BorderRadius.circular(12),
-                    child: Container(
-                      width: double.infinity,
-                      padding: const EdgeInsets.symmetric(vertical: 16),
-                      decoration: BoxDecoration(
-                        gradient: const LinearGradient(colors: [AppColors.amber, Colors.orangeAccent]),
-                        borderRadius: BorderRadius.circular(30),
-                        boxShadow: [
-                          BoxShadow(color: AppColors.amber.withValues(alpha: 0.3), blurRadius: 12, offset: const Offset(0, 4)),
+                    padding: const EdgeInsets.all(20),
+                    child: Row(
+                      children: [
+                        Container(
+                          padding: const EdgeInsets.all(12),
+                          decoration: const BoxDecoration(
+                            color: AppColors.primary,
+                            shape: BoxShape.circle,
+                          ),
+                          child: const Icon(Icons.restaurant, color: Colors.white, size: 28),
+                        ),
+                        const SizedBox(width: 16),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              const Text('Active Plan', style: TextStyle(color: AppColors.primary, fontWeight: FontWeight.w600)),
+                              const SizedBox(height: 4),
+                              Text('My Meal Plan', style: GoogleFonts.playfairDisplay(fontSize: 22, fontStyle: FontStyle.italic, fontWeight: FontWeight.bold, color: AppColors.textHeader)),
+                            ],
+                          ),
+                        ),
+                        const Icon(Icons.chevron_right, color: AppColors.primary),
+                      ],
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 24),
+                ...List.generate(_plan!.days.length, (i) {
+                  final day = _plan!.days[i];
+                  final isExpanded = _dayIndex == i;
+                  return Theme(
+                    data: Theme.of(context).copyWith(dividerColor: Colors.transparent),
+                    child: ExpansionTile(
+                      initiallyExpanded: isExpanded,
+                      onExpansionChanged: (expanded) {
+                        if (expanded) setState(() => _dayIndex = i);
+                      },
+                      tilePadding: EdgeInsets.zero,
+                      title: Row(
+                        children: [
+                          Container(
+                            width: 12,
+                            height: 12,
+                            decoration: const BoxDecoration(
+                              color: AppColors.primary,
+                              shape: BoxShape.circle,
+                            ),
+                          ),
+                          const SizedBox(width: 12),
+                          Text(day.day, style: const TextStyle(color: AppColors.primary, fontWeight: FontWeight.bold, fontSize: 18)),
                         ],
                       ),
-                      alignment: Alignment.center,
-                      child: const Text('Generate Meal Plan ⚡', style: TextStyle(color: AppColors.textHeader, fontSize: 16, fontWeight: FontWeight.bold)),
-                    ),
-                  ).animate(onPlay: (c) => c.repeat(reverse: true)).shimmer(duration: 2.seconds, color: Colors.black26),
-                ],
-              ),
-            ),
-          if (_plan != null && _plan!.days.isNotEmpty) ...[
-            Hero(
-              tag: 'meal_card',
-              child: AppCard(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const Text('Active Plan', style: TextStyle(color: AppColors.amber, fontWeight: FontWeight.w600)),
-                    const SizedBox(height: 8),
-                    Text(_plan!.title, style: GoogleFonts.playfairDisplay(fontSize: 24, fontStyle: FontStyle.italic, fontWeight: FontWeight.bold, color: AppColors.textHeader)),
-                  ],
-                ),
-              ),
-            ),
-            const SizedBox(height: 16),
-            SingleChildScrollView(
-              scrollDirection: Axis.horizontal,
-              child: Row(
-                children: List.generate(_plan!.days.length, (i) {
-                  return Padding(
-                    padding: const EdgeInsets.only(right: 8),
-                    child: ChoiceChip(
-                      label: Text(_plan!.days[i].day),
-                      selected: _dayIndex == i,
-                      onSelected: (_) => setState(() => _dayIndex = i),
+                      children: [
+                        _MealCard(title: 'Breakfast', meal: day.breakfast),
+                        _MealCard(title: 'Lunch', meal: day.lunch),
+                        _MealCard(title: 'Dinner', meal: day.dinner),
+                        ...day.snacks.asMap().entries.map((e) => _MealCard(title: 'Snack ${e.key + 1}', meal: e.value)),
+                        const SizedBox(height: 16),
+                      ],
                     ),
                   );
                 }),
-              ),
-            ),
-            const SizedBox(height: 16),
-            if (day != null) ...[
-              _MealCard(title: 'Breakfast', meal: day.breakfast),
-              _MealCard(title: 'Lunch', meal: day.lunch),
-              _MealCard(title: 'Dinner', meal: day.dinner),
-              ...day.snacks.asMap().entries.map((e) => _MealCard(title: 'Snack ${e.key + 1}', meal: e.value)),
+              ] else if (!_showForm)
+                const AppCard(child: Center(child: Padding(padding: EdgeInsets.all(24), child: Text('No meal plan yet', style: TextStyle(color: AppColors.textSecondary))))),
             ],
-          ] else if (!_showForm)
-            const AppCard(child: Center(child: Padding(padding: EdgeInsets.all(24), child: Text('No meal plan yet', style: TextStyle(color: AppColors.textSecondary))))),
-        ],
-      ),
+          ),
           if (_loading) const LoadingOverlay(text: 'Forging your meal plan... ⚡'),
         ],
       ),
@@ -225,52 +261,64 @@ class _MealCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 12),
-      child: AppCard(
-        child: Container(
-          decoration: const BoxDecoration(
-            border: Border(left: BorderSide(color: AppColors.amber, width: 4)),
-          ),
-          padding: const EdgeInsets.only(left: 12),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(title, style: const TextStyle(fontSize: 12, color: AppColors.textSecondary)),
-              const SizedBox(height: 4),
-              Text(meal.name, style: const TextStyle(fontWeight: FontWeight.w600, color: AppColors.textHeader)),
-              Text('${meal.calories} kcal', style: const TextStyle(color: AppColors.amber)),
-              const SizedBox(height: 8),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  _Macro('P', meal.protein, Colors.redAccent),
-                  _Macro('C', meal.carbs, Colors.blueAccent),
-                  _Macro('F', meal.fat, Colors.yellow),
-                ],
-              ),
-            ],
-          ),
-        ),
+    return Container(
+      margin: const EdgeInsets.only(bottom: 12, left: 12),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: AppColors.border),
       ),
-    );
-  }
-}
-
-class _Macro extends StatelessWidget {
-  final String label;
-  final int value;
-  final Color color;
-
-  const _Macro(this.label, this.value, this.color);
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      children: [
-        Text('${value}g', style: TextStyle(fontWeight: FontWeight.bold, color: color)),
-        Text(label, style: const TextStyle(fontSize: 11, color: AppColors.textSecondary)),
-      ],
+      padding: const EdgeInsets.all(12),
+      child: Row(
+        children: [
+          ClipRRect(
+            borderRadius: BorderRadius.circular(16),
+            child: Builder(
+              builder: (context) {
+                final foodImgs = [
+                  '1546069901-ba9599a7e63c', '1512621776951-a57141f2eefd', 
+                  '1493770348161-369560ae357d', '1473093295043-cdd812d0e601',
+                  '1467003909585-2f8a72700288'
+                ];
+                final imgId = foodImgs[meal.name.hashCode.abs() % foodImgs.length];
+                return Image.network(
+                  'https://images.unsplash.com/photo-$imgId?q=80&w=200',
+                  width: 60,
+                  height: 60,
+                  fit: BoxFit.cover,
+              errorBuilder: (context, error, stackTrace) => Container(
+                width: 60,
+                height: 60,
+                color: AppColors.primaryLight,
+                child: const Icon(Icons.restaurant, color: AppColors.primary),
+              ),
+            );
+              },
+            ),
+          ),
+          const SizedBox(width: 16),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(title, style: const TextStyle(fontSize: 12, color: AppColors.textSecondary, fontWeight: FontWeight.w600)),
+                const SizedBox(height: 2),
+                Text(meal.name, style: const TextStyle(fontWeight: FontWeight.bold, color: AppColors.textHeader, fontSize: 15)),
+                const SizedBox(height: 4),
+                Text('${meal.calories} kcal • ${meal.protein}g P', style: const TextStyle(color: AppColors.textSecondary, fontSize: 13)),
+              ],
+            ),
+          ),
+          Container(
+            padding: const EdgeInsets.all(12),
+            decoration: const BoxDecoration(
+              color: AppColors.primaryLight,
+              shape: BoxShape.circle,
+            ),
+            child: Text('${meal.calories}\nkcal', textAlign: TextAlign.center, style: const TextStyle(color: AppColors.primary, fontWeight: FontWeight.bold, fontSize: 10, height: 1.1)),
+          ),
+        ],
+      ),
     );
   }
 }

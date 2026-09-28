@@ -161,6 +161,7 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget build(BuildContext context) {
     if (_loading) {
       return Scaffold(
+        backgroundColor: AppColors.background,
         body: SafeArea(
           child: Padding(
             padding: const EdgeInsets.all(16),
@@ -183,7 +184,6 @@ class _HomeScreenState extends State<HomeScreen> {
     }
 
     final name = _profile?.fullName?.split(' ').first ?? 'Athlete';
-    final tier = SubscriptionService.isPremium ? 'PRO' : (AppConstants.tierLabels[_profile?.subscriptionTier] ?? 'Free');
     final todayStr = DateFormat('yyyy-MM-dd').format(DateTime.now());
     final todayLogMatches = _logs.where((l) => l.logDate == todayStr);
     final todayLog = todayLogMatches.isEmpty ? null : todayLogMatches.first;
@@ -193,46 +193,28 @@ class _HomeScreenState extends State<HomeScreen> {
       showIgnore: false,
       showLater: false,
       child: Scaffold(
-      appBar: AppBar(
-        title: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text('Hello $name 👋', style: const TextStyle(fontSize: 14, color: AppColors.textBody)),
-            RichText(
-              text: TextSpan(
-                style: const TextStyle(fontSize: 24, fontWeight: FontWeight.w600, color: AppColors.textHeader),
-                children: [
-                  const TextSpan(text: 'Build '),
-                  TextSpan(
-                    text: 'Better Habits',
-                    style: GoogleFonts.playfairDisplay(
-                      fontStyle: FontStyle.italic,
-                      color: AppColors.primary,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ],
-              ),
+        backgroundColor: AppColors.background,
+        appBar: AppBar(
+          backgroundColor: Colors.transparent,
+          elevation: 0,
+          title: Row(
+            children: [
+              const Icon(Icons.fitness_center, color: AppColors.primary),
+              const SizedBox(width: 8),
+              const Text('FITFORGE AI', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: AppColors.textHeader)),
+            ],
+          ),
+          actions: [
+            IconButton(
+              icon: const Icon(Icons.notifications_none, color: AppColors.textHeader),
+              onPressed: () {},
             ),
           ],
         ),
-        actions: [
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-            decoration: BoxDecoration(
-              gradient: const LinearGradient(colors: [AppColors.primary, AppColors.accent]),
-              borderRadius: BorderRadius.circular(20),
-            ),
-            child: Text(tier.toUpperCase(), style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: AppColors.textHeader)),
-          ),
-          const SizedBox(width: 16),
-        ],
-      ),
-      body: AnimatedMeshBackground(
-        child: RefreshIndicator(
+        body: RefreshIndicator(
           onRefresh: _load,
           child: ListView(
-            padding: const EdgeInsets.fromLTRB(16, 16, 16, 140),
+            padding: const EdgeInsets.fromLTRB(16, 8, 16, 120),
             children: [
               if (_isOffline)
                 Container(
@@ -247,102 +229,170 @@ class _HomeScreenState extends State<HomeScreen> {
                     ],
                   ),
                 ).animate().fadeIn(),
-              Container(
-                margin: const EdgeInsets.only(bottom: 16),
-                padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 16),
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(colors: _streak() > 0 ? [Colors.orangeAccent, Colors.deepOrange] : [AppColors.border, AppColors.surface]),
-                  borderRadius: BorderRadius.circular(16),
-                  boxShadow: _streak() > 0 ? [
-                    BoxShadow(color: Colors.orange.withValues(alpha: 0.3), blurRadius: 12, spreadRadius: 2, offset: const Offset(0, 4)),
-                  ] : [],
-                ),
-                child: Row(
-                  children: [
-                    Text(_streak() > 0 ? '🔥' : '🧊', style: const TextStyle(fontSize: 48)),
-                    const SizedBox(width: 16),
-                    Expanded(
+              
+              Stack(
+                clipBehavior: Clip.none,
+                children: [
+                  Positioned(
+                    right: -30,
+                    top: -20,
+                    child: Container(
+                      width: 220,
+                      height: 220,
+                      decoration: BoxDecoration(
+                        color: AppColors.primaryLight.withOpacity(0.5),
+                        shape: BoxShape.circle,
+                      ),
+                    ),
+                  ),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text('Hello $name 👋', style: const TextStyle(color: AppColors.textSecondary, fontSize: 16)),
+                      const SizedBox(height: 4),
+                      RichText(
+                        text: const TextSpan(
+                          style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold, color: AppColors.textHeader, height: 1.2),
+                          children: [
+                            TextSpan(text: "Let's Build a\n"),
+                            TextSpan(text: "Healthier", style: TextStyle(color: AppColors.primary)),
+                            TextSpan(text: " You"),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(height: 48),
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+                        decoration: BoxDecoration(
+                          gradient: const LinearGradient(
+                            colors: [AppColors.gradientStart, AppColors.primary],
+                            begin: Alignment.topLeft,
+                            end: Alignment.bottomRight,
+                          ),
+                          borderRadius: BorderRadius.circular(16),
+                        ),
+                        child: Row(
+                          children: [
+                            const Text('🔥', style: TextStyle(fontSize: 32)),
+                            const SizedBox(width: 16),
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text('${_streak()} Day Streak!', style: const TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold)),
+                                  const Text('Keep it up! You are crushing it.', style: TextStyle(color: Colors.white70, fontSize: 13)),
+                                ],
+                              ),
+                            ),
+                            const Icon(Icons.chevron_right, color: Colors.white),
+                          ],
+                        ),
+                      ).animate().scale(delay: 200.ms, duration: 400.ms, curve: Curves.easeOutBack),
+                    ],
+                  ),
+                  Positioned(
+                    right: -10,
+                    top: -10,
+                    bottom: 20,
+                    child: Image.asset(
+                      'assets/images/hero.png',
+                      width: 160,
+                      fit: BoxFit.contain,
+                      alignment: Alignment.bottomRight,
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 24),
+
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Expanded(
+                    child: AppCard(
+                      padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 8),
                       child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text('${_streak()} Day Streak!', style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: _streak() > 0 ? AppColors.textHeader : AppColors.textBody)),
-                          Text(_streak() > 0 ? 'Keep it up! You are crushing it.' : 'Log a workout today to start your streak!', style: TextStyle(fontSize: 14, color: _streak() > 0 ? AppColors.textSecondary : AppColors.textSecondary)),
+                          SizedBox(
+                            height: 60,
+                            width: 60,
+                            child: Stack(
+                              fit: StackFit.expand,
+                              children: [
+                                CircularProgressIndicator(
+                                  value: _weeklyProgress() / 100,
+                                  backgroundColor: AppColors.border,
+                                  valueColor: const AlwaysStoppedAnimation<Color>(AppColors.primary),
+                                  strokeWidth: 6,
+                                ),
+                                Center(
+                                  child: Text('${_weeklyProgress().toInt()}%', style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14, color: AppColors.textHeader)),
+                                ),
+                              ],
+                            ),
+                          ),
+                          const SizedBox(height: 12),
+                          const Text('This week', style: TextStyle(fontSize: 12, color: AppColors.textSecondary)),
                         ],
                       ),
                     ),
-                  ],
-                ),
-              ).animate().scale(delay: 200.ms, duration: 400.ms, curve: Curves.easeOutBack),
-              Row(
-                children: [
-                  Expanded(child: AppCard(child: Center(child: ProgressRing(progress: _weeklyProgress(), label: 'This week')))),
+                  ),
                   const SizedBox(width: 12),
-                  Expanded(child: _StatCard(title: 'Workouts', value: '${_logs.where((l) => l.workoutCompleted).take(7).length}/7', subtitle: 'this week')),
-                ],
-              ),
-              const SizedBox(height: 12),
-              Row(
-                children: [
-                  Expanded(child: _StatCard(title: 'Water Today', value: '${todayLog?.waterMl ?? 0} ml', subtitle: 'stay hydrated')),
+                  Expanded(
+                    child: _StatCard(
+                      icon: Icons.fitness_center,
+                      title: 'Workouts',
+                      value: '${_logs.where((l) => l.workoutCompleted).take(7).length}/7',
+                      subtitle: 'this week',
+                    ),
+                  ),
                   const SizedBox(width: 12),
-                  Expanded(child: _StatCard(title: 'Sleep', value: '${todayLog?.sleepHours?.toStringAsFixed(1) ?? "0"} hrs', subtitle: 'last night')),
+                  Expanded(
+                    child: _StatCard(
+                      icon: Icons.water_drop,
+                      title: 'Water Today',
+                      value: '${todayLog?.waterMl ?? 0} ml',
+                      subtitle: 'Stay hydrated',
+                    ),
+                  ),
                 ],
               ),
               const SizedBox(height: 24),
-              const Text('Quick Actions', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600, color: AppColors.textHeader)),
+
+              const Text('Quick Actions', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: AppColors.textHeader)),
               const SizedBox(height: 12),
-              AppCard(
-                padding: EdgeInsets.zero,
-                child: Column(
-                  children: [
-                    _QuickAction(icon: Icons.fitness_center, label: "Today's Workout", color: AppColors.primary, onTap: () => context.go('/workout'), showDivider: true),
-                    _QuickAction(icon: Icons.restaurant, label: 'Meal Plan', color: AppColors.amber, onTap: () => context.go('/meals'), showDivider: true),
-                    _QuickAction(icon: Icons.trending_up, label: 'Log Progress', color: Colors.blueAccent, onTap: () => context.go('/progress'), showDivider: true),
-                    _QuickAction(icon: Icons.chat_bubble_outline, label: 'AI Coach', color: Colors.purpleAccent, onTap: () => context.go('/coach'), showDivider: false),
-                  ],
-                ),
+
+              _QuickActionCard(
+                icon: Icons.fitness_center,
+                title: "Today's Workout",
+                subtitle: _workout?.title ?? "No plan yet",
+                onTap: () => context.go('/workout'),
               ),
-              const SizedBox(height: 24),
-              if (_workout != null)
-                Hero(
-                  tag: 'workout_card',
-                  child: AppCard(
-                    onTap: () => context.go('/workout'),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const Text('Active Workout', style: TextStyle(fontWeight: FontWeight.w600, color: AppColors.textHeader)),
-                        const SizedBox(height: 8),
-                        Text(
-                          _workout?.title ?? 'No plan yet — generate one',
-                          style: TextStyle(color: _workout != null ? AppColors.primary : AppColors.textSecondary),
-                        ),
-                      ],
-                    ),
-                  ),
-                ).animate().fadeIn(duration: 400.ms).slideY(begin: 0.1, curve: Curves.easeOut),
               const SizedBox(height: 12),
-              if (_meal != null)
-                Hero(
-                  tag: 'meal_card',
-                  child: AppCard(
-                    onTap: () => context.go('/meals'),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const Text('Active Meal Plan', style: TextStyle(fontWeight: FontWeight.w600, color: AppColors.textHeader)),
-                        const SizedBox(height: 8),
-                        Text(
-                          _meal?.title ?? 'No plan yet — generate one',
-                          style: TextStyle(color: _meal != null ? AppColors.amber : AppColors.textSecondary),
-                        ),
-                      ],
-                    ),
-                  ),
-                ).animate().fadeIn(duration: 400.ms, delay: 100.ms).slideY(begin: 0.1, curve: Curves.easeOut),
+              _QuickActionCard(
+                icon: Icons.restaurant,
+                title: "Meal Plan",
+                subtitle: _meal?.title ?? "No plan yet",
+                onTap: () => context.go('/meals'),
+              ),
+              const SizedBox(height: 12),
+              _QuickActionCard(
+                icon: Icons.trending_up,
+                title: "Log Progress",
+                subtitle: "Track your journey",
+                onTap: () => context.go('/progress'),
+              ),
+              const SizedBox(height: 12),
+              _QuickActionCard(
+                icon: Icons.chat_bubble_outline,
+                title: "AI Coach",
+                subtitle: "Ask anything",
+                onTap: () => context.go('/coach'),
+              ),
+              
+              const SizedBox(height: 40),
             ],
           ),
-        ),
         ),
       ),
     );
@@ -350,72 +400,78 @@ class _HomeScreenState extends State<HomeScreen> {
 }
 
 class _StatCard extends StatelessWidget {
+  final IconData icon;
   final String title;
   final String value;
   final String subtitle;
 
-  const _StatCard({required this.title, required this.value, required this.subtitle});
+  const _StatCard({required this.icon, required this.title, required this.value, required this.subtitle});
 
   @override
   Widget build(BuildContext context) {
     return AppCard(
+      padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 8),
       child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(title, style: const TextStyle(fontSize: 12, color: AppColors.textSecondary)),
+          Icon(icon, color: AppColors.primary, size: 28),
+          const SizedBox(height: 8),
+          Text(title, style: const TextStyle(fontSize: 12, color: AppColors.textSecondary), textAlign: TextAlign.center, maxLines: 1, overflow: TextOverflow.ellipsis),
           const SizedBox(height: 4),
-          Text(value, style: const TextStyle(fontSize: 28, fontWeight: FontWeight.bold, color: AppColors.textHeader)),
-          Text(subtitle, style: const TextStyle(fontSize: 11, color: AppColors.textSecondary)),
+          Text(value, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: AppColors.textHeader)),
+          const SizedBox(height: 2),
+          Text(subtitle, style: const TextStyle(fontSize: 11, color: AppColors.textSecondary), textAlign: TextAlign.center, maxLines: 1, overflow: TextOverflow.ellipsis),
         ],
       ),
     );
   }
 }
 
-class _QuickAction extends StatelessWidget {
+class _QuickActionCard extends StatelessWidget {
   final IconData icon;
-  final String label;
-  final Color color;
+  final String title;
+  final String subtitle;
   final VoidCallback onTap;
-  final bool showDivider;
 
-  const _QuickAction({required this.icon, required this.label, required this.color, required this.onTap, this.showDivider = false});
+  const _QuickActionCard({required this.icon, required this.title, required this.subtitle, required this.onTap});
 
   @override
   Widget build(BuildContext context) {
-    return Material(
-      color: Colors.transparent,
-      child: InkWell(
-        onTap: onTap,
-        child: Column(
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(16),
+      child: Container(
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: AppColors.surface,
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(color: AppColors.border, width: 1),
+        ),
+        child: Row(
           children: [
-            Padding(
-              padding: const EdgeInsets.all(16),
-              child: Row(
+            Container(
+              padding: const EdgeInsets.all(12),
+              decoration: const BoxDecoration(
+                color: AppColors.primaryLight,
+                shape: BoxShape.circle,
+              ),
+              child: Icon(icon, color: AppColors.primary),
+            ),
+            const SizedBox(width: 16),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Container(
-                    padding: const EdgeInsets.all(10),
-                    decoration: BoxDecoration(
-                      color: color.withValues(alpha: 0.1),
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    child: Icon(icon, color: color, size: 22),
-                  ),
-                  const SizedBox(width: 16),
-                  Text(label, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600, color: AppColors.textHeader)),
-                  const Spacer(),
-                  const Icon(Icons.chevron_right, color: AppColors.border, size: 20),
+                  Text(title, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: AppColors.textHeader)),
+                  const SizedBox(height: 4),
+                  Text(subtitle, style: const TextStyle(fontSize: 14, color: AppColors.textSecondary)),
                 ],
               ),
             ),
-            if (showDivider)
-              const Padding(
-                padding: EdgeInsets.only(left: 60),
-                child: Divider(height: 1, thickness: 1, color: AppColors.border),
-              ),
+            const Icon(Icons.chevron_right, color: AppColors.textSecondary),
           ],
         ),
       ),
     );
   }
 }
+
