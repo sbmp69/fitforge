@@ -95,13 +95,13 @@ class _FlexCardScreenState extends State<FlexCardScreen> {
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
                                 Image.asset('assets/logo.png', height: 32, color: AppColors.primary),
-                                Text('FITFORGE', style: GoogleFonts.montserrat(fontWeight: FontWeight.bold, letterSpacing: 2, color: AppColors.textHeader)),
+                                Text('FITFORGE', style: GoogleFonts.montserrat(fontWeight: FontWeight.bold, letterSpacing: 2, color: Colors.white)),
                               ],
                             ),
                             const Spacer(),
-                            Text(widget.userName.toUpperCase(), style: const TextStyle(fontSize: 14, color: AppColors.textSecondary, letterSpacing: 1.5)),
+                            Text(widget.userName.toUpperCase(), style: const TextStyle(fontSize: 14, color: Colors.white70, letterSpacing: 1.5)),
                             const SizedBox(height: 8),
-                            Text('DAY CRUSHED', style: GoogleFonts.oswald(fontSize: 48, fontWeight: FontWeight.bold, color: AppColors.textHeader, height: 1.1)),
+                            Text('DAY CRUSHED', style: GoogleFonts.oswald(fontSize: 48, fontWeight: FontWeight.bold, color: Colors.white, height: 1.1)),
                             const SizedBox(height: 24),
                             if (widget.currentStreak > 0)
                               Row(
@@ -121,7 +121,7 @@ class _FlexCardScreenState extends State<FlexCardScreen> {
                             ),
                             const Spacer(),
                             const Center(
-                              child: Text("Search 'FitForge' on Google Play", style: TextStyle(fontSize: 11, color: AppColors.textSecondary)),
+                              child: Text("Search 'FitForge' on Google Play", style: TextStyle(fontSize: 11, color: Colors.white54)),
                             ),
                           ],
                         ),
@@ -134,7 +134,7 @@ class _FlexCardScreenState extends State<FlexCardScreen> {
                   right: -10,
                   child: IconButton(
                     onPressed: () => Navigator.pop(context),
-                    icon: const Icon(Icons.close, color: AppColors.textHeader),
+                    icon: const Icon(Icons.close, color: Colors.white),
                     style: IconButton.styleFrom(backgroundColor: Colors.black54),
                   ),
                 ),
@@ -149,8 +149,8 @@ class _FlexCardScreenState extends State<FlexCardScreen> {
                 icon: const Icon(Icons.share),
                 label: const Text('Share to Instagram Story', style: TextStyle(fontWeight: FontWeight.bold)),
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.purpleAccent,
-                  foregroundColor: AppColors.textHeader,
+                  backgroundColor: AppColors.primary,
+                  foregroundColor: Colors.white,
                   padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
                 ),
@@ -172,14 +172,14 @@ class _MiniStat extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
       decoration: BoxDecoration(
-        color: AppColors.textHeader.withValues(alpha: 0.05),
+        color: Colors.white.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(12),
       ),
       child: Row(
         children: [
           Icon(icon, size: 16, color: AppColors.primary),
           const SizedBox(width: 6),
-          Text(value, style: const TextStyle(fontWeight: FontWeight.w600, color: AppColors.textHeader)),
+          Text(value, style: const TextStyle(fontWeight: FontWeight.w600, color: Colors.white)),
         ],
       ),
     );
