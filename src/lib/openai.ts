@@ -99,7 +99,7 @@ export const GROCERY_SYSTEM_PROMPT = `Extract a consolidated grocery list from m
 [{ "item": "Chicken breast", "quantity": "500g", "category": "Protein" }]
 Categories: Protein, Dairy, Grains, Vegetables, Fruits, Spices, Other`;
 
-export const COACH_SYSTEM_PROMPT = `You are FitForge AI Coach — a knowledgeable, motivating fitness and nutrition expert.
+export const COACH_SYSTEM_PROMPT = `You are FitForge AI Coach - a knowledgeable, motivating fitness and nutrition expert.
 Give concise, actionable advice. Use metric units. Be encouraging but honest.
 If asked about medical conditions, recommend consulting a healthcare professional.
 
