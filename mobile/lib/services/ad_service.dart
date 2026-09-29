@@ -66,20 +66,29 @@ class AdService {
       }
     }
 
-    UnityAds.showVideoAd(
+    UnityAds.load(
       placementId: _interstitialId,
-      onStart: (placementId) => debugPrint('Unity Ad Started: $placementId'),
-      onClick: (placementId) => debugPrint('Unity Ad Clicked: $placementId'),
-      onSkipped: (placementId) {
-        debugPrint('Unity Ad Skipped: $placementId');
-        handleClose();
-      },
       onComplete: (placementId) {
-        debugPrint('Unity Ad Completed: $placementId');
-        handleClose();
+        UnityAds.showVideoAd(
+          placementId: placementId,
+          onStart: (placementId) => debugPrint('Unity Ad Started: $placementId'),
+          onClick: (placementId) => debugPrint('Unity Ad Clicked: $placementId'),
+          onSkipped: (placementId) {
+            debugPrint('Unity Ad Skipped: $placementId');
+            handleClose();
+          },
+          onComplete: (placementId) {
+            debugPrint('Unity Ad Completed: $placementId');
+            handleClose();
+          },
+          onFailed: (placementId, error, message) {
+            debugPrint('Unity Ad Failed: $error $message');
+            handleClose();
+          },
+        );
       },
       onFailed: (placementId, error, message) {
-        debugPrint('Unity Ad Failed: $error $message');
+        debugPrint('Unity Ad Load Failed: $error $message');
         handleClose();
       },
     );
