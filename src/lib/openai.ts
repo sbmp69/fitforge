@@ -1,18 +1,9 @@
 import OpenAI from "openai";
 
-const MODEL = "inclusionai/ling-3.1-flash";
+const MODEL = "gpt-4o-mini";
 
 export function getOpenAIClient() {
-  const k1 = "sk-or-v1-414f52c26ea0e1f";
-  const k2 = "f344b16366df7c94a0769a167c6b6ba215414b842a0e27743";
-  return new OpenAI({ 
-    baseURL: "https://openrouter.ai/api/v1",
-    apiKey: process.env.OPENROUTER_API_KEY || (k1 + k2),
-    defaultHeaders: {
-      "HTTP-Referer": "https://fitforge.ai",
-      "X-Title": "FitForge"
-    }
-  });
+  return new OpenAI({ apiKey: process.env.OPENAI_API_KEY! });
 }
 
 export async function generateJSON<T>(
@@ -25,24 +16,14 @@ export async function generateJSON<T>(
     model: MODEL,
     max_tokens: 4096,
     temperature: 0.7,
+    response_format: { type: "json_object" },
     messages: [
       { role: "system", content: systemPrompt },
       { role: "user", content: userPrompt }
     ],
   });
 
-  let text = response.choices[0]?.message?.content || "";
-  
-  // Extract just the JSON object to ignore any conversational filler
-  const firstBrace = text.indexOf("{");
-  const lastBrace = text.lastIndexOf("}");
-  
-  if (firstBrace !== -1 && lastBrace !== -1 && lastBrace > firstBrace) {
-    text = text.substring(firstBrace, lastBrace + 1);
-  } else {
-    // Strip markdown code blocks as a fallback
-    text = text.replace(/```json/g, "").replace(/```/g, "").trim();
-  }
+  const text = response.choices[0]?.message?.content || "";
   
   try {
     return JSON.parse(text) as T;
