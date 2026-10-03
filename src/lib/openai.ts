@@ -25,14 +25,16 @@ export async function generateJSON<T>(
     model: MODEL,
     max_tokens: 4096,
     temperature: 0.7,
-    response_format: { type: "json_object" },
     messages: [
       { role: "system", content: systemPrompt },
       { role: "user", content: userPrompt }
     ],
   });
 
-  const text = response.choices[0]?.message?.content || "";
+  let text = response.choices[0]?.message?.content || "";
+  
+  // Strip markdown code blocks if the model wrapped it
+  text = text.replace(/```json/g, "").replace(/```/g, "").trim();
   
   try {
     return JSON.parse(text) as T;
