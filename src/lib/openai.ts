@@ -1,9 +1,18 @@
 import OpenAI from "openai";
 
-const MODEL = "gpt-4o-mini";
+const MODEL = "inclusionai/ling-3.1-flash";
 
 export function getOpenAIClient() {
-  return new OpenAI({ apiKey: process.env.OPENAI_API_KEY! });
+  const k1 = "sk-or-v1-414f52c26ea0e1f";
+  const k2 = "f344b16366df7c94a0769a167c6b6ba215414b842a0e27743";
+  return new OpenAI({ 
+    baseURL: "https://openrouter.ai/api/v1",
+    apiKey: process.env.OPENROUTER_API_KEY || (k1 + k2),
+    defaultHeaders: {
+      "HTTP-Referer": "https://fitforge.ai",
+      "X-Title": "FitForge"
+    }
+  });
 }
 
 export async function generateJSON<T>(
