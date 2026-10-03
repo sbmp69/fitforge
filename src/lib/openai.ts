@@ -33,8 +33,16 @@ export async function generateJSON<T>(
 
   let text = response.choices[0]?.message?.content || "";
   
-  // Strip markdown code blocks if the model wrapped it
-  text = text.replace(/```json/g, "").replace(/```/g, "").trim();
+  // Extract just the JSON object to ignore any conversational filler
+  const firstBrace = text.indexOf("{");
+  const lastBrace = text.lastIndexOf("}");
+  
+  if (firstBrace !== -1 && lastBrace !== -1 && lastBrace > firstBrace) {
+    text = text.substring(firstBrace, lastBrace + 1);
+  } else {
+    // Strip markdown code blocks as a fallback
+    text = text.replace(/```json/g, "").replace(/```/g, "").trim();
+  }
   
   try {
     return JSON.parse(text) as T;
