@@ -1,10 +1,13 @@
-import 'dart:io';
+﻿import 'dart:io';
 import 'dart:async';
-import 'subscription_service.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart';
 import 'package:unity_ads_plugin/unity_ads_plugin.dart';
-
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+
+import 'subscription_service.dart';
+import '../router/app_router.dart';
+import '../screens/paywall/paywall_screen.dart';
 
 class AdService {
   static String get _androidGameId => dotenv.env['UNITY_ANDROID_GAME_ID'] ?? '800370432'; 
@@ -48,6 +51,44 @@ class AdService {
     });
   }
 
+  static void _showPostAdPopup() {
+    final ctx = AppRouter.navigatorKey.currentContext;
+    if (ctx != null && !SubscriptionService.isPremium) {
+      showDialog(
+        context: ctx,
+        builder: (context) => AlertDialog(
+          backgroundColor: const Color(0xFF1E293B),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+          title: const Text('Go Ad-Free! 🚀', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+          content: const Text(
+            'Tired of ads? Subscribe to PRO for an entirely ad-free experience with unlimited AI generations!',
+            style: TextStyle(color: Colors.white70, fontSize: 14, height: 1.4),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text('Maybe Later', style: TextStyle(color: Colors.white54)),
+            ),
+            ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: const Color(0xFF10B981),
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+              ),
+              onPressed: () {
+                Navigator.pop(context);
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (_) => const PaywallScreen()),
+                );
+              },
+              child: const Text('Upgrade Now', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+            ),
+          ],
+        ),
+      );
+    }
+  }
+
   static void showInterstitialAd(Function onAdClosed) {
     if (SubscriptionService.isPremium) {
       onAdClosed();
@@ -63,6 +104,7 @@ class AdService {
         _isAdShowing = false;
         _secondsElapsed = 0; // Reset timer since they just saw an ad
         onAdClosed();
+        _showPostAdPopup();
       }
     }
 
