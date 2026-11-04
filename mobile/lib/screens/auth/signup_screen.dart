@@ -47,10 +47,13 @@ class _SignupScreenState extends State<SignupScreen> {
       _error = null;
     });
     try {
-      await _supabase.signInWithGoogle();
-      if (mounted) context.go('/home');
+      final success = await _supabase.signInWithGoogle();
+      if (success && mounted) context.go('/home');
     } catch (e) {
-      setState(() => _error = e.toString());
+      final err = e.toString().toLowerCase();
+      if (!err.contains('canceled') && !err.contains('cancelled') && !err.contains('code 16')) {
+        setState(() => _error = e.toString());
+      }
     } finally {
       if (mounted) setState(() => _loading = false);
     }

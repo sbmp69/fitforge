@@ -1,4 +1,4 @@
-﻿class OnboardingData {
+class OnboardingData {
   String gender;
   String goal; // 'weight_loss', 'build_muscle', 'tone'
   String weightLossHistory; // 'succeeded_improve', 'succeeded_rebound', 'tried_failed', 'never_tried'
@@ -14,6 +14,8 @@
   List<String> injuries; // ['No injuries', 'Shoulders', 'Knee', etc.]
   String fitnessLevel; // 'Beginner', 'Intermediate', 'Advanced'
   List<String> equipment; // ['Bodyweight', 'Portable', 'Gym']
+  String mealPreference;
+  String country;
   List<String> workoutDays; // ['Mon', 'Tue', 'Wed', 'Fri']
   bool workoutReminder;
 
@@ -33,6 +35,8 @@
     List<String>? injuries,
     this.fitnessLevel = 'Beginner',
     List<String>? equipment,
+    this.mealPreference = 'Traditional Indian',
+    this.country = 'India',
     List<String>? workoutDays,
     this.workoutReminder = true,
   })  : targetFocusAreas = targetFocusAreas ?? ['Full Body'],
@@ -80,6 +84,8 @@
         'injuries': injuries,
         'fitness_level': fitnessLevel,
         'equipment': equipment,
+        'meal_preference': mealPreference,
+        'country': country,
         'workout_days': workoutDays,
         'workout_reminder': workoutReminder,
       };

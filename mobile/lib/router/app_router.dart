@@ -40,7 +40,7 @@ class AppRouter {
       },
       routes: [
         GoRoute(path: '/onboarding', builder: (_, __) => const OnboardingScreen()),
-        GoRoute(path: '/physique-onboarding', builder: (_, __) => const PhysiqueOnboardingScreen()),
+        GoRoute(path: '/physique-onboarding', redirect: (_, __) => '/home'),
         GoRoute(path: '/login', builder: (_, __) => const LoginScreen()),
         GoRoute(path: '/signup', builder: (_, __) => const SignupScreen()),
         StatefulShellRoute.indexedStack(

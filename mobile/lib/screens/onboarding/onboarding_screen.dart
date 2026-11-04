@@ -17,7 +17,7 @@ class OnboardingScreen extends StatefulWidget {
 class _OnboardingScreenState extends State<OnboardingScreen> {
   final _pageController = PageController();
   int _currentStep = 0;
-  final int _totalSteps = 16;
+  final int _totalSteps = 18;
   final OnboardingData _data = OnboardingData();
 
   void _nextPage() {
@@ -138,6 +138,8 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                   _buildInjuriesStep(),
                   _buildFitnessLevelStep(),
                   _buildEquipmentStep(),
+                  _buildMealPreferenceStep(),
+                  _buildCountryStep(),
                   _buildScheduleStep(),
                 ],
               ),
@@ -1229,7 +1231,168 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     );
   }
 
-  // --- Step 16: Training Schedule & Reminder ---
+  // --- Step 16: Meal Preference / Cuisine ---
+  Widget _buildMealPreferenceStep() {
+    final options = [
+      {'key': 'Traditional Indian', 'title': 'Traditional Indian', 'subtitle': 'Balanced regional curries, lentils & grains', 'icon': Icons.restaurant},
+      {'key': 'High Protein', 'title': 'High Protein', 'subtitle': 'Lean meats, eggs, paneer, sprouts & fish', 'icon': Icons.fitness_center},
+      {'key': 'Vegetarian', 'title': 'Vegetarian', 'subtitle': 'Pure plant & dairy based, rich in nutrition', 'icon': Icons.eco},
+      {'key': 'Vegan', 'title': 'Vegan', 'subtitle': '100% plant-based, cruelty & dairy free', 'icon': Icons.spa},
+      {'key': 'Keto', 'title': 'Keto / Low Carb', 'subtitle': 'Healthy fats, leafy greens & minimal carbs', 'icon': Icons.local_fire_department},
+      {'key': 'Mediterranean', 'title': 'Mediterranean', 'subtitle': 'Olive oils, fresh greens, whole grains & seafood', 'icon': Icons.set_meal},
+      {'key': 'No Preference', 'title': 'No Preference / Flexible', 'subtitle': 'Open to diverse and versatile wholesome meals', 'icon': Icons.all_inclusive},
+    ];
+
+    return _StepContainer(
+      title: "Choose your meal preference",
+      subtitle: "This preference is directly used to generate tailored AI meal plans and recipes for you.",
+      bottomAction: _PrimaryButton(
+        title: 'CONTINUE',
+        onPressed: _nextPage,
+      ),
+      child: SingleChildScrollView(
+        child: Column(
+          children: options.map((opt) {
+            final isSel = _data.mealPreference == opt['key'];
+            return Padding(
+              padding: const EdgeInsets.only(bottom: 12),
+              child: InkWell(
+                onTap: () {
+                  setState(() => _data.mealPreference = opt['key'] as String);
+                  _nextPage();
+                },
+                borderRadius: BorderRadius.circular(16),
+                child: Container(
+                  padding: const EdgeInsets.all(16),
+                  decoration: BoxDecoration(
+                    color: isSel ? AppColors.primaryLight : AppColors.surface,
+                    borderRadius: BorderRadius.circular(16),
+                    border: Border.all(
+                      color: isSel ? AppColors.primary : AppColors.border,
+                      width: isSel ? 2 : 1,
+                    ),
+                  ),
+                  child: Row(
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.all(10),
+                        decoration: BoxDecoration(
+                          color: isSel ? AppColors.primary : AppColors.primaryLight,
+                          shape: BoxShape.circle,
+                        ),
+                        child: Icon(opt['icon'] as IconData, color: isSel ? Colors.white : AppColors.primary, size: 22),
+                      ),
+                      const SizedBox(width: 14),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              opt['title'] as String,
+                              style: TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.bold,
+                                color: isSel ? AppColors.primary : AppColors.textHeader,
+                              ),
+                            ),
+                            const SizedBox(height: 2),
+                            Text(
+                              opt['subtitle'] as String,
+                              style: const TextStyle(fontSize: 12, color: AppColors.textSecondary),
+                            ),
+                          ],
+                        ),
+                      ),
+                      if (isSel)
+                        const Icon(Icons.check_circle, color: AppColors.primary, size: 22),
+                    ],
+                  ),
+                ),
+              ),
+            );
+          }).toList(),
+        ),
+      ),
+    );
+  }
+
+  // --- Step 17: Country Selection ---
+  Widget _buildCountryStep() {
+    final countries = [
+      'India',
+      'United States',
+      'United Kingdom',
+      'Canada',
+      'Australia',
+      'United Arab Emirates',
+      'Germany',
+      'Other',
+    ];
+
+    return _StepContainer(
+      title: "Where are you located?",
+      subtitle: "Helps us optimize local ingredient availability and smart workout reminder timing.",
+      bottomAction: _PrimaryButton(
+        title: 'CONTINUE',
+        onPressed: _nextPage,
+      ),
+      child: SingleChildScrollView(
+        child: Column(
+          children: countries.map((name) {
+            final isSel = _data.country == name;
+            return Padding(
+              padding: const EdgeInsets.only(bottom: 12),
+              child: InkWell(
+                onTap: () {
+                  setState(() => _data.country = name);
+                  _nextPage();
+                },
+                borderRadius: BorderRadius.circular(16),
+                child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 16),
+                  decoration: BoxDecoration(
+                    color: isSel ? AppColors.primaryLight : AppColors.surface,
+                    borderRadius: BorderRadius.circular(16),
+                    border: Border.all(
+                      color: isSel ? AppColors.primary : AppColors.border,
+                      width: isSel ? 2 : 1,
+                    ),
+                  ),
+                  child: Row(
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.all(8),
+                        decoration: BoxDecoration(
+                          color: isSel ? AppColors.primary : AppColors.primaryLight,
+                          shape: BoxShape.circle,
+                        ),
+                        child: Icon(Icons.public, color: isSel ? Colors.white : AppColors.primary, size: 20),
+                      ),
+                      const SizedBox(width: 14),
+                      Expanded(
+                        child: Text(
+                          name,
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                            color: isSel ? AppColors.primary : AppColors.textHeader,
+                          ),
+                        ),
+                      ),
+                      if (isSel)
+                        const Icon(Icons.check_circle, color: AppColors.primary, size: 22),
+                    ],
+                  ),
+                ),
+              ),
+            );
+          }).toList(),
+        ),
+      ),
+    );
+  }
+
+  // --- Step 18: Training Schedule & Reminder ---
   Widget _buildScheduleStep() {
     final days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 

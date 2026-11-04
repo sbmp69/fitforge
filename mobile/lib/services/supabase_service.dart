@@ -1,4 +1,4 @@
-﻿import 'dart:convert';
+import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -208,17 +208,96 @@ class SupabaseService {
     }
   }
 
+  Future<void> savePendingOnboardingProfile() async {
+    final user = currentUser;
+    if (user == null) return;
+
+    final prefs = await SharedPreferences.getInstance();
+    final rawData = prefs.getString('pending_onboarding_data');
+    if (rawData == null) return;
+
+    try {
+      final json = jsonDecode(rawData) as Map<String, dynamic>;
+      final updateData = <String, dynamic>{
+        'height_cm': json['height_cm'],
+        'weight_kg': json['current_weight_kg'],
+        'primary_goal': json['goal'],
+        'fitness_level': (json['fitness_level'] as String?)?.toLowerCase() ?? 'beginner',
+        'gender': json['gender'],
+        'country': json['country'] ?? 'India',
+        'meal_preference': json['meal_preference'] ?? 'Traditional Indian',
+        'target_focus_areas': json['target_focus_areas'],
+        'body_fat_range': json['current_body_fat'],
+        'target_weight_kg': json['target_weight_kg'],
+        'target_pace': json['target_pace'],
+        'weight_loss_history': json['weight_loss_history'],
+        'lifestyle_issues': json['lifestyle_issues'],
+        'injuries': json['injuries'],
+        'equipment': json['equipment'],
+        'workout_days': json['workout_days'],
+        'workout_reminder': json['workout_reminder'] ?? true,
+      };
+
+      final age = json['age'] as int?;
+      if (age != null && age > 0) {
+        final birthYear = DateTime.now().year - age;
+        updateData['date_of_birth'] = '$birthYear-01-01';
+      }
+
+      await client.from('profiles').update(updateData).eq('id', user.id);
+      debugPrint('Successfully saved onboarding survey to Supabase profile!');
+    } catch (e) {
+      debugPrint('Error syncing onboarding profile to Supabase: $e');
+    }
+  }
+
   Future<void> signUp(String email, String password, String fullName, String role) async {
+    final prefs = await SharedPreferences.getInstance();
+    final rawOnboarding = prefs.getString('pending_onboarding_data');
+    final Map<String, dynamic> payload = {
+      'email': email,
+      'password': password,
+      'full_name': fullName,
+      'role': role,
+    };
+
+    if (rawOnboarding != null) {
+      try {
+        final onbJson = jsonDecode(rawOnboarding) as Map<String, dynamic>;
+        payload.addAll({
+          'height_cm': onbJson['height_cm'],
+          'weight_kg': onbJson['current_weight_kg'],
+          'primary_goal': onbJson['goal'],
+          'fitness_level': (onbJson['fitness_level'] as String?)?.toLowerCase() ?? 'beginner',
+          'country': onbJson['country'] ?? 'India',
+          'meal_preference': onbJson['meal_preference'] ?? 'Traditional Indian',
+          'gender': onbJson['gender'],
+          'target_focus_areas': onbJson['target_focus_areas'],
+          'body_fat_range': onbJson['current_body_fat'],
+          'target_weight_kg': onbJson['target_weight_kg'],
+          'target_pace': onbJson['target_pace'],
+          'weight_loss_history': onbJson['weight_loss_history'],
+          'lifestyle_issues': onbJson['lifestyle_issues'],
+          'injuries': onbJson['injuries'],
+          'equipment': onbJson['equipment'],
+          'workout_days': onbJson['workout_days'],
+          'workout_reminder': onbJson['workout_reminder'] ?? true,
+        });
+        final age = onbJson['age'] as int?;
+        if (age != null && age > 0) {
+          final birthYear = DateTime.now().year - age;
+          payload['date_of_birth'] = '$birthYear-01-01';
+        }
+      } catch (e) {
+        debugPrint('Error parsing pending onboarding data: $e');
+      }
+    }
+
     final url = Uri.parse('${dotenv.env['API_BASE_URL'] ?? 'http://192.168.1.5:3000'}/api/auth/register');
     final response = await http.post(
       url,
       headers: {'Content-Type': 'application/json'},
-      body: jsonEncode({
-        'email': email,
-        'password': password,
-        'full_name': fullName,
-        'role': role,
-      }),
+      body: jsonEncode(payload),
     );
 
     if (response.statusCode != 200) {
@@ -230,13 +309,14 @@ class SupabaseService {
     final res = await client.auth.signInWithPassword(email: email, password: password);
     if (res.user != null) {
       await SubscriptionService.logIn(res.user!.id);
+      await savePendingOnboardingProfile();
     }
   }
 
-  Future<void> signInWithGoogle() async {
+  Future<bool> signInWithGoogle() async {
     if (kIsWeb) {
       await client.auth.signInWithOAuth(OAuthProvider.google);
-      return;
+      return true;
     }
 
     const webClientId = '232259821601-aiqlebtbcs52hsvko0mmfqmshi5p3koa.apps.googleusercontent.com';
@@ -254,7 +334,19 @@ class SupabaseService {
       _isGoogleSignInInitialized = true;
     }
     
-    final googleUser = await GoogleSignIn.instance.authenticate();
+    GoogleSignInAccount? googleUser;
+    try {
+      googleUser = await GoogleSignIn.instance.authenticate();
+    } catch (e) {
+      final err = e.toString().toLowerCase();
+      if (err.contains('canceled') || err.contains('cancelled') || err.contains('code 16') || err.contains('user.')) {
+        debugPrint('Google sign in cancelled by user.');
+        return false;
+      }
+      rethrow;
+    }
+
+    if (googleUser == null) return false;
     
     final googleAuth = await googleUser.authentication;
     final idToken = googleAuth.idToken;
@@ -267,7 +359,9 @@ class SupabaseService {
     );
     if (res.user != null) {
       await SubscriptionService.logIn(res.user!.id);
+      await savePendingOnboardingProfile();
     }
+    return true;
   }
 
   Future<void> deleteAccount() async {

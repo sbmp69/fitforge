@@ -1,4 +1,4 @@
-﻿import 'dart:ui';
+import 'dart:ui';
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'dart:io';
@@ -248,7 +248,13 @@ class _HomeScreenState extends State<HomeScreen> {
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text('Hello $name ðŸ‘‹', style: const TextStyle(color: AppColors.textSecondary, fontSize: 16)),
+                      Row(
+                        children: [
+                          Text('Hello $name', style: const TextStyle(color: AppColors.textSecondary, fontSize: 16)),
+                          const SizedBox(width: 6),
+                          const Icon(Icons.waving_hand, color: Color(0xFFFFCC80), size: 16),
+                        ],
+                      ),
                       const SizedBox(height: 4),
                       RichText(
                         text: const TextSpan(
@@ -273,7 +279,18 @@ class _HomeScreenState extends State<HomeScreen> {
                         ),
                         child: Row(
                           children: [
-                            const Text('ðŸ”¥', style: TextStyle(fontSize: 32)),
+                            Container(
+                              padding: const EdgeInsets.all(8),
+                              decoration: BoxDecoration(
+                                color: Colors.white.withValues(alpha: 0.15),
+                                shape: BoxShape.circle,
+                              ),
+                              child: const Icon(
+                                Icons.local_fire_department,
+                                color: Color(0xFFFF9800),
+                                size: 28,
+                              ),
+                            ),
                             const SizedBox(width: 16),
                             Expanded(
                               child: Column(
