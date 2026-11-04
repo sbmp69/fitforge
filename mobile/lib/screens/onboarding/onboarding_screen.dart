@@ -1,3 +1,5 @@
+import 'package:supabase_flutter/supabase_flutter.dart';
+import '../../services/supabase_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:go_router/go_router.dart';
@@ -45,7 +47,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
             if (profile.workoutDays.isNotEmpty) _data.workoutDays = List.from(profile.workoutDays);
             if (profile.dateOfBirth != null) {
               final age = DateTime.now().year - profile.dateOfBirth!.year;
-              if (age > 10 && age < 100) _data.age = age;
+              if (age > 10 && age < 100) _data.age = age.toInt();
             }
           });
         }
