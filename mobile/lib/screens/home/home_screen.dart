@@ -1,4 +1,4 @@
-import 'dart:ui';
+﻿import 'dart:ui';
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'dart:io';
@@ -248,7 +248,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text('Hello $name 👋', style: const TextStyle(color: AppColors.textSecondary, fontSize: 16)),
+                      Text('Hello $name ðŸ‘‹', style: const TextStyle(color: AppColors.textSecondary, fontSize: 16)),
                       const SizedBox(height: 4),
                       RichText(
                         text: const TextSpan(
@@ -273,7 +273,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         ),
                         child: Row(
                           children: [
-                            const Text('🔥', style: TextStyle(fontSize: 32)),
+                            const Text('ðŸ”¥', style: TextStyle(fontSize: 32)),
                             const SizedBox(width: 16),
                             Expanded(
                               child: Column(
@@ -359,7 +359,100 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
               const SizedBox(height: 24),
 
-              const Text('Quick Actions', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: AppColors.textHeader)),
+                              if (_profile != null && (_profile?.targetWeightKg != null || _profile?.targetFocusAreas.isNotEmpty == true)) ...[
+                  Container(
+                    padding: const EdgeInsets.all(20),
+                    decoration: BoxDecoration(
+                      gradient: const LinearGradient(
+                        colors: [Color(0xFFEAF1EB), Color(0xFFD8E5DA)],
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                      ),
+                      borderRadius: BorderRadius.circular(20),
+                      border: Border.all(color: AppColors.accent.withValues(alpha: 0.3)),
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          children: [
+                            Container(
+                              padding: const EdgeInsets.all(8),
+                              decoration: const BoxDecoration(
+                                color: AppColors.primary,
+                                shape: BoxShape.circle,
+                              ),
+                              child: const Icon(Icons.track_changes, color: Colors.white, size: 20),
+                            ),
+                            const SizedBox(width: 12),
+                            const Text(
+                              'Your Target Roadmap 🎯',
+                              style: TextStyle(
+                                fontSize: 17,
+                                fontWeight: FontWeight.w900,
+                                color: AppColors.textHeader,
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 14),
+                        Row(
+                          children: [
+                            if (_profile?.weightKg != null && _profile?.targetWeightKg != null)
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    const Text('Goal Target', style: TextStyle(fontSize: 12, color: AppColors.textSecondary)),
+                                    const SizedBox(height: 2),
+                                    Text(
+                                      'kg ➔ kg',
+                                      style: const TextStyle(fontSize: 15, fontWeight: FontWeight.bold, color: AppColors.textHeader),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            if (_profile?.targetPace != null)
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    const Text('Pace', style: TextStyle(fontSize: 12, color: AppColors.textSecondary)),
+                                    const SizedBox(height: 2),
+                                    Text(
+                                      _profile!.targetPace!.toUpperCase(),
+                                      style: const TextStyle(fontSize: 15, fontWeight: FontWeight.bold, color: AppColors.primary),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                          ],
+                        ),
+                        if (_profile?.targetFocusAreas.isNotEmpty ?? false) ...[
+                          const SizedBox(height: 12),
+                          Wrap(
+                            spacing: 6,
+                            runSpacing: 6,
+                            children: _profile!.targetFocusAreas.map((area) => Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                              decoration: BoxDecoration(
+                                color: Colors.white,
+                                borderRadius: BorderRadius.circular(8),
+                                border: Border.all(color: AppColors.border),
+                              ),
+                              child: Text(
+                                area,
+                                style: const TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: AppColors.textHeader),
+                              ),
+                            )).toList(),
+                          ),
+                        ],
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 24),
+                ],
+                const Text('Quick Actions', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: AppColors.textHeader)),
               const SizedBox(height: 12),
 
               _QuickActionCard(
@@ -474,4 +567,5 @@ class _QuickActionCard extends StatelessWidget {
     );
   }
 }
+
 

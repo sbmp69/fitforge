@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'dart:async';
 import 'package:flutter/services.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -225,7 +225,7 @@ class _WorkoutScreenState extends State<WorkoutScreen> {
                         ],
                       ),
                       alignment: Alignment.center,
-                      child: const Text('Generate AI Plan ⚡', style: TextStyle(color: AppColors.textHeader, fontSize: 16, fontWeight: FontWeight.bold)),
+                      child: const Text('Generate AI Plan âš¡', style: TextStyle(color: AppColors.textHeader, fontSize: 16, fontWeight: FontWeight.bold)),
                     ),
                   ).animate(onPlay: (c) => c.repeat(reverse: true)).shimmer(duration: 2.seconds, color: Colors.black26),
                 ],
@@ -289,7 +289,7 @@ class _WorkoutScreenState extends State<WorkoutScreen> {
             ),
         ],
       ),
-          if (_loading) const LoadingOverlay(text: 'Forging your workout... ⚡'),
+          if (_loading) const LoadingOverlay(text: 'Forging your workout... âš¡'),
         ],
       ),
     );
@@ -394,7 +394,7 @@ class _DayCardState extends State<_DayCard> {
                               children: [
                                 Text(ex.name, style: const TextStyle(fontWeight: FontWeight.bold, color: AppColors.textHeader, fontSize: 14)),
                                 const SizedBox(height: 4),
-                                Text('${ex.sets} sets × ${ex.reps}', style: const TextStyle(fontSize: 12, color: AppColors.textSecondary)),
+                                Text('${ex.sets} sets Ã— ${ex.reps}', style: const TextStyle(fontSize: 12, color: AppColors.textSecondary)),
                                 const SizedBox(height: 8),
                                 InkWell(
                                   onTap: () async {
@@ -435,3 +435,4 @@ class _DayCardState extends State<_DayCard> {
     );
   }
 }
+
