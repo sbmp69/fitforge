@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:go_router/go_router.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -226,10 +226,10 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   // --- Step 3: Weight Loss History ---
   Widget _buildWeightLossHistoryStep() {
     final options = [
-      {'key': 'succeeded_improve', 'title': 'Succeeded, Want to Improve', 'emoji': '💪'},
-      {'key': 'succeeded_rebound', 'title': 'Succeeded but Rebounded', 'emoji': '😅'},
-      {'key': 'tried_failed', 'title': 'Tried but Failed', 'emoji': '😫'},
-      {'key': 'never_tried', 'title': 'Never Tried', 'emoji': '🌱'},
+      {'key': 'succeeded_improve', 'title': 'Succeeded, Want to Improve', 'emoji': 'ðŸ’ª'},
+      {'key': 'succeeded_rebound', 'title': 'Succeeded but Rebounded', 'emoji': 'ðŸ˜…'},
+      {'key': 'tried_failed', 'title': 'Tried but Failed', 'emoji': 'ðŸ˜«'},
+      {'key': 'never_tried', 'title': 'Never Tried', 'emoji': 'ðŸŒ±'},
     ];
 
     return _StepContainer(
@@ -1102,7 +1102,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
       title: "Training Equipment & Schedule",
       subtitle: "Final step! Choose your tools and which days you want to train.",
       bottomAction: _PrimaryButton(
-        title: 'BUILD MY PERSONALIZED PLAN 🚀',
+        title: 'BUILD MY PERSONALIZED PLAN ðŸš€',
         onPressed: _finishOnboarding,
       ),
       child: SingleChildScrollView(
@@ -1402,7 +1402,7 @@ class _PrimaryButton extends StatelessWidget {
   }
 }
 
-// Custom Vector Anatomy Silhouette Painter (No screenshot dependencies)
+// Professional Athletic Anatomy Silhouette Painter (Athletic curved muscular contours)
 class _AnatomySilhouettePainter extends CustomPainter {
   final List<String> selectedAreas;
 
@@ -1410,65 +1410,143 @@ class _AnatomySilhouettePainter extends CustomPainter {
 
   @override
   void paint(Canvas canvas, Size size) {
+    final cx = size.width / 2;
+
     final basePaint = Paint()
-      ..color = AppColors.border
+      ..color = const Color(0xFFDCE4DF)
       ..style = PaintingStyle.fill;
 
     final activePaint = Paint()
       ..color = AppColors.primary
       ..style = PaintingStyle.fill;
 
-    final cx = size.width / 2;
+    final outlinePaint = Paint()
+      ..color = AppColors.border
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 1.0;
 
-    // Head
-    canvas.drawCircle(Offset(cx, 28), 18, basePaint);
+    // Check highlights
+    final isFull = selectedAreas.contains('Full Body');
+    final chestActive = isFull || selectedAreas.contains('Chest');
+    final backActive = isFull || selectedAreas.contains('Back');
+    final armsActive = isFull || selectedAreas.contains('Arms');
+    final absActive = isFull || selectedAreas.contains('Abs');
+    final glutesActive = isFull || selectedAreas.contains('Glutes');
+    final legActive = isFull || selectedAreas.contains('Leg');
 
-    // Torso / Chest / Abs
-    final chestActive = selectedAreas.contains('Chest') || selectedAreas.contains('Full Body');
-    final absActive = selectedAreas.contains('Abs') || selectedAreas.contains('Full Body');
-    final backActive = selectedAreas.contains('Back') || selectedAreas.contains('Full Body');
+    // 1. Head & Neck
+    canvas.drawCircle(Offset(cx, 26), 16, basePaint);
+    canvas.drawCircle(Offset(cx, 26), 16, outlinePaint);
+    final neckPath = Path()
+      ..moveTo(cx - 7, 38)
+      ..lineTo(cx + 7, 38)
+      ..lineTo(cx + 10, 48)
+      ..lineTo(cx - 10, 48)
+      ..close();
+    canvas.drawPath(neckPath, basePaint);
 
-    // Upper Torso / Chest
-    canvas.drawRRect(
-      RRect.fromRectAndRadius(Rect.fromLTWH(cx - 38, 52, 76, 50), const Radius.circular(14)),
-      (chestActive || backActive) ? activePaint : basePaint,
-    );
+    // 2. Chest & Upper Torso (V-taper athletic shape)
+    final chestPaint = (chestActive || backActive) ? activePaint : basePaint;
+    final chestPath = Path()
+      ..moveTo(cx - 40, 52)
+      ..quadraticBezierTo(cx, 46, cx + 40, 52)
+      ..quadraticBezierTo(cx + 34, 82, cx + 24, 102)
+      ..lineTo(cx - 24, 102)
+      ..quadraticBezierTo(cx - 34, 82, cx - 40, 52)
+      ..close();
+    canvas.drawPath(chestPath, chestPaint);
+    canvas.drawPath(chestPath, outlinePaint);
 
-    // Lower Torso / Abs
-    canvas.drawRRect(
-      RRect.fromRectAndRadius(Rect.fromLTWH(cx - 30, 106, 60, 48), const Radius.circular(10)),
-      absActive ? activePaint : basePaint,
-    );
+    // Pec line details
+    if (!chestActive && !backActive) {
+      final pecPaint = Paint()..color = const Color(0xFFCAD6CE)..style = PaintingStyle.stroke..strokeWidth = 1.5;
+      canvas.drawLine(Offset(cx - 24, 76), Offset(cx - 4, 78), pecPaint);
+      canvas.drawLine(Offset(cx + 4, 78), Offset(cx + 24, 76), pecPaint);
+      canvas.drawLine(Offset(cx, 54), Offset(cx, 96), pecPaint);
+    }
 
-    // Arms
-    final armsActive = selectedAreas.contains('Arms') || selectedAreas.contains('Full Body');
+    // 3. Abdominals & Core (Tapered 6-pack grid)
+    final absPaint = absActive ? activePaint : basePaint;
+    final absPath = Path()
+      ..moveTo(cx - 24, 104)
+      ..lineTo(cx + 24, 104)
+      ..quadraticBezierTo(cx + 26, 130, cx + 28, 152)
+      ..lineTo(cx - 28, 152)
+      ..quadraticBezierTo(cx - 26, 130, cx - 24, 104)
+      ..close();
+    canvas.drawPath(absPath, absPaint);
+    canvas.drawPath(absPath, outlinePaint);
+
+    // 4. Arms (Deltoid + Bicep/Tricep + Forearm)
     final armPaint = armsActive ? activePaint : basePaint;
     // Left Arm
-    canvas.drawRRect(RRect.fromRectAndRadius(Rect.fromLTWH(cx - 58, 56, 16, 90), const Radius.circular(8)), armPaint);
+    final leftArm = Path()
+      ..moveTo(cx - 42, 54)
+      ..quadraticBezierTo(cx - 56, 70, cx - 50, 98) // Bicep curve
+      ..quadraticBezierTo(cx - 52, 120, cx - 44, 142) // Forearm
+      ..lineTo(cx - 36, 140)
+      ..quadraticBezierTo(cx - 38, 116, cx - 36, 96)
+      ..close();
+    canvas.drawPath(leftArm, armPaint);
+    canvas.drawPath(leftArm, outlinePaint);
+
     // Right Arm
-    canvas.drawRRect(RRect.fromRectAndRadius(Rect.fromLTWH(cx + 42, 56, 16, 90), const Radius.circular(8)), armPaint);
+    final rightArm = Path()
+      ..moveTo(cx + 42, 54)
+      ..quadraticBezierTo(cx + 56, 70, cx + 50, 98)
+      ..quadraticBezierTo(cx + 52, 120, cx + 44, 142)
+      ..lineTo(cx + 36, 140)
+      ..quadraticBezierTo(cx + 38, 116, cx + 36, 96)
+      ..close();
+    canvas.drawPath(rightArm, armPaint);
+    canvas.drawPath(rightArm, outlinePaint);
 
-    // Glutes / Pelvis
-    final glutesActive = selectedAreas.contains('Glutes') || selectedAreas.contains('Full Body');
-    canvas.drawRRect(
-      RRect.fromRectAndRadius(Rect.fromLTWH(cx - 34, 158, 68, 30), const Radius.circular(8)),
-      glutesActive ? activePaint : basePaint,
-    );
+    // 5. Glutes & Pelvis
+    final glutesPaint = glutesActive ? activePaint : basePaint;
+    final glutesPath = Path()
+      ..moveTo(cx - 28, 154)
+      ..lineTo(cx + 28, 154)
+      ..quadraticBezierTo(cx + 28, 172, cx + 20, 186)
+      ..lineTo(cx - 20, 186)
+      ..quadraticBezierTo(cx - 28, 172, cx - 28, 154)
+      ..close();
+    canvas.drawPath(glutesPath, glutesPaint);
+    canvas.drawPath(glutesPath, outlinePaint);
 
-    // Legs
-    final legActive = selectedAreas.contains('Leg') || selectedAreas.contains('Full Body');
-    final legPaint = legActive ? activePaint : basePaint;
+    // 6. Legs (Quadriceps, Knee, Calf)
+    final legPaintToUse = legActive ? activePaint : basePaint;
     // Left Leg
-    canvas.drawRRect(RRect.fromRectAndRadius(Rect.fromLTWH(cx - 30, 192, 24, 130), const Radius.circular(10)), legPaint);
+    final leftLeg = Path()
+      ..moveTo(cx - 20, 188)
+      ..lineTo(cx - 4, 188)
+      ..quadraticBezierTo(cx - 4, 230, cx - 6, 252) // Inner quad
+      ..quadraticBezierTo(cx - 4, 280, cx - 8, 316) // Calf/Ankle
+      ..lineTo(cx - 18, 316)
+      ..quadraticBezierTo(cx - 24, 280, cx - 20, 252)
+      ..quadraticBezierTo(cx - 26, 224, cx - 20, 188)
+      ..close();
+    canvas.drawPath(leftLeg, legPaintToUse);
+    canvas.drawPath(leftLeg, outlinePaint);
+
     // Right Leg
-    canvas.drawRRect(RRect.fromRectAndRadius(Rect.fromLTWH(cx + 6, 192, 24, 130), const Radius.circular(10)), legPaint);
+    final rightLeg = Path()
+      ..moveTo(cx + 4, 188)
+      ..lineTo(cx + 20, 188)
+      ..quadraticBezierTo(cx + 26, 224, cx + 20, 252)
+      ..quadraticBezierTo(cx + 24, 280, cx + 18, 316)
+      ..lineTo(cx + 8, 316)
+      ..quadraticBezierTo(cx + 4, 280, cx + 6, 252)
+      ..quadraticBezierTo(cx + 4, 230, cx + 4, 188)
+      ..close();
+    canvas.drawPath(rightLeg, legPaintToUse);
+    canvas.drawPath(rightLeg, outlinePaint);
   }
 
   @override
   bool shouldRepaint(covariant _AnatomySilhouettePainter oldDelegate) => true;
 }
 
-// Dynamic Physique Vector Painter for Body Fat Simulation
+// Proportional Body Fat Transformation Painter (True athletic muscular curves)
 class _PhysiqueBodyFatPainter extends CustomPainter {
   final String bodyFat;
   final String gender;
@@ -1482,62 +1560,104 @@ class _PhysiqueBodyFatPainter extends CustomPainter {
 
   @override
   void paint(Canvas canvas, Size size) {
-    double widthFactor = 1.0;
-    if (bodyFat == '<15%') widthFactor = 0.82;
-    if (bodyFat == '20%') widthFactor = 0.90;
-    if (bodyFat == '25%') widthFactor = 1.0;
-    if (bodyFat == '30%') widthFactor = 1.15;
-    if (bodyFat == '>40%') widthFactor = 1.30;
+    final cx = size.width / 2;
+
+    double chestSpread = 34.0;
+    double waistSpread = 18.0;
+    double hipSpread = 22.0;
+    double armThickness = 12.0;
+    double legThickness = 16.0;
+
+    if (bodyFat == '<15%') {
+      chestSpread = 38.0; // Wide V-taper
+      waistSpread = 16.0; // Tight shredded waist
+      hipSpread = 20.0;
+      armThickness = 13.0;
+      legThickness = 15.0;
+    } else if (bodyFat == '20%') {
+      chestSpread = 36.0;
+      waistSpread = 20.0;
+      hipSpread = 23.0;
+      armThickness = 12.0;
+      legThickness = 16.0;
+    } else if (bodyFat == '25%') {
+      chestSpread = 35.0;
+      waistSpread = 25.0;
+      hipSpread = 26.0;
+      armThickness = 13.0;
+      legThickness = 18.0;
+    } else if (bodyFat == '30%') {
+      chestSpread = 36.0;
+      waistSpread = 32.0; // Noticeable belly expansion
+      hipSpread = 30.0;
+      armThickness = 14.0;
+      legThickness = 20.0;
+    } else if (bodyFat == '>40%') {
+      chestSpread = 38.0;
+      waistSpread = 42.0; // Significant adiposity
+      hipSpread = 36.0;
+      armThickness = 16.0;
+      legThickness = 23.0;
+    }
 
     final paint = Paint()
       ..color = primaryColor
       ..style = PaintingStyle.fill;
 
-    final cx = size.width / 2;
+    final outline = Paint()
+      ..color = Colors.black.withValues(alpha: 0.08)
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 1.0;
 
     // Head
-    canvas.drawCircle(Offset(cx, 24), 16, paint);
+    canvas.drawCircle(Offset(cx, 22), 15, paint);
 
-    // Shoulders & Chest
-    final chestWidth = 60.0 * widthFactor;
-    canvas.drawRRect(
-      RRect.fromRectAndRadius(
-        Rect.fromCenter(center: Offset(cx, 62), width: chestWidth, height: 42),
-        const Radius.circular(12),
-      ),
-      paint,
-    );
-
-    // Midsection / Abdomen (expands dynamically with body fat)
-    final waistWidth = (38.0 * widthFactor * (bodyFat == '>40%' ? 1.25 : 1.0));
-    canvas.drawRRect(
-      RRect.fromRectAndRadius(
-        Rect.fromCenter(center: Offset(cx, 98), width: waistWidth, height: 38),
-        const Radius.circular(10),
-      ),
-      paint,
-    );
+    // Torso (V-taper to round progression)
+    final torso = Path()
+      ..moveTo(cx - chestSpread, 44)
+      ..quadraticBezierTo(cx, 38, cx + chestSpread, 44)
+      ..quadraticBezierTo(cx + waistSpread + 2, 80, cx + hipSpread, 114)
+      ..lineTo(cx - hipSpread, 114)
+      ..quadraticBezierTo(cx - waistSpread - 2, 80, cx - chestSpread, 44)
+      ..close();
+    canvas.drawPath(torso, paint);
+    canvas.drawPath(torso, outline);
 
     // Arms
-    canvas.drawRRect(
-      RRect.fromRectAndRadius(Rect.fromLTWH(cx - chestWidth / 2 - 14, 46, 12, 60), const Radius.circular(6)),
-      paint,
-    );
-    canvas.drawRRect(
-      RRect.fromRectAndRadius(Rect.fromLTWH(cx + chestWidth / 2 + 2, 46, 12, 60), const Radius.circular(6)),
-      paint,
-    );
+    final leftArm = Path()
+      ..moveTo(cx - chestSpread, 48)
+      ..quadraticBezierTo(cx - chestSpread - armThickness - 2, 75, cx - chestSpread - 4, 108)
+      ..lineTo(cx - chestSpread + 6, 106)
+      ..quadraticBezierTo(cx - chestSpread + 4, 75, cx - chestSpread + 10, 56)
+      ..close();
+    canvas.drawPath(leftArm, paint);
+
+    final rightArm = Path()
+      ..moveTo(cx + chestSpread, 48)
+      ..quadraticBezierTo(cx + chestSpread + armThickness + 2, 75, cx + chestSpread + 4, 108)
+      ..lineTo(cx + chestSpread - 6, 106)
+      ..quadraticBezierTo(cx + chestSpread - 4, 75, cx + chestSpread - 10, 56)
+      ..close();
+    canvas.drawPath(rightArm, paint);
 
     // Legs
-    final legWidth = 16.0 * (widthFactor > 1.0 ? 1.15 : 0.95);
-    canvas.drawRRect(
-      RRect.fromRectAndRadius(Rect.fromLTWH(cx - legWidth - 4, 124, legWidth, 54), const Radius.circular(8)),
-      paint,
-    );
-    canvas.drawRRect(
-      RRect.fromRectAndRadius(Rect.fromLTWH(cx + 4, 124, legWidth, 54), const Radius.circular(8)),
-      paint,
-    );
+    final leftLeg = Path()
+      ..moveTo(cx - hipSpread, 116)
+      ..lineTo(cx - 3, 116)
+      ..quadraticBezierTo(cx - 3, 146, cx - 6, 172)
+      ..lineTo(cx - 6 - legThickness, 172)
+      ..quadraticBezierTo(cx - hipSpread - 2, 146, cx - hipSpread, 116)
+      ..close();
+    canvas.drawPath(leftLeg, paint);
+
+    final rightLeg = Path()
+      ..moveTo(cx + 3, 116)
+      ..lineTo(cx + hipSpread, 116)
+      ..quadraticBezierTo(cx + hipSpread + 2, 146, cx + 6 + legThickness, 172)
+      ..lineTo(cx + 6, 172)
+      ..quadraticBezierTo(cx + 3, 146, cx + 3, 116)
+      ..close();
+    canvas.drawPath(rightLeg, paint);
   }
 
   @override
@@ -1573,3 +1693,5 @@ class _PredictionCurvePainter extends CustomPainter {
   @override
   bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
 }
+
+
