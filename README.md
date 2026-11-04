@@ -18,6 +18,12 @@ FitForge is a full-stack, AI-native fitness ecosystem engineered for absolute sc
 
 The platform leverages **Supabase** for edge-optimized PostgreSQL/Auth, **Razorpay** for complex marketplace payment routing, and the **OpenAI API** to dynamically generate context-aware, hyper-personalized fitness and nutrition regimens.
 
+### 🚀 Key Features & Updates
+- **17-Step Health & Fitness Assessment**: Multi-metric evaluation including dynamic BMI stadiometer, physique body fat models, and safety injury checks.
+- **Muscle Monster Style Equipment UI**: Calisthenics, portable dumbbells/kettlebells, and commercial gym power rack options.
+- **Instant Plan Generation**: Direct synthesis of custom weekly workouts and daily meal plans from onboarding context without redundant questionnaires.
+- **Cross-Platform Synchronization**: Seamless profile and roadmap synchronization with Supabase.
+
 ---
 
 ## 🏗 System Architecture
