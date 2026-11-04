@@ -1,4 +1,4 @@
-export const maxDuration = 60;
+﻿export const maxDuration = 60;
 import { NextRequest, NextResponse } from "next/server";
 import { createClient, createAuthClient } from "@/lib/supabase/server";
 import {
@@ -63,7 +63,7 @@ Ensure the meal uses authentic regional ingredients for this cuisine/country.
 Return a single meal object JSON with name, calories, protein, carbs, fat, ingredients.`;
     } else {
       userPrompt = `Create a 7-day meal plan.
-User Profile: Age ${ageText}, Gender ${profile.gender || 'Unknown'}, Height ${profile.height_cm}cm, Weight ${profile.weight_kg}kg, Fitness Level: ${profile.fitness_level}.
+User Profile: Age ${ageText}, Gender ${profile.gender || 'Unknown'}, Height ${profile.height_cm}cm, Current Weight ${profile.weight_kg}kg, Target Goal Weight ${profile.target_weight_kg || profile.weight_kg}kg, Target Pace: ${profile.target_pace || 'normal'}, Fitness Level: ${profile.fitness_level}.\nLifestyle & Metabolic Factors: ${profile.lifestyle_issues?.join(', ') || 'Normal active'}.
 Primary Goal: ${profile.primary_goal} (If missing, assume healthy maintenance).
 Instructions: First, calculate the required daily caloric intake for this specific user based on their metrics and goal (assume statistical average for age/gender if needed). Then, generate a meal plan that strictly matches those calculated daily calories.
 Dietary preference: ${dietaryPreference}
@@ -115,3 +115,4 @@ Include breakfast, lunch, dinner, and 1-2 snacks per day with macro breakdowns.`
     );
   }
 }
+

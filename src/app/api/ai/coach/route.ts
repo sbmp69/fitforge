@@ -1,4 +1,4 @@
-export const maxDuration = 60;
+﻿export const maxDuration = 60;
 import { NextRequest, NextResponse } from "next/server";
 import { createClient, createAuthClient } from "@/lib/supabase/server";
 import { generateText, COACH_SYSTEM_PROMPT } from "@/lib/openai";
@@ -48,7 +48,13 @@ export async function POST(request: NextRequest) {
       }
       hyperContext += `Age: ${ageText}, Gender: ${profile.gender ?? 'Unknown'}\n`;
       hyperContext += `Height: ${profile.height_cm ?? 'Unknown'}cm, Weight: ${profile.weight_kg ?? 'Unknown'}kg\n`;
-      hyperContext += `Goal: ${profile.primary_goal ?? 'Unknown'}, Level: ${profile.fitness_level ?? 'Unknown'}\n`;
+            hyperContext += `Goal: ${profile.primary_goal ?? 'Unknown'}, Level: ${profile.fitness_level ?? 'Unknown'}\n`;
+      if (profile.target_weight_kg) hyperContext += `Target Weight: ${profile.target_weight_kg}kg, Pace: ${profile.target_pace || 'normal'}\n`;
+      if (profile.target_focus_areas?.length) hyperContext += `Focus Muscle Groups: ${profile.target_focus_areas.join(', ')}\n`;
+      if (profile.injuries?.length) hyperContext += `Injuries / Restrictions: ${profile.injuries.join(', ')}\n`;
+      if (profile.equipment?.length) hyperContext += `Available Equipment: ${profile.equipment.join(', ')}\n`;
+      if (profile.workout_days?.length) hyperContext += `Training Days: ${profile.workout_days.join(', ')}\n`;
+      if (profile.lifestyle_issues?.length) hyperContext += `Lifestyle / Issues: ${profile.lifestyle_issues.join(', ')}\n`;
     }
     if (workoutPlan) {
       hyperContext += `\n--- ACTIVE WORKOUT PLAN ---\nTitle: ${workoutPlan.title}\n`;
@@ -85,3 +91,4 @@ export async function POST(request: NextRequest) {
     );
   }
 }
+

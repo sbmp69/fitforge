@@ -1,4 +1,4 @@
-class Profile {
+﻿class Profile {
   final String id;
   final String email;
   final String? fullName;
@@ -16,6 +16,16 @@ class Profile {
   final String? mealPreference;
   final DateTime? dateOfBirth;
   final String? gender;
+  final List<String> targetFocusAreas;
+  final String? bodyFatRange;
+  final double? targetWeightKg;
+  final String? targetPace;
+  final String? weightLossHistory;
+  final List<String> lifestyleIssues;
+  final List<String> injuries;
+  final List<String> equipment;
+  final List<String> workoutDays;
+  final bool workoutReminder;
 
   const Profile({
     required this.id,
@@ -35,6 +45,16 @@ class Profile {
     this.mealPreference,
     this.dateOfBirth,
     this.gender,
+    this.targetFocusAreas = const [],
+    this.bodyFatRange,
+    this.targetWeightKg,
+    this.targetPace,
+    this.weightLossHistory,
+    this.lifestyleIssues = const [],
+    this.injuries = const [],
+    this.equipment = const [],
+    this.workoutDays = const [],
+    this.workoutReminder = false,
   });
 
   factory Profile.fromJson(Map<String, dynamic> json) => Profile(
@@ -55,5 +75,15 @@ class Profile {
         mealPreference: json['meal_preference'] as String?,
         dateOfBirth: json['date_of_birth'] != null ? DateTime.tryParse(json['date_of_birth'] as String) : null,
         gender: json['gender'] as String?,
+        targetFocusAreas: (json['target_focus_areas'] as List<dynamic>?)?.map((e) => e.toString()).toList() ?? const [],
+        bodyFatRange: json['body_fat_range'] as String?,
+        targetWeightKg: (json['target_weight_kg'] as num?)?.toDouble(),
+        targetPace: json['target_pace'] as String?,
+        weightLossHistory: json['weight_loss_history'] as String?,
+        lifestyleIssues: (json['lifestyle_issues'] as List<dynamic>?)?.map((e) => e.toString()).toList() ?? const [],
+        injuries: (json['injuries'] as List<dynamic>?)?.map((e) => e.toString()).toList() ?? const [],
+        equipment: (json['equipment'] as List<dynamic>?)?.map((e) => e.toString()).toList() ?? const [],
+        workoutDays: (json['workout_days'] as List<dynamic>?)?.map((e) => e.toString()).toList() ?? const [],
+        workoutReminder: json['workout_reminder'] as bool? ?? false,
       );
 }

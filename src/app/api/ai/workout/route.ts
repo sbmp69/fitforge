@@ -1,4 +1,4 @@
-export const maxDuration = 60;
+﻿export const maxDuration = 60;
 import { NextRequest, NextResponse } from "next/server";
 import { createClient, createAuthClient } from "@/lib/supabase/server";
 import {
@@ -27,10 +27,6 @@ export async function POST(request: NextRequest) {
       .eq("id", user.id)
       .single();
 
-    console.log("Supabase Auth User ID:", user.id);
-    console.log("Profile Error:", profileError);
-    console.log("Profile Data:", profile);
-
     if (!profile) {
       return NextResponse.json({ error: `Profile not found for user ${user.id}. DB Error: ${profileError?.message || 'none'}` }, { status: 404 });
     }
@@ -56,21 +52,38 @@ export async function POST(request: NextRequest) {
       ageText = `${Math.abs(new Date(diff).getUTCFullYear() - 1970)}`;
     }
 
-    const physiqueContext = `Physique Data: Age ${ageText}, Gender ${profile.gender || 'Unknown'}, Height: ${profile.height_cm || 'Not provided'}cm, Weight: ${profile.weight_kg || 'Not provided'}kg.`;
+    const effectiveGoal = goal || profile.primary_goal || 'build_muscle';
+    const effectiveLevel = level || profile.fitness_level || 'beginner';
+    const effectiveDays = daysPerWeek || (profile.workout_days && profile.workout_days.length > 0 ? profile.workout_days.length : 3);
+    const effectiveEquipment = equipment || profile.equipment || ['bodyweight only'];
+
+    let physiqueContext = `Physique Data: Age ${ageText}, Gender ${profile.gender || 'Unknown'}, Height: ${profile.height_cm || 'Not provided'}cm, Current Weight: ${profile.weight_kg || 'Not provided'}kg.`;
+    if (profile.target_weight_kg) {
+      physiqueContext += ` Target Goal Weight: ${profile.target_weight_kg}kg. Target Pace: ${profile.target_pace || 'normal'}.`;
+    }
+    if (profile.target_focus_areas && profile.target_focus_areas.length > 0) {
+      physiqueContext += `\nPRIORITY FOCUS MUSCLE GROUPS: ${profile.target_focus_areas.join(', ')}. Dedicate extra volume and targeted exercises to these areas!`;
+    }
+    if (profile.injuries && profile.injuries.length > 0 && !profile.injuries.includes('No injuries')) {
+      physiqueContext += `\nCRITICAL INJURY SAFETY: User has reported injuries/pain in: ${profile.injuries.join(', ')}. STRICTLY AVOID any exercises that heavily load, strain, or compromise these vulnerable joints/muscles! Suggest safe, pain-free alternatives.`;
+    }
+    if (profile.lifestyle_issues && profile.lifestyle_issues.length > 0 && !profile.lifestyle_issues.includes('None, I\'m healthy!')) {
+      physiqueContext += `\nLifestyle Factors: ${profile.lifestyle_issues.join(', ')}. Include appropriate postural correction and mobility exercises.`;
+    }
 
     if (regenerateDay && existingPlan) {
       userPrompt = `Regenerate only the "${regenerateDay}" workout in this plan. Keep other days unchanged.
 Current plan: ${JSON.stringify(existingPlan)}
 ${physiqueContext}
-Goal: ${goal}, Level: ${level}, Equipment: ${equipment?.join(", ") || "bodyweight only"}
+Goal: ${effectiveGoal}, Level: ${effectiveLevel}, Equipment: ${Array.isArray(effectiveEquipment) ? effectiveEquipment.join(", ") : effectiveEquipment}
 Return the full updated plan JSON.`;
     } else {
-      userPrompt = `Create a ${daysPerWeek}-day weekly workout plan.
+      userPrompt = `Create a ${effectiveDays}-day weekly workout plan.
 ${physiqueContext}
-Goal: ${goal}
-Level: ${level}
-Equipment available: ${equipment?.join(", ") || "bodyweight only"}
-Include ${daysPerWeek} workout days with appropriate rest days implied.`;
+Goal: ${effectiveGoal}
+Level: ${effectiveLevel}
+Equipment available: ${Array.isArray(effectiveEquipment) ? effectiveEquipment.join(", ") : effectiveEquipment}
+Include ${effectiveDays} workout days with appropriate rest days implied.`;
     }
 
     const planData = await generateJSON<WorkoutPlanData>(
@@ -82,10 +95,10 @@ Include ${daysPerWeek} workout days with appropriate rest days implied.`;
       .from("workout_plans")
       .insert({
         user_id: user.id,
-        goal,
-        level,
-        days_per_week: daysPerWeek,
-        equipment: equipment || [],
+        goal: effectiveGoal,
+        level: effectiveLevel,
+        days_per_week: effectiveDays,
+        equipment: Array.isArray(effectiveEquipment) ? effectiveEquipment : [effectiveEquipment],
         plan_data: planData,
       })
       .select()
