@@ -1,4 +1,4 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:go_router/go_router.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -17,7 +17,7 @@ class OnboardingScreen extends StatefulWidget {
 class _OnboardingScreenState extends State<OnboardingScreen> {
   final _pageController = PageController();
   int _currentStep = 0;
-  final int _totalSteps = 15;
+  final int _totalSteps = 16;
   final OnboardingData _data = OnboardingData();
 
   void _nextPage() {
@@ -137,7 +137,8 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                   _buildLifestyleIssuesStep(),
                   _buildInjuriesStep(),
                   _buildFitnessLevelStep(),
-                  _buildEquipmentAndDaysStep(),
+                  _buildEquipmentStep(),
+                  _buildScheduleStep(),
                 ],
               ),
             ),
@@ -226,10 +227,10 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   // --- Step 3: Weight Loss History ---
   Widget _buildWeightLossHistoryStep() {
     final options = [
-      {'key': 'succeeded_improve', 'title': 'Succeeded, Want to Improve', 'emoji': 'ðŸ’ª'},
-      {'key': 'succeeded_rebound', 'title': 'Succeeded but Rebounded', 'emoji': 'ðŸ˜…'},
-      {'key': 'tried_failed', 'title': 'Tried but Failed', 'emoji': 'ðŸ˜«'},
-      {'key': 'never_tried', 'title': 'Never Tried', 'emoji': 'ðŸŒ±'},
+      {'key': 'succeeded_improve', 'title': 'Succeeded, Want to Improve', 'icon': Icons.trending_up},
+      {'key': 'succeeded_rebound', 'title': 'Succeeded but Rebounded', 'icon': Icons.replay},
+      {'key': 'tried_failed', 'title': 'Tried but Failed', 'icon': Icons.sentiment_dissatisfied},
+      {'key': 'never_tried', 'title': 'Never Tried', 'icon': Icons.fiber_new},
     ];
 
     return _StepContainer(
@@ -263,8 +264,15 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Text(opt['emoji'] as String, style: const TextStyle(fontSize: 32)),
-                  const SizedBox(height: 12),
+                  Container(
+                    padding: const EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                      color: isSelected ? AppColors.primary : AppColors.primaryLight,
+                      shape: BoxShape.circle,
+                    ),
+                    child: Icon(opt['icon'] as IconData, color: isSelected ? Colors.white : AppColors.primary, size: 28),
+                  ),
+                  const SizedBox(height: 10),
                   Text(
                     opt['title'] as String,
                     textAlign: TextAlign.center,
@@ -1093,87 +1101,188 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     );
   }
 
-  // --- Step 15: Equipment & Workout Days ---
-  Widget _buildEquipmentAndDaysStep() {
-    final equips = ['Bodyweight', 'Portable', 'Gym'];
-    final days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+  // --- Step 15: Preferred Training Equipment ---
+  Widget _buildEquipmentStep() {
+    final equipCards = [
+      {
+        'key': 'Bodyweight',
+        'title': 'Bodyweight',
+        'subtitle': 'Bodyweight training.',
+        'image': 'assets/images/equip_bodyweight.png',
+      },
+      {
+        'key': 'Portable',
+        'title': 'Portable',
+        'subtitle': 'dumbbells, kettlebells,etc.',
+        'image': 'assets/images/equip_portable.png',
+      },
+      {
+        'key': 'Gym',
+        'title': 'Gym',
+        'subtitle': 'Smith machine, etc.',
+        'image': 'assets/images/equip_gym.png',
+      },
+    ];
 
     return _StepContainer(
-      title: "Training Equipment & Schedule",
-      subtitle: "Final step! Choose your tools and which days you want to train.",
+      title: "Choose your preferred training equipment",
+      subtitle: "We provide over 800 exercises and 500 workouts for a wide range of equipment.",
       bottomAction: _PrimaryButton(
-        title: 'BUILD MY PERSONALIZED PLAN ðŸš€',
-        onPressed: _finishOnboarding,
+        title: 'CONTINUE',
+        onPressed: _nextPage,
       ),
-      child: SingleChildScrollView(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const Text('Preferred Equipment', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: AppColors.textHeader)),
-            const SizedBox(height: 8),
-            Row(
-              children: equips.map((eq) {
-                final isSel = _data.equipment.contains(eq);
-                return Expanded(
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 4),
-                    child: InkWell(
-                      onTap: () {
-                        setState(() {
-                          if (isSel && _data.equipment.length > 1) {
-                            _data.equipment.remove(eq);
-                          } else if (!isSel) {
-                            _data.equipment.add(eq);
-                          }
-                        });
-                      },
-                      borderRadius: BorderRadius.circular(12),
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(vertical: 12),
-                        decoration: BoxDecoration(
-                          color: isSel ? AppColors.primary : AppColors.surface,
-                          borderRadius: BorderRadius.circular(12),
-                          border: Border.all(color: isSel ? AppColors.primary : AppColors.border),
-                        ),
-                        child: Text(
-                          eq,
-                          textAlign: TextAlign.center,
-                          style: TextStyle(fontWeight: FontWeight.bold, color: isSel ? Colors.white : AppColors.textHeader),
+      child: Column(
+        children: equipCards.map((item) {
+          final key = item['key'] as String;
+          final isSel = _data.equipment.contains(key);
+          return Padding(
+            padding: const EdgeInsets.only(bottom: 16),
+            child: InkWell(
+              onTap: () {
+                setState(() {
+                  if (isSel && _data.equipment.length > 1) {
+                    _data.equipment.remove(key);
+                  } else if (!isSel) {
+                    _data.equipment.add(key);
+                  }
+                });
+              },
+              borderRadius: BorderRadius.circular(20),
+              child: AnimatedContainer(
+                duration: const Duration(milliseconds: 200),
+                height: 110,
+                decoration: BoxDecoration(
+                  color: isSel ? AppColors.primaryLight : AppColors.surface,
+                  borderRadius: BorderRadius.circular(20),
+                  border: Border.all(
+                    color: isSel ? AppColors.primary : AppColors.border,
+                    width: isSel ? 2 : 1,
+                  ),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withValues(alpha: 0.03),
+                      blurRadius: 10,
+                      offset: const Offset(0, 4),
+                    ),
+                  ],
+                ),
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Row(
+                              children: [
+                                Text(
+                                  item['title'] as String,
+                                  style: TextStyle(
+                                    fontSize: 19,
+                                    fontWeight: FontWeight.bold,
+                                    color: isSel ? AppColors.primary : AppColors.textHeader,
+                                  ),
+                                ),
+                                if (isSel) ...[
+                                  const SizedBox(width: 8),
+                                  const Icon(Icons.check_circle, size: 20, color: AppColors.primary),
+                                ],
+                              ],
+                            ),
+                            const SizedBox(height: 6),
+                            Text(
+                              item['subtitle'] as String,
+                              style: const TextStyle(
+                                fontSize: 13,
+                                color: AppColors.textSecondary,
+                                height: 1.2,
+                              ),
+                            ),
+                          ],
                         ),
                       ),
                     ),
-                  ),
-                );
-              }).toList(),
+                    ClipRRect(
+                      borderRadius: const BorderRadius.horizontal(right: Radius.circular(19)),
+                      child: SizedBox(
+                        width: 125,
+                        height: 110,
+                        child: Image.asset(
+                          item['image'] as String,
+                          fit: BoxFit.cover,
+                          errorBuilder: (ctx, err, stack) => Container(
+                            color: AppColors.primaryLight,
+                            child: const Icon(Icons.fitness_center, size: 36, color: AppColors.primary),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
             ),
-            const SizedBox(height: 24),
-            const Text('Which days will you train?', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: AppColors.textHeader)),
-            const SizedBox(height: 8),
-            Wrap(
-              spacing: 8,
-              runSpacing: 8,
-              children: days.map((d) {
-                final isSel = _data.workoutDays.contains(d);
-                return FilterChip(
-                  label: Text(d),
-                  selected: isSel,
-                  selectedColor: AppColors.primary,
-                  checkmarkColor: Colors.white,
-                  labelStyle: TextStyle(color: isSel ? Colors.white : AppColors.textHeader, fontWeight: FontWeight.bold),
-                  onSelected: (val) {
-                    setState(() {
-                      if (val) {
-                        _data.workoutDays.add(d);
-                      } else if (_data.workoutDays.length > 1) {
-                        _data.workoutDays.remove(d);
-                      }
-                    });
-                  },
-                );
-              }).toList(),
+          );
+        }).toList(),
+      ),
+    );
+  }
+
+  // --- Step 16: Training Schedule & Reminder ---
+  Widget _buildScheduleStep() {
+    final days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+
+    return _StepContainer(
+      title: "Which days will you train?",
+      subtitle: "Choose your weekly workout rhythm and set training reminders.",
+      bottomAction: _PrimaryButton(
+        title: 'BUILD MY PERSONALIZED PLAN',
+        onPressed: _finishOnboarding,
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Text(
+            'Weekly Workout Days',
+            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: AppColors.textHeader),
+          ),
+          const SizedBox(height: 14),
+          Wrap(
+            spacing: 10,
+            runSpacing: 10,
+            children: days.map((d) {
+              final isSel = _data.workoutDays.contains(d);
+              return FilterChip(
+                label: Text(d),
+                selected: isSel,
+                selectedColor: AppColors.primary,
+                checkmarkColor: Colors.white,
+                labelStyle: TextStyle(
+                  color: isSel ? Colors.white : AppColors.textHeader,
+                  fontWeight: FontWeight.bold,
+                ),
+                onSelected: (val) {
+                  setState(() {
+                    if (val) {
+                      _data.workoutDays.add(d);
+                    } else if (_data.workoutDays.length > 1) {
+                      _data.workoutDays.remove(d);
+                    }
+                  });
+                },
+              );
+            }).toList(),
+          ),
+          const SizedBox(height: 32),
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+            decoration: BoxDecoration(
+              color: AppColors.surface,
+              borderRadius: BorderRadius.circular(16),
+              border: Border.all(color: AppColors.border),
             ),
-            const SizedBox(height: 16),
-            SwitchListTile(
+            child: SwitchListTile(
               contentPadding: EdgeInsets.zero,
               title: const Text('Training Reminder', style: TextStyle(fontWeight: FontWeight.bold, color: AppColors.textHeader)),
               subtitle: const Text('Never miss your training day', style: TextStyle(color: AppColors.textSecondary, fontSize: 13)),
@@ -1181,13 +1290,12 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
               activeColor: AppColors.primary,
               onChanged: (val) => setState(() => _data.workoutReminder = val),
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
 }
-
 // --- Helper UI & Custom Painters ---
 
 class _StepContainer extends StatelessWidget {
