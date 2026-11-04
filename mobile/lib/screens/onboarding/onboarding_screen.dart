@@ -58,6 +58,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
       body: SafeArea(
         child: Column(
           children: [
+            // Top App Bar
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
               child: Row(
@@ -103,6 +104,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                 ],
               ),
             ),
+            // Progress Bar
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 4),
               child: ClipRRect(
@@ -145,6 +147,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     );
   }
 
+  // --- Step 1: Gender ---
   Widget _buildGenderStep() {
     return _StepContainer(
       title: "Let's Start with the Basics",
@@ -185,6 +188,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     );
   }
 
+  // --- Step 2: Fitness Goal ---
   Widget _buildFitnessGoalStep() {
     return _StepContainer(
       title: "What's your fitness goal?",
@@ -219,6 +223,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     );
   }
 
+  // --- Step 3: Weight Loss History ---
   Widget _buildWeightLossHistoryStep() {
     final options = [
       {'key': 'succeeded_improve', 'title': 'Succeeded, Want to Improve', 'emoji': '💪'},
@@ -278,6 +283,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     );
   }
 
+  // --- Step 4: Focus Areas (Custom Vector Anatomy Diagram) ---
   Widget _buildFocusAreasStep() {
     final muscleGroups = ['Back', 'Chest', 'Arms', 'Abs', 'Glutes', 'Leg', 'Full Body'];
 
@@ -288,18 +294,20 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
+          // Dynamic FitForge Vector Anatomy Illustration
           Expanded(
             flex: 5,
             child: Center(
-              child: Image.asset(
-                'assets/images/anatomy_body.jpeg',
-                height: 380,
-                fit: BoxFit.contain,
-                errorBuilder: (_, __, ___) => const Icon(Icons.accessibility_new, size: 180, color: AppColors.accent),
+              child: CustomPaint(
+                size: const Size(160, 340),
+                painter: _AnatomySilhouettePainter(
+                  selectedAreas: _data.targetFocusAreas,
+                ),
               ),
             ),
           ),
           const SizedBox(width: 8),
+          // Target Muscle Buttons
           Expanded(
             flex: 5,
             child: Column(
@@ -357,6 +365,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     );
   }
 
+  // --- Step 5: Age Wheel Picker ---
   Widget _buildAgeStep() {
     return _StepContainer(
       title: "Your age",
@@ -398,7 +407,12 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     );
   }
 
+  // --- Step 6: Height (Interactive Height Stadiometer) ---
   Widget _buildHeightStep() {
+    final ft = (_data.heightCm / 30.48);
+    final feet = ft.floor();
+    final inches = ((ft - feet) * 12).round();
+
     return _StepContainer(
       title: "Your height",
       subtitle: "Height information helps us calculate your BMI more accurately",
@@ -407,6 +421,8 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
         children: [
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.baseline,
+            textBaseline: TextBaseline.alphabetic,
             children: [
               Text(
                 '${_data.heightCm}',
@@ -414,6 +430,8 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
               ),
               const SizedBox(width: 6),
               const Text('cm', style: TextStyle(fontSize: 20, color: AppColors.textSecondary, fontWeight: FontWeight.bold)),
+              const SizedBox(width: 14),
+              Text('($feet\' $inches")', style: const TextStyle(fontSize: 16, color: AppColors.textSecondary)),
             ],
           ),
           const SizedBox(height: 12),
@@ -431,12 +449,61 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
               onChanged: (val) => setState(() => _data.heightCm = val.round()),
             ),
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: 20),
+          // Dynamic Stadiometer Graphic
           Expanded(
-            child: Image.asset(
-              'assets/images/height_guy.jpeg',
-              fit: BoxFit.contain,
-              errorBuilder: (_, __, ___) => const Icon(Icons.person, size: 160, color: AppColors.primary),
+            child: Container(
+              width: double.infinity,
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+              decoration: BoxDecoration(
+                color: AppColors.surface,
+                borderRadius: BorderRadius.circular(20),
+                border: Border.all(color: AppColors.border),
+              ),
+              child: Row(
+                children: [
+                  // Stadiometer Ruler Marks
+                  SizedBox(
+                    width: 70,
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        _buildRulerMark('210 cm', _data.heightCm >= 210),
+                        _buildRulerMark('190 cm', _data.heightCm >= 190),
+                        _buildRulerMark('175 cm', _data.heightCm >= 175),
+                        _buildRulerMark('160 cm', _data.heightCm >= 160),
+                        _buildRulerMark('140 cm', _data.heightCm >= 140),
+                      ],
+                    ),
+                  ),
+                  const VerticalDivider(width: 1, color: AppColors.border),
+                  // Dynamic Height Vector Avatar
+                  Expanded(
+                    child: Center(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.end,
+                        children: [
+                          Icon(
+                            Icons.accessibility_new_rounded,
+                            size: (_data.heightCm / 220.0 * 220).clamp(120.0, 220.0),
+                            color: AppColors.primary,
+                          ),
+                          const SizedBox(height: 8),
+                          Container(
+                            height: 4,
+                            width: 120,
+                            decoration: BoxDecoration(
+                              color: AppColors.primary.withValues(alpha: 0.3),
+                              borderRadius: BorderRadius.circular(2),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ],
+              ),
             ),
           ),
         ],
@@ -444,9 +511,37 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     );
   }
 
+  Widget _buildRulerMark(String text, bool active) {
+    return Row(
+      children: [
+        Container(
+          width: active ? 16 : 8,
+          height: 2,
+          color: active ? AppColors.primary : AppColors.border,
+        ),
+        const SizedBox(width: 6),
+        Text(
+          text,
+          style: TextStyle(
+            fontSize: 11,
+            fontWeight: active ? FontWeight.bold : FontWeight.normal,
+            color: active ? AppColors.primary : AppColors.textSecondary,
+          ),
+        ),
+      ],
+    );
+  }
+
+  // --- Step 7: Weight & Accurate Functional BMI Gauge ---
   Widget _buildWeightStep() {
     final bmi = _data.bmi;
     final category = _data.bmiCategory;
+    final normalizedPointer = ((bmi - 15.0) / 25.0).clamp(0.0, 1.0);
+
+    Color categoryColor = AppColors.primary;
+    if (category == 'Underweight') categoryColor = Colors.blueAccent;
+    if (category == 'Overweight') categoryColor = Colors.orangeAccent;
+    if (category == 'Obese') categoryColor = Colors.redAccent;
 
     return _StepContainer(
       title: "Your current weight",
@@ -480,11 +575,12 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
             ),
           ),
           const SizedBox(height: 24),
+          // Accurate Functional Dynamic BMI Card
           Container(
             padding: const EdgeInsets.all(20),
             decoration: BoxDecoration(
               color: AppColors.surface,
-              borderRadius: BorderRadius.circular(16),
+              borderRadius: BorderRadius.circular(20),
               border: Border.all(color: AppColors.border),
               boxShadow: [
                 BoxShadow(
@@ -500,45 +596,75 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    const Text('Current BMI', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: AppColors.textHeader)),
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Text('Calculated BMI', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: AppColors.textHeader)),
+                        const SizedBox(height: 2),
+                        Text(
+                          'Category: $category',
+                          style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: categoryColor),
+                        ),
+                      ],
+                    ),
                     Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
                       decoration: BoxDecoration(
-                        color: AppColors.primary,
-                        borderRadius: BorderRadius.circular(8),
+                        color: categoryColor,
+                        borderRadius: BorderRadius.circular(10),
                       ),
                       child: Text(
                         bmi.toStringAsFixed(1),
-                        style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 14),
+                        style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16),
                       ),
                     ),
                   ],
                 ),
-                const SizedBox(height: 16),
-                ClipRRect(
-                  borderRadius: BorderRadius.circular(4),
-                  child: Row(
-                    children: [
-                      Expanded(flex: 3, child: Container(height: 8, color: Colors.blueAccent)),
-                      Expanded(flex: 5, child: Container(height: 8, color: AppColors.primary)),
-                      Expanded(flex: 4, child: Container(height: 8, color: Colors.orangeAccent)),
-                    ],
-                  ),
+                const SizedBox(height: 20),
+                // Dynamic Sliding Pointer on Spectrum Bar
+                LayoutBuilder(
+                  builder: (context, constraints) {
+                    final width = constraints.maxWidth;
+                    final pointerX = (width * normalizedPointer).clamp(0.0, width - 12);
+                    return Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Container(
+                          margin: EdgeInsets.only(left: pointerX),
+                          child: Icon(Icons.arrow_drop_down, color: categoryColor, size: 24),
+                        ),
+                        ClipRRect(
+                          borderRadius: BorderRadius.circular(6),
+                          child: Row(
+                            children: [
+                              Expanded(flex: 3, child: Container(height: 10, color: Colors.blueAccent)),
+                              Expanded(flex: 5, child: Container(height: 10, color: AppColors.primary)),
+                              Expanded(flex: 4, child: Container(height: 10, color: Colors.orangeAccent)),
+                              Expanded(flex: 2, child: Container(height: 10, color: Colors.redAccent)),
+                            ],
+                          ),
+                        ),
+                      ],
+                    );
+                  },
                 ),
-                const SizedBox(height: 6),
+                const SizedBox(height: 8),
                 const Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Text('Underweight', style: TextStyle(fontSize: 11, color: AppColors.textSecondary)),
-                    Text('Normal', style: TextStyle(fontSize: 11, color: AppColors.textSecondary)),
-                    Text('Overweight', style: TextStyle(fontSize: 11, color: AppColors.textSecondary)),
+                    Text('< 18.5', style: TextStyle(fontSize: 11, color: AppColors.textSecondary)),
+                    Text('18.5 - 24.9', style: TextStyle(fontSize: 11, color: AppColors.textSecondary)),
+                    Text('25 - 29.9', style: TextStyle(fontSize: 11, color: AppColors.textSecondary)),
+                    Text('30+', style: TextStyle(fontSize: 11, color: AppColors.textSecondary)),
                   ],
                 ),
                 const SizedBox(height: 14),
                 Text(
                   category == 'Normal'
-                      ? 'Being within the normal range of BMI, continue to maintain it through fitness!'
-                      : 'We will personalize your calories and cardio pace to bring you into your peak optimal zone.',
+                      ? 'You are currently in the healthy weight zone! FitForge will focus on muscle definition and metabolic conditioning.'
+                      : category == 'Underweight'
+                          ? 'Your BMI indicates you may benefit from calorie surplus nutrition and progressive hypertrophy resistance training.'
+                          : 'FitForge will structure a progressive calorie deficit and high-efficiency metabolic training to safely lower fat mass.',
                   style: const TextStyle(fontSize: 13, color: AppColors.textSecondary, height: 1.4),
                 ),
               ],
@@ -549,6 +675,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     );
   }
 
+  // --- Step 8: Desired Pace ---
   Widget _buildPaceStep() {
     final options = [
       {'key': 'fast', 'title': 'Fast and Intense'},
@@ -579,6 +706,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     );
   }
 
+  // --- Step 9: Dynamic Current Body Shape Visualizer ---
   Widget _buildCurrentBodyFatStep() {
     final tiers = ['<15%', '20%', '25%', '30%', '>40%'];
 
@@ -590,10 +718,38 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
         children: [
           Expanded(
             child: Center(
-              child: Image.asset(
-                'assets/images/WhatsApp_Image_2026-11-04_at_10.14.08.jpeg',
-                fit: BoxFit.contain,
-                errorBuilder: (_, __, ___) => const Icon(Icons.person, size: 180, color: AppColors.primary),
+              child: Container(
+                padding: const EdgeInsets.all(24),
+                decoration: BoxDecoration(
+                  color: AppColors.surface,
+                  borderRadius: BorderRadius.circular(24),
+                  border: Border.all(color: AppColors.border),
+                ),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    // Dynamic Custom Avatar reflecting chosen body fat
+                    CustomPaint(
+                      size: const Size(140, 180),
+                      painter: _PhysiqueBodyFatPainter(
+                        bodyFat: _data.currentBodyFat,
+                        gender: _data.gender,
+                        primaryColor: AppColors.primary,
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                    Text(
+                      'Estimated Body Fat: ${_data.currentBodyFat}',
+                      style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: AppColors.textHeader),
+                    ),
+                    const SizedBox(height: 6),
+                    Text(
+                      _getBodyFatDescription(_data.currentBodyFat),
+                      textAlign: TextAlign.center,
+                      style: const TextStyle(fontSize: 12, color: AppColors.textSecondary),
+                    ),
+                  ],
+                ),
               ),
             ),
           ),
@@ -616,6 +772,24 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     );
   }
 
+  String _getBodyFatDescription(String bf) {
+    switch (bf) {
+      case '<15%':
+        return 'Athletic / Lean: Visible abdominal definition and vascularity.';
+      case '20%':
+        return 'Fit / Healthy: Solid muscle tone with moderate subcutaneous layer.';
+      case '25%':
+        return 'Average: Everyday physique with room for metabolic improvement.';
+      case '30%':
+        return 'Soft: Excess fat accumulation around waist and abdomen.';
+      case '>40%':
+        return 'High: Higher adiposity requiring structured caloric management.';
+      default:
+        return 'Standard physique.';
+    }
+  }
+
+  // --- Step 10: Target Date Prediction Graph ---
   Widget _buildWeightPredictionStep() {
     final date = _data.predictedTargetDate;
     final months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
@@ -683,6 +857,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     );
   }
 
+  // --- Step 11: Dynamic Desired Body Shape Visualizer ---
   Widget _buildDesiredBodyFatStep() {
     final tiers = ['<15%', '20%', '25%'];
 
@@ -694,10 +869,37 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
         children: [
           Expanded(
             child: Center(
-              child: Image.asset(
-                'assets/images/WhatsApp_Image_2026-11-04_at_10.14.08_2.jpeg',
-                fit: BoxFit.contain,
-                errorBuilder: (_, __, ___) => const Icon(Icons.fitness_center, size: 180, color: AppColors.primary),
+              child: Container(
+                padding: const EdgeInsets.all(24),
+                decoration: BoxDecoration(
+                  color: AppColors.surface,
+                  borderRadius: BorderRadius.circular(24),
+                  border: Border.all(color: AppColors.border),
+                ),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    CustomPaint(
+                      size: const Size(140, 180),
+                      painter: _PhysiqueBodyFatPainter(
+                        bodyFat: _data.desiredBodyFat,
+                        gender: _data.gender,
+                        primaryColor: const Color(0xFF10B981),
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                    Text(
+                      'Target Physique: ${_data.desiredBodyFat}',
+                      style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: AppColors.textHeader),
+                    ),
+                    const SizedBox(height: 6),
+                    Text(
+                      _getBodyFatDescription(_data.desiredBodyFat),
+                      textAlign: TextAlign.center,
+                      style: const TextStyle(fontSize: 12, color: AppColors.textSecondary),
+                    ),
+                  ],
+                ),
               ),
             ),
           ),
@@ -720,6 +922,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     );
   }
 
+  // --- Step 12: Lifestyle Issues ---
   Widget _buildLifestyleIssuesStep() {
     final issues = [
       {'title': 'Prolonged sitting', 'icon': Icons.chair},
@@ -789,6 +992,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     );
   }
 
+  // --- Step 13: Injuries ---
   Widget _buildInjuriesStep() {
     final injuryList = ['No injuries', 'Shoulders', 'Back', 'Waist', 'Wrist', 'Knee'];
 
@@ -858,6 +1062,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     );
   }
 
+  // --- Step 14: Fitness Level ---
   Widget _buildFitnessLevelStep() {
     final levels = [
       {'level': 'Beginner', 'desc': 'New to working out or coming back after a long break'},
@@ -888,6 +1093,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     );
   }
 
+  // --- Step 15: Equipment & Workout Days ---
   Widget _buildEquipmentAndDaysStep() {
     final equips = ['Bodyweight', 'Portable', 'Gym'];
     final days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
@@ -981,6 +1187,8 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     );
   }
 }
+
+// --- Helper UI & Custom Painters ---
 
 class _StepContainer extends StatelessWidget {
   final String title;
@@ -1192,6 +1400,148 @@ class _PrimaryButton extends StatelessWidget {
       ),
     );
   }
+}
+
+// Custom Vector Anatomy Silhouette Painter (No screenshot dependencies)
+class _AnatomySilhouettePainter extends CustomPainter {
+  final List<String> selectedAreas;
+
+  _AnatomySilhouettePainter({required this.selectedAreas});
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final basePaint = Paint()
+      ..color = AppColors.border
+      ..style = PaintingStyle.fill;
+
+    final activePaint = Paint()
+      ..color = AppColors.primary
+      ..style = PaintingStyle.fill;
+
+    final cx = size.width / 2;
+
+    // Head
+    canvas.drawCircle(Offset(cx, 28), 18, basePaint);
+
+    // Torso / Chest / Abs
+    final chestActive = selectedAreas.contains('Chest') || selectedAreas.contains('Full Body');
+    final absActive = selectedAreas.contains('Abs') || selectedAreas.contains('Full Body');
+    final backActive = selectedAreas.contains('Back') || selectedAreas.contains('Full Body');
+
+    // Upper Torso / Chest
+    canvas.drawRRect(
+      RRect.fromRectAndRadius(Rect.fromLTWH(cx - 38, 52, 76, 50), const Radius.circular(14)),
+      (chestActive || backActive) ? activePaint : basePaint,
+    );
+
+    // Lower Torso / Abs
+    canvas.drawRRect(
+      RRect.fromRectAndRadius(Rect.fromLTWH(cx - 30, 106, 60, 48), const Radius.circular(10)),
+      absActive ? activePaint : basePaint,
+    );
+
+    // Arms
+    final armsActive = selectedAreas.contains('Arms') || selectedAreas.contains('Full Body');
+    final armPaint = armsActive ? activePaint : basePaint;
+    // Left Arm
+    canvas.drawRRect(RRect.fromRectAndRadius(Rect.fromLTWH(cx - 58, 56, 16, 90), const Radius.circular(8)), armPaint);
+    // Right Arm
+    canvas.drawRRect(RRect.fromRectAndRadius(Rect.fromLTWH(cx + 42, 56, 16, 90), const Radius.circular(8)), armPaint);
+
+    // Glutes / Pelvis
+    final glutesActive = selectedAreas.contains('Glutes') || selectedAreas.contains('Full Body');
+    canvas.drawRRect(
+      RRect.fromRectAndRadius(Rect.fromLTWH(cx - 34, 158, 68, 30), const Radius.circular(8)),
+      glutesActive ? activePaint : basePaint,
+    );
+
+    // Legs
+    final legActive = selectedAreas.contains('Leg') || selectedAreas.contains('Full Body');
+    final legPaint = legActive ? activePaint : basePaint;
+    // Left Leg
+    canvas.drawRRect(RRect.fromRectAndRadius(Rect.fromLTWH(cx - 30, 192, 24, 130), const Radius.circular(10)), legPaint);
+    // Right Leg
+    canvas.drawRRect(RRect.fromRectAndRadius(Rect.fromLTWH(cx + 6, 192, 24, 130), const Radius.circular(10)), legPaint);
+  }
+
+  @override
+  bool shouldRepaint(covariant _AnatomySilhouettePainter oldDelegate) => true;
+}
+
+// Dynamic Physique Vector Painter for Body Fat Simulation
+class _PhysiqueBodyFatPainter extends CustomPainter {
+  final String bodyFat;
+  final String gender;
+  final Color primaryColor;
+
+  _PhysiqueBodyFatPainter({
+    required this.bodyFat,
+    required this.gender,
+    required this.primaryColor,
+  });
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    double widthFactor = 1.0;
+    if (bodyFat == '<15%') widthFactor = 0.82;
+    if (bodyFat == '20%') widthFactor = 0.90;
+    if (bodyFat == '25%') widthFactor = 1.0;
+    if (bodyFat == '30%') widthFactor = 1.15;
+    if (bodyFat == '>40%') widthFactor = 1.30;
+
+    final paint = Paint()
+      ..color = primaryColor
+      ..style = PaintingStyle.fill;
+
+    final cx = size.width / 2;
+
+    // Head
+    canvas.drawCircle(Offset(cx, 24), 16, paint);
+
+    // Shoulders & Chest
+    final chestWidth = 60.0 * widthFactor;
+    canvas.drawRRect(
+      RRect.fromRectAndRadius(
+        Rect.fromCenter(center: Offset(cx, 62), width: chestWidth, height: 42),
+        const Radius.circular(12),
+      ),
+      paint,
+    );
+
+    // Midsection / Abdomen (expands dynamically with body fat)
+    final waistWidth = (38.0 * widthFactor * (bodyFat == '>40%' ? 1.25 : 1.0));
+    canvas.drawRRect(
+      RRect.fromRectAndRadius(
+        Rect.fromCenter(center: Offset(cx, 98), width: waistWidth, height: 38),
+        const Radius.circular(10),
+      ),
+      paint,
+    );
+
+    // Arms
+    canvas.drawRRect(
+      RRect.fromRectAndRadius(Rect.fromLTWH(cx - chestWidth / 2 - 14, 46, 12, 60), const Radius.circular(6)),
+      paint,
+    );
+    canvas.drawRRect(
+      RRect.fromRectAndRadius(Rect.fromLTWH(cx + chestWidth / 2 + 2, 46, 12, 60), const Radius.circular(6)),
+      paint,
+    );
+
+    // Legs
+    final legWidth = 16.0 * (widthFactor > 1.0 ? 1.15 : 0.95);
+    canvas.drawRRect(
+      RRect.fromRectAndRadius(Rect.fromLTWH(cx - legWidth - 4, 124, legWidth, 54), const Radius.circular(8)),
+      paint,
+    );
+    canvas.drawRRect(
+      RRect.fromRectAndRadius(Rect.fromLTWH(cx + 4, 124, legWidth, 54), const Radius.circular(8)),
+      paint,
+    );
+  }
+
+  @override
+  bool shouldRepaint(covariant _PhysiqueBodyFatPainter oldDelegate) => true;
 }
 
 class _PredictionCurvePainter extends CustomPainter {
