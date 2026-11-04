@@ -95,11 +95,23 @@ class _ProfileScreenState extends State<ProfileScreen> {
   Future<void> _showEditProfileDialog(BuildContext context) async {
     if (_profile == null) return;
     final nameCtrl = TextEditingController(text: _profile!.fullName);
-    final goalCtrl = TextEditingController(text: _profile!.primaryGoal);
-    final levelCtrl = TextEditingController(text: _profile!.fitnessLevel);
+    
+    String initialGoal = _profile!.primaryGoal ?? 'Muscle Gain';
+    if (initialGoal == 'build_muscle') initialGoal = 'Muscle Gain';
+    else if (initialGoal == 'lose_weight' || initialGoal == 'weight_loss') initialGoal = 'Weight Loss';
+    else if (initialGoal == 'endurance') initialGoal = 'Endurance';
+    else if (initialGoal == 'tone' || initialGoal == 'get_toned') initialGoal = 'General Fitness';
+
+    String initialLevel = _profile!.fitnessLevel ?? 'Intermediate';
+    if (initialLevel.toLowerCase() == 'beginner') initialLevel = 'Beginner';
+    else if (initialLevel.toLowerCase() == 'intermediate') initialLevel = 'Intermediate';
+    else if (initialLevel.toLowerCase() == 'advanced') initialLevel = 'Advanced';
+
+    final goalCtrl = TextEditingController(text: initialGoal);
+    final levelCtrl = TextEditingController(text: initialLevel);
     String country = _profile!.country ?? 'India';
     if (!AppConstants.allCountries.contains(country)) country = AppConstants.allCountries.first;
-    String meal = _profile!.mealPreference ?? 'Indian';
+    String meal = _profile!.mealPreference ?? 'Traditional Indian';
     if (!AppConstants.popularCuisines.contains(meal)) meal = AppConstants.popularCuisines.first;
     double heightCm = (_profile!.heightCm ?? 175).toDouble();
     double weightKg = _profile!.weightKg ?? 70.0;
@@ -122,127 +134,116 @@ class _ProfileScreenState extends State<ProfileScreen> {
         builder: (context, setModalState) {
           return Padding(
             padding: EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom + 24, left: 24, right: 24, top: 24),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                const Text('Edit Profile', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: AppColors.textHeader)),
-                const SizedBox(height: 24),
-                TextField(controller: nameCtrl, decoration: const InputDecoration(labelText: 'Full Name')),
-                const SizedBox(height: 16),
-                DropdownButtonFormField<String>(
-                  value: goalCtrl.text.isNotEmpty ? goalCtrl.text : goals.first,
-                  decoration: const InputDecoration(labelText: 'Primary Goal'),
-                  items: goals.map((e) => DropdownMenuItem(value: e, child: Text(e))).toList(),
-                  onChanged: (val) => goalCtrl.text = val!,
-                ),
-                const SizedBox(height: 16),
-                DropdownButtonFormField<String>(
-                  value: levelCtrl.text.isNotEmpty ? levelCtrl.text : levels.first,
-                  decoration: const InputDecoration(labelText: 'Fitness Level'),
-                  items: levels.map((e) => DropdownMenuItem(value: e, child: Text(e))).toList(),
-                  onChanged: (val) => levelCtrl.text = val!,
-                ),
-                const SizedBox(height: 16),
-                Text('Height: ${heightCm.round()} cm', style: const TextStyle(fontWeight: FontWeight.bold, color: AppColors.textHeader)),
-                Slider(
-                  value: heightCm,
-                  min: 140,
-                  max: 220,
-                  divisions: 80,
-                  onChanged: (v) => setModalState(() => heightCm = v),
-                ),
-                const SizedBox(height: 16),
-                Text('Weight: ${weightKg.toStringAsFixed(1)} kg', style: const TextStyle(fontWeight: FontWeight.bold, color: AppColors.textHeader)),
-                Slider(
-                  value: weightKg,
-                  min: 40,
-                  max: 150,
-                  divisions: 220,
-                  onChanged: (v) => setModalState(() => weightKg = v),
-                ),
-                const SizedBox(height: 16),
-                DropdownButtonFormField<String>(
-                  value: country,
-                  isExpanded: true,
-                  decoration: const InputDecoration(labelText: 'Country'),
-                  items: AppConstants.allCountries.map((e) => DropdownMenuItem(value: e, child: Text(e, overflow: TextOverflow.ellipsis))).toList(),
-                  onChanged: (v) => setModalState(() => country = v!),
-                ),
-                const SizedBox(height: 16),
-                DropdownButtonFormField<String>(
-                  value: meal,
-                  isExpanded: true,
-                  decoration: const InputDecoration(labelText: 'Meal Preference / Cuisine'),
-                  items: AppConstants.popularCuisines.map((e) => DropdownMenuItem(value: e, child: Text(e, overflow: TextOverflow.ellipsis))).toList(),
-                  onChanged: (v) => setModalState(() => meal = v!),
-                ),
-                const SizedBox(height: 16),
-                ListTile(
-                  contentPadding: EdgeInsets.zero,
-                  title: const Text('Date of Birth', style: TextStyle(color: AppColors.textHeader, fontSize: 16)),
-                  subtitle: Text(
-                    dateOfBirth == null ? 'Select your birthday' : '${dateOfBirth!.year}-${dateOfBirth!.month.toString().padLeft(2, '0')}-${dateOfBirth!.day.toString().padLeft(2, '0')}',
-                    style: TextStyle(color: dateOfBirth == null ? AppColors.textSecondary : AppColors.primary),
+            child: SingleChildScrollView(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  const Text('Edit Profile Details', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: AppColors.textHeader)),
+                  const SizedBox(height: 20),
+                  TextField(controller: nameCtrl, decoration: const InputDecoration(labelText: 'Full Name')),
+                  const SizedBox(height: 16),
+                  DropdownButtonFormField<String>(
+                    value: goalCtrl.text.isNotEmpty ? goalCtrl.text : goals.first,
+                    decoration: const InputDecoration(labelText: 'Primary Goal'),
+                    items: goals.map((e) => DropdownMenuItem(value: e, child: Text(e))).toList(),
+                    onChanged: (val) => goalCtrl.text = val!,
                   ),
-                  trailing: const Icon(Icons.calendar_today, color: AppColors.textSecondary),
-                  onTap: () async {
-                    final date = await showDatePicker(
-                      context: context,
-                      initialDate: dateOfBirth ?? DateTime(2000, 1, 1),
-                      firstDate: DateTime(1920),
-                      lastDate: DateTime.now(),
-                    );
-                    if (date != null) setModalState(() => dateOfBirth = date);
-                  },
-                ),
-                const SizedBox(height: 16),
-                DropdownButtonFormField<String>(
-                  value: gender,
-                  isExpanded: true,
-                  decoration: const InputDecoration(labelText: 'Gender'),
-                  items: ['Male', 'Female', 'Other'].map((e) => DropdownMenuItem(value: e, child: Text(e))).toList(),
-                  onChanged: (v) => setModalState(() => gender = v!),
-                ),
-                const SizedBox(height: 24),
-                ElevatedButton(
-                  onPressed: saving ? null : () async {
-                    HapticFeedback.lightImpact();
-                    setModalState(() => saving = true);
-                    try {
-                      await _supabase.updateProfileDetails(
-                        fullName: nameCtrl.text.trim(),
-                        goal: goalCtrl.text,
-                        level: levelCtrl.text,
-                        country: country,
-                        mealPreference: meal,
-                        heightCm: heightCm.round(),
-                        weightKg: weightKg,
-                        dateOfBirth: dateOfBirth,
-                        gender: gender,
-                      );
-                      await _load();
-                      if (context.mounted) Navigator.pop(context);
-                    } catch (e) {
-                      if (context.mounted) {
-                        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Error: $e')));
-                        setModalState(() => saving = false);
+                  const SizedBox(height: 16),
+                  DropdownButtonFormField<String>(
+                    value: levelCtrl.text.isNotEmpty ? levelCtrl.text : levels.first,
+                    decoration: const InputDecoration(labelText: 'Fitness Level'),
+                    items: levels.map((e) => DropdownMenuItem(value: e, child: Text(e))).toList(),
+                    onChanged: (val) => levelCtrl.text = val!,
+                  ),
+                  const SizedBox(height: 16),
+                  Text('Height: ${heightCm.round()} cm', style: const TextStyle(fontWeight: FontWeight.bold, color: AppColors.textHeader)),
+                  Slider(
+                    value: heightCm,
+                    min: 140,
+                    max: 220,
+                    divisions: 80,
+                    activeColor: AppColors.primary,
+                    onChanged: (v) => setModalState(() => heightCm = v),
+                  ),
+                  const SizedBox(height: 16),
+                  Text('Weight: ${weightKg.toStringAsFixed(1)} kg', style: const TextStyle(fontWeight: FontWeight.bold, color: AppColors.textHeader)),
+                  Slider(
+                    value: weightKg,
+                    min: 40,
+                    max: 150,
+                    divisions: 220,
+                    activeColor: AppColors.primary,
+                    onChanged: (v) => setModalState(() => weightKg = v),
+                  ),
+                  const SizedBox(height: 16),
+                  DropdownButtonFormField<String>(
+                    value: country,
+                    isExpanded: true,
+                    decoration: const InputDecoration(labelText: 'Country'),
+                    items: AppConstants.allCountries.map((e) => DropdownMenuItem(value: e, child: Text(e, overflow: TextOverflow.ellipsis))).toList(),
+                    onChanged: (v) => setModalState(() => country = v!),
+                  ),
+                  const SizedBox(height: 16),
+                  DropdownButtonFormField<String>(
+                    value: meal,
+                    isExpanded: true,
+                    decoration: const InputDecoration(labelText: 'Meal Preference / Cuisine'),
+                    items: AppConstants.popularCuisines.map((e) => DropdownMenuItem(value: e, child: Text(e, overflow: TextOverflow.ellipsis))).toList(),
+                    onChanged: (v) => setModalState(() => meal = v!),
+                  ),
+                  const SizedBox(height: 16),
+                  DropdownButtonFormField<String>(
+                    value: gender,
+                    isExpanded: true,
+                    decoration: const InputDecoration(labelText: 'Gender'),
+                    items: ['Male', 'Female', 'Other'].map((e) => DropdownMenuItem(value: e, child: Text(e))).toList(),
+                    onChanged: (v) => setModalState(() => gender = v!),
+                  ),
+                  const SizedBox(height: 24),
+                  ElevatedButton(
+                    onPressed: saving ? null : () async {
+                      HapticFeedback.lightImpact();
+                      setModalState(() => saving = true);
+                      try {
+                        await _supabase.updateProfileDetails(
+                          fullName: nameCtrl.text.trim(),
+                          goal: goalCtrl.text,
+                          level: levelCtrl.text,
+                          country: country,
+                          mealPreference: meal,
+                          heightCm: heightCm.round(),
+                          weightKg: weightKg,
+                          dateOfBirth: dateOfBirth,
+                          gender: gender,
+                        );
+                        await _load();
+                        if (context.mounted) Navigator.pop(context);
+                      } catch (e) {
+                        if (context.mounted) {
+                          ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Error: $e')));
+                          setModalState(() => saving = false);
+                        }
                       }
-                    }
-                  },
-                  child: saving
-                      ? const SizedBox(height: 20, width: 20, child: CircularProgressIndicator(strokeWidth: 2))
-                      : const Text('Save Changes'),
-                ),
-                const SizedBox(height: 32),
-              ],
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: AppColors.primary,
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
+                      padding: const EdgeInsets.symmetric(vertical: 16),
+                    ),
+                    child: saving
+                        ? const SizedBox(height: 20, width: 20, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
+                        : const Text('Save Changes', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+                  ),
+                  const SizedBox(height: 24),
+                ],
+              ),
             ),
           );
         },
       ),
     );
   }
-
   void _scheduleDynamicNotifications() async {
     await NotificationService().requestPermissions();
     for (int i = 1; i <= 21; i++) {
@@ -396,6 +397,114 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       Text(_profile?.email ?? '', style: const TextStyle(color: AppColors.textSecondary)),
                       const SizedBox(height: 4),
                       Chip(label: Text(tier), backgroundColor: AppColors.primary.withValues(alpha: 0.15)),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: 16),
+          AppCard(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    const Icon(Icons.analytics_outlined, color: AppColors.primary),
+                    const SizedBox(width: 8),
+                    const Text('Your Fitness Profile', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: AppColors.textHeader)),
+                    const Spacer(),
+                    TextButton.icon(
+                      onPressed: () => context.go('/onboarding'),
+                      icon: const Icon(Icons.restart_alt, size: 16, color: AppColors.primary),
+                      label: const Text('Retake Survey', style: TextStyle(color: AppColors.primary, fontWeight: FontWeight.bold, fontSize: 13)),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 12),
+                Row(
+                  children: [
+                    Expanded(
+                      child: Container(
+                        padding: const EdgeInsets.all(12),
+                        decoration: BoxDecoration(color: AppColors.primaryLight, borderRadius: BorderRadius.circular(12)),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            const Text('Height', style: TextStyle(fontSize: 12, color: AppColors.textSecondary)),
+                            const SizedBox(height: 4),
+                            Text('${_profile?.heightCm ?? 175} cm', style: const TextStyle(fontWeight: FontWeight.bold, color: AppColors.textHeader, fontSize: 15)),
+                          ],
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 10),
+                    Expanded(
+                      child: Container(
+                        padding: const EdgeInsets.all(12),
+                        decoration: BoxDecoration(color: AppColors.primaryLight, borderRadius: BorderRadius.circular(12)),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            const Text('Weight', style: TextStyle(fontSize: 12, color: AppColors.textSecondary)),
+                            const SizedBox(height: 4),
+                            Text('${_profile?.weightKg?.toStringAsFixed(1) ?? "70.0"} kg', style: const TextStyle(fontWeight: FontWeight.bold, color: AppColors.textHeader, fontSize: 15)),
+                          ],
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 10),
+                    Expanded(
+                      child: Container(
+                        padding: const EdgeInsets.all(12),
+                        decoration: BoxDecoration(color: AppColors.primaryLight, borderRadius: BorderRadius.circular(12)),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            const Text('Target', style: TextStyle(fontSize: 12, color: AppColors.textSecondary)),
+                            const SizedBox(height: 4),
+                            Text('${_profile?.targetWeightKg?.toStringAsFixed(1) ?? _profile?.weightKg?.toStringAsFixed(1) ?? "65.0"} kg', style: const TextStyle(fontWeight: FontWeight.bold, color: AppColors.textHeader, fontSize: 15)),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 12),
+                Container(
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(color: AppColors.background, borderRadius: BorderRadius.circular(12), border: Border.all(color: AppColors.border)),
+                  child: Column(
+                    children: [
+                      Row(
+                        children: [
+                          const Icon(Icons.fitness_center, size: 16, color: AppColors.primary),
+                          const SizedBox(width: 8),
+                          Text('Goal: ${AppConstants.goalLabels[_profile?.primaryGoal] ?? _profile?.primaryGoal ?? "Build Muscle"}', style: const TextStyle(fontSize: 13, color: AppColors.textHeader, fontWeight: FontWeight.w600)),
+                        ],
+                      ),
+                      const SizedBox(height: 8),
+                      Row(
+                        children: [
+                          const Icon(Icons.restaurant, size: 16, color: AppColors.primary),
+                          const SizedBox(width: 8),
+                          Expanded(
+                            child: Text('Cuisine: ${_profile?.mealPreference ?? "Traditional Indian"}', style: const TextStyle(fontSize: 13, color: AppColors.textHeader, fontWeight: FontWeight.w600), overflow: TextOverflow.ellipsis),
+                          ),
+                        ],
+                      ),
+                      if (_profile?.targetFocusAreas.isNotEmpty == true) ...[
+                        const SizedBox(height: 8),
+                        Row(
+                          children: [
+                            const Icon(Icons.track_changes, size: 16, color: AppColors.primary),
+                            const SizedBox(width: 8),
+                            Expanded(
+                              child: Text('Focus: ${_profile!.targetFocusAreas.join(', ')}', style: const TextStyle(fontSize: 13, color: AppColors.textHeader, fontWeight: FontWeight.w600), overflow: TextOverflow.ellipsis),
+                            ),
+                          ],
+                        ),
+                      ],
                     ],
                   ),
                 ),

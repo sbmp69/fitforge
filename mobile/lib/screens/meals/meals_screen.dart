@@ -52,6 +52,12 @@ class _MealsScreenState extends State<MealsScreen> {
       setState(() {
         _plan = results[0] as MealPlan?;
         _profile = results[1] as Profile?;
+        if (_profile?.mealPreference != null) {
+          final pref = _profile!.mealPreference!.toLowerCase();
+          if (pref.contains('veg') && !pref.contains('non')) _diet = 'vegetarian';
+          else if (pref.contains('vegan')) _diet = 'vegan';
+          else if (pref.contains('keto')) _diet = 'keto';
+        }
       });
     }
   }
@@ -128,7 +134,10 @@ class _MealsScreenState extends State<MealsScreen> {
         actions: [
           TextButton(
             onPressed: () => setState(() => _showForm = !_showForm),
-            child: const Text('New Plan', style: TextStyle(color: AppColors.primary, fontWeight: FontWeight.bold)),
+            child: Text(
+              _plan == null ? '' : 'Regenerate',
+              style: const TextStyle(color: AppColors.primary, fontWeight: FontWeight.bold),
+            ),
           ),
         ],
       ),
@@ -137,35 +146,170 @@ class _MealsScreenState extends State<MealsScreen> {
           ListView(
             padding: const EdgeInsets.fromLTRB(16, 16, 16, 140),
             children: [
+              if (_plan == null) ...[
+                Container(
+                  padding: const EdgeInsets.all(20),
+                  decoration: BoxDecoration(
+                    color: AppColors.surface,
+                    borderRadius: BorderRadius.circular(24),
+                    border: Border.all(color: AppColors.border),
+                    boxShadow: [
+                      BoxShadow(color: Colors.black.withValues(alpha: 0.04), blurRadius: 14, offset: const Offset(0, 4)),
+                    ],
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      Row(
+                        children: [
+                          Container(
+                            padding: const EdgeInsets.all(12),
+                            decoration: BoxDecoration(
+                              color: AppColors.primaryLight,
+                              shape: BoxShape.circle,
+                            ),
+                            child: const Icon(Icons.restaurant_menu, color: AppColors.primary, size: 28),
+                          ),
+                          const SizedBox(width: 14),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                const Text(
+                                  'Your Personalized Diet is Ready',
+                                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: AppColors.textHeader),
+                                ),
+                                const SizedBox(height: 4),
+                                const Text(
+                                  'Tailored to your metabolism and cuisine',
+                                  style: TextStyle(fontSize: 13, color: AppColors.textSecondary),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 20),
+                      Container(
+                        padding: const EdgeInsets.all(14),
+                        decoration: BoxDecoration(
+                          color: AppColors.primaryLight.withValues(alpha: 0.4),
+                          borderRadius: BorderRadius.circular(16),
+                        ),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Row(
+                              children: [
+                                const Icon(Icons.dining, size: 16, color: AppColors.primary),
+                                const SizedBox(width: 8),
+                                Expanded(
+                                  child: Text(
+                                    'Cuisine: ${_profile?.mealPreference ?? "Traditional Indian"}',
+                                    style: const TextStyle(fontWeight: FontWeight.bold, color: AppColors.textHeader, fontSize: 13),
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                ),
+                              ],
+                            ),
+                            const SizedBox(height: 10),
+                            Row(
+                              children: [
+                                const Icon(Icons.public, size: 16, color: AppColors.primary),
+                                const SizedBox(width: 8),
+                                Text('Country: ${_profile?.country ?? "India"}', style: const TextStyle(fontWeight: FontWeight.bold, color: AppColors.textHeader, fontSize: 13)),
+                                const Spacer(),
+                                const Icon(Icons.speed, size: 16, color: AppColors.primary),
+                                const SizedBox(width: 8),
+                                Text('Pace: ${_profile?.targetPace ?? "Normal"}', style: const TextStyle(fontWeight: FontWeight.bold, color: AppColors.textHeader, fontSize: 13)),
+                              ],
+                            ),
+                            if (_profile?.weightKg != null && _profile?.targetWeightKg != null) ...[
+                              const SizedBox(height: 10),
+                              Row(
+                                children: [
+                                  const Icon(Icons.monitor_weight_outlined, size: 16, color: AppColors.primary),
+                                  const SizedBox(width: 8),
+                                  Text(
+                                    'Target: ${_profile!.weightKg!.toStringAsFixed(1)} kg -> ${_profile!.targetWeightKg!.toStringAsFixed(1)} kg',
+                                    style: const TextStyle(fontWeight: FontWeight.bold, color: AppColors.textHeader, fontSize: 13),
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ],
+                        ),
+                      ),
+                      const SizedBox(height: 20),
+                      InkWell(
+                        onTap: _loading ? null : _generate,
+                        borderRadius: BorderRadius.circular(30),
+                        child: Container(
+                          width: double.infinity,
+                          padding: const EdgeInsets.symmetric(vertical: 16),
+                          decoration: BoxDecoration(
+                            gradient: const LinearGradient(colors: [AppColors.primary, AppColors.accent]),
+                            borderRadius: BorderRadius.circular(30),
+                            boxShadow: [
+                              BoxShadow(color: AppColors.primary.withValues(alpha: 0.3), blurRadius: 12, offset: const Offset(0, 4)),
+                            ],
+                          ),
+                          alignment: Alignment.center,
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: const [
+                              Icon(Icons.restaurant, color: AppColors.textHeader, size: 22),
+                              SizedBox(width: 8),
+                              Text('Generate My Meal Plan', style: TextStyle(color: AppColors.textHeader, fontSize: 16, fontWeight: FontWeight.bold)),
+                            ],
+                          ),
+                        ),
+                      ).animate(onPlay: (c) => c.repeat(reverse: true)).shimmer(duration: 2.seconds, color: Colors.black26),
+                      const SizedBox(height: 12),
+                      Center(
+                        child: TextButton.icon(
+                          onPressed: () => setState(() => _showForm = !_showForm),
+                          icon: Icon(_showForm ? Icons.expand_less : Icons.tune, size: 16, color: AppColors.textSecondary),
+                          label: Text(
+                            _showForm ? 'Hide Preferences' : 'Add Allergies or Adjust Diet',
+                            style: const TextStyle(color: AppColors.textSecondary, fontSize: 13),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 16),
+              ],
               if (_showForm)
                 AppCard(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
+                      const Text('Customize Meal Parameters', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: AppColors.textHeader)),
+                      const SizedBox(height: 14),
                       DropdownButtonFormField<String>(
                         value: _diet,
-                        decoration: const InputDecoration(labelText: 'Diet'),
+                        decoration: const InputDecoration(labelText: 'Dietary Preference'),
                         items: AppConstants.dietLabels.entries
                             .map((e) => DropdownMenuItem(value: e.key, child: Text(e.value)))
                             .toList(),
                         onChanged: (v) => setState(() => _diet = v!),
                       ),
                       const SizedBox(height: 12),
-                      TextField(controller: _allergies, decoration: const InputDecoration(labelText: 'Allergies (comma-separated)')),
-                      const SizedBox(height: 24),
-                      if (!SubscriptionService.isPremium)
-                        Padding(
-                          padding: const EdgeInsets.only(bottom: 8),
-                          child: Text('${(5 - (_profile?.aiPlansUsedThisMonth ?? 0)).clamp(0, 5)} AI plans left this month', textAlign: TextAlign.center, style: const TextStyle(color: AppColors.textSecondary, fontSize: 12)),
-                        ),
+                      TextField(controller: _allergies, decoration: const InputDecoration(labelText: 'Allergies to Exclude (comma-separated)', hintText: 'e.g. peanuts, dairy, gluten')),
+                      const SizedBox(height: 20),
                       ElevatedButton(
-                        onPressed: _loading ? null : _generate,
+                        onPressed: _loading ? null : () {
+                          _generate();
+                          setState(() => _showForm = false);
+                        },
                         style: ElevatedButton.styleFrom(
                           backgroundColor: AppColors.primary,
                           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
                           padding: const EdgeInsets.symmetric(vertical: 16),
                         ),
-                        child: const Text('Generate Meal Plan', style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold)),
+                        child: const Text('Regenerate Meal Plan', style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold)),
                       ),
                     ],
                   ),

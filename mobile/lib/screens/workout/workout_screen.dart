@@ -145,7 +145,7 @@ class _WorkoutScreenState extends State<WorkoutScreen> {
           TextButton(
             onPressed: () => setState(() => _showForm = !_showForm),
             child: Text(
-              _plan == null ? 'Generate' : 'New Plan',
+              _plan == null ? '' : 'Regenerate',
               style: const TextStyle(color: AppColors.primary, fontWeight: FontWeight.bold),
             ),
           ),
@@ -156,64 +156,110 @@ class _WorkoutScreenState extends State<WorkoutScreen> {
           ListView(
         padding: const EdgeInsets.fromLTRB(16, 16, 16, 140),
         children: [
-          if (_showForm) ...[
-            AppCard(
+          if (_plan == null) ...[
+            Container(
+              padding: const EdgeInsets.all(20),
+              decoration: BoxDecoration(
+                color: AppColors.surface,
+                borderRadius: BorderRadius.circular(24),
+                border: Border.all(color: AppColors.border),
+                boxShadow: [
+                  BoxShadow(color: Colors.black.withValues(alpha: 0.04), blurRadius: 14, offset: const Offset(0, 4)),
+                ],
+              ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  DropdownButtonFormField<String>(
-                    initialValue: _goal,
-                    decoration: const InputDecoration(labelText: 'Goal'),
-                    items: AppConstants.goalLabels.entries
-                        .map((e) => DropdownMenuItem(value: e.key, child: Text(e.value)))
-                        .toList(),
-                    onChanged: (v) => setState(() => _goal = v!),
+                  Row(
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.all(12),
+                        decoration: BoxDecoration(
+                          color: AppColors.primaryLight,
+                          shape: BoxShape.circle,
+                        ),
+                        child: const Icon(Icons.fitness_center, color: AppColors.primary, size: 28),
+                      ),
+                      const SizedBox(width: 14),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            const Text(
+                              'Your Personalized Plan is Ready',
+                              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: AppColors.textHeader),
+                            ),
+                            const SizedBox(height: 4),
+                            const Text(
+                              'Tailored using your 17 onboarding answers',
+                              style: TextStyle(fontSize: 13, color: AppColors.textSecondary),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
                   ),
-                  const SizedBox(height: 12),
-                  DropdownButtonFormField<String>(
-                    initialValue: _level,
-
-                    decoration: const InputDecoration(labelText: 'Level'),
-                    items: AppConstants.levelLabels.entries
-                        .map((e) => DropdownMenuItem(value: e.key, child: Text(e.value)))
-                        .toList(),
-                    onChanged: (v) => setState(() => _level = v!),
-                  ),
-                  const SizedBox(height: 12),
-                  Text('Days per week: ${_days.round()}'),
-                  Slider(value: _days, min: 1, max: 7, divisions: 6, onChanged: (v) => setState(() => _days = v)),
-                  const Text('Equipment', style: TextStyle(color: AppColors.textSecondary)),
-                  Wrap(
-                    spacing: 8,
-                    runSpacing: 8,
-                    children: _equipmentOptions.map((item) {
-                      final selected = _equipment.contains(item);
-                      return FilterChip(
-                        label: Text(item),
-                        selected: selected,
-                        onSelected: (_) => setState(() {
-                          selected ? _equipment.remove(item) : _equipment.add(item);
-                        }),
-                      );
-                    }).toList(),
-                  ),
-                  const SizedBox(height: 12),
-                  TextField(
-                    controller: _customEquipmentController,
-                    decoration: const InputDecoration(
-                      labelText: 'Custom Equipment (e.g. Ab Roller)',
-                      hintText: 'Type any specific equipment you have',
+                  const SizedBox(height: 20),
+                  Container(
+                    padding: const EdgeInsets.all(14),
+                    decoration: BoxDecoration(
+                      color: AppColors.primaryLight.withValues(alpha: 0.4),
+                      borderRadius: BorderRadius.circular(16),
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          children: [
+                            const Icon(Icons.flag, size: 16, color: AppColors.primary),
+                            const SizedBox(width: 8),
+                            Text('Goal: ${AppConstants.goalLabels[_goal] ?? _goal}', style: const TextStyle(fontWeight: FontWeight.bold, color: AppColors.textHeader, fontSize: 13)),
+                            const Spacer(),
+                            const Icon(Icons.bolt, size: 16, color: AppColors.primary),
+                            const SizedBox(width: 8),
+                            Text('Level: ${AppConstants.levelLabels[_level] ?? _level}', style: const TextStyle(fontWeight: FontWeight.bold, color: AppColors.textHeader, fontSize: 13)),
+                          ],
+                        ),
+                        const SizedBox(height: 10),
+                        Row(
+                          children: [
+                            const Icon(Icons.calendar_today, size: 16, color: AppColors.primary),
+                            const SizedBox(width: 8),
+                            Text('Schedule: ${_days.round()} days / week', style: const TextStyle(fontWeight: FontWeight.bold, color: AppColors.textHeader, fontSize: 13)),
+                            const Spacer(),
+                            const Icon(Icons.shield, size: 16, color: AppColors.primary),
+                            const SizedBox(width: 8),
+                            Text(
+                              _profile?.injuries.isNotEmpty == true && !_profile!.injuries.contains('No injuries')
+                                  ? 'Injury Safe'
+                                  : 'Full Mobility',
+                              style: const TextStyle(fontWeight: FontWeight.bold, color: AppColors.textHeader, fontSize: 13),
+                            ),
+                          ],
+                        ),
+                        if (_profile?.targetFocusAreas.isNotEmpty == true) ...[
+                          const SizedBox(height: 10),
+                          Row(
+                            children: [
+                              const Icon(Icons.gps_fixed, size: 16, color: AppColors.primary),
+                              const SizedBox(width: 8),
+                              Expanded(
+                                child: Text(
+                                  'Focus: ${_profile!.targetFocusAreas.join(', ')}',
+                                  style: const TextStyle(fontWeight: FontWeight.bold, color: AppColors.textHeader, fontSize: 13),
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ],
                     ),
                   ),
-                  const SizedBox(height: 24),
-                  if (!SubscriptionService.isPremium)
-                    Padding(
-                      padding: const EdgeInsets.only(bottom: 8),
-                      child: Text('${(5 - (_profile?.aiPlansUsedThisMonth ?? 0)).clamp(0, 5)} AI plans left this month', textAlign: TextAlign.center, style: const TextStyle(color: AppColors.textSecondary, fontSize: 12)),
-                    ),
+                  const SizedBox(height: 20),
                   InkWell(
                     onTap: _loading ? null : _generate,
-                    borderRadius: BorderRadius.circular(12),
+                    borderRadius: BorderRadius.circular(30),
                     child: Container(
                       width: double.infinity,
                       padding: const EdgeInsets.symmetric(vertical: 16),
@@ -228,13 +274,79 @@ class _WorkoutScreenState extends State<WorkoutScreen> {
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: const [
-                          Icon(Icons.bolt, color: AppColors.textHeader, size: 20),
+                          Icon(Icons.bolt, color: AppColors.textHeader, size: 22),
                           SizedBox(width: 8),
-                          Text('Generate AI Plan', style: TextStyle(color: AppColors.textHeader, fontSize: 16, fontWeight: FontWeight.bold)),
+                          Text('Generate My Workout Plan', style: TextStyle(color: AppColors.textHeader, fontSize: 16, fontWeight: FontWeight.bold)),
                         ],
                       ),
                     ),
                   ).animate(onPlay: (c) => c.repeat(reverse: true)).shimmer(duration: 2.seconds, color: Colors.black26),
+                  const SizedBox(height: 12),
+                  Center(
+                    child: TextButton.icon(
+                      onPressed: () => setState(() => _showForm = !_showForm),
+                      icon: Icon(_showForm ? Icons.expand_less : Icons.tune, size: 16, color: AppColors.textSecondary),
+                      label: Text(
+                        _showForm ? 'Hide Preferences' : 'Adjust Equipment or Days',
+                        style: const TextStyle(color: AppColors.textSecondary, fontSize: 13),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(height: 16),
+          ],
+          if (_showForm) ...[
+            AppCard(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  const Text('Customize Workout Parameters', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: AppColors.textHeader)),
+                  const SizedBox(height: 14),
+                  Text('Days per week: ${_days.round()}', style: const TextStyle(fontWeight: FontWeight.bold, color: AppColors.textHeader)),
+                  Slider(value: _days, min: 1, max: 7, divisions: 6, activeColor: AppColors.primary, onChanged: (v) => setState(() => _days = v)),
+                  const SizedBox(height: 8),
+                  const Text('Select Available Equipment', style: TextStyle(fontWeight: FontWeight.bold, color: AppColors.textHeader)),
+                  const SizedBox(height: 10),
+                  Wrap(
+                    spacing: 8,
+                    runSpacing: 8,
+                    children: _equipmentOptions.map((item) {
+                      final selected = _equipment.contains(item);
+                      return FilterChip(
+                        label: Text(item),
+                        selected: selected,
+                        selectedColor: AppColors.primary,
+                        checkmarkColor: Colors.white,
+                        labelStyle: TextStyle(color: selected ? Colors.white : AppColors.textHeader, fontWeight: FontWeight.bold),
+                        onSelected: (_) => setState(() {
+                          selected ? _equipment.remove(item) : _equipment.add(item);
+                        }),
+                      );
+                    }).toList(),
+                  ),
+                  const SizedBox(height: 14),
+                  TextField(
+                    controller: _customEquipmentController,
+                    decoration: const InputDecoration(
+                      labelText: 'Custom Equipment (e.g. Ab Roller, Dip Station)',
+                      hintText: 'Type any specific equipment you have',
+                    ),
+                  ),
+                  const SizedBox(height: 20),
+                  ElevatedButton(
+                    onPressed: _loading ? null : () {
+                      _generate();
+                      setState(() => _showForm = false);
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: AppColors.primary,
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
+                      padding: const EdgeInsets.symmetric(vertical: 16),
+                    ),
+                    child: const Text('Regenerate Workout Plan', style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold)),
+                  ),
                 ],
               ),
             ),
