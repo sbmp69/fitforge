@@ -17,6 +17,41 @@ class OnboardingScreen extends StatefulWidget {
 class _OnboardingScreenState extends State<OnboardingScreen> {
   final _pageController = PageController();
   int _currentStep = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadExistingProfile();
+  }
+
+  Future<void> _loadExistingProfile() async {
+    final user = Supabase.instance.client.auth.currentUser;
+    if (user != null) {
+      try {
+        final profile = await SupabaseService().getProfile();
+        if (profile != null && mounted) {
+          setState(() {
+            if (profile.heightCm != null) _data.heightCm = profile.heightCm!;
+            if (profile.weightKg != null) _data.currentWeightKg = profile.weightKg!;
+            if (profile.targetWeightKg != null) _data.targetWeightKg = profile.targetWeightKg!;
+            if (profile.gender != null) _data.gender = profile.gender!;
+            if (profile.primaryGoal != null) _data.goal = profile.primaryGoal!;
+            if (profile.fitnessLevel != null) _data.fitnessLevel = profile.fitnessLevel!;
+            if (profile.country != null) _data.country = profile.country!;
+            if (profile.mealPreference != null) _data.mealPreference = profile.mealPreference!;
+            if (profile.targetFocusAreas.isNotEmpty) _data.targetFocusAreas = List.from(profile.targetFocusAreas);
+            if (profile.injuries.isNotEmpty) _data.injuries = List.from(profile.injuries);
+            if (profile.equipment.isNotEmpty) _data.equipment = List.from(profile.equipment);
+            if (profile.workoutDays.isNotEmpty) _data.workoutDays = List.from(profile.workoutDays);
+            if (profile.dateOfBirth != null) {
+              final age = DateTime.now().year - profile.dateOfBirth!.year;
+              if (age > 10 && age < 100) _data.age = age;
+            }
+          });
+        }
+      } catch (_) {}
+    }
+  }
   final int _totalSteps = 18;
   final OnboardingData _data = OnboardingData();
 
@@ -44,11 +79,22 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setBool(AppConstants.onboardingKey, true);
     await prefs.setString('pending_onboarding_data', jsonEncode(_data.toJson()));
-    if (mounted) {
-      context.go('/signup');
+    
+    final loggedIn = Supabase.instance.client.auth.currentSession != null;
+    if (loggedIn) {
+      await SupabaseService().savePendingOnboardingProfile();
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Fitness assessment updated successfully!')),
+        );
+        context.go('/profile');
+      }
+    } else {
+      if (mounted) {
+        context.go('/signup');
+      }
     }
   }
-
   @override
   Widget build(BuildContext context) {
     final progress = (_currentStep + 1) / _totalSteps;
@@ -67,6 +113,11 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                     IconButton(
                       icon: const Icon(Icons.arrow_back_ios_new, size: 20, color: AppColors.textHeader),
                       onPressed: _prevPage,
+                    )
+                  else if (Supabase.instance.client.auth.currentSession != null)
+                    IconButton(
+                      icon: const Icon(Icons.close, size: 22, color: AppColors.textHeader),
+                      onPressed: () => context.go('/profile'),
                     )
                   else
                     const SizedBox(width: 48),
@@ -97,10 +148,16 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                       ),
                     ),
                   ),
-                  TextButton(
-                    onPressed: () => context.go('/login'),
-                    child: const Text('Log In', style: TextStyle(color: AppColors.primary, fontWeight: FontWeight.bold)),
-                  ),
+                  if (Supabase.instance.client.auth.currentSession == null)
+                    TextButton(
+                      onPressed: () => context.go('/login'),
+                      child: const Text('Log In', style: TextStyle(color: AppColors.primary, fontWeight: FontWeight.bold)),
+                    )
+                  else
+                    IconButton(
+                      icon: const Icon(Icons.close, size: 22, color: AppColors.textHeader),
+                      onPressed: () => context.go('/profile'),
+                    ),
                 ],
               ),
             ),

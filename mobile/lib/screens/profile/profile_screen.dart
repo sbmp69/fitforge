@@ -92,155 +92,50 @@ class _ProfileScreenState extends State<ProfileScreen> {
     }
   }
 
-  Future<void> _showEditProfileDialog(BuildContext context) async {
+  Future<void> _showEditNameDialog(BuildContext context) async {
     if (_profile == null) return;
     final nameCtrl = TextEditingController(text: _profile!.fullName);
-    
-    String initialGoal = _profile!.primaryGoal ?? 'Muscle Gain';
-    if (initialGoal == 'build_muscle') initialGoal = 'Muscle Gain';
-    else if (initialGoal == 'lose_weight' || initialGoal == 'weight_loss') initialGoal = 'Weight Loss';
-    else if (initialGoal == 'endurance') initialGoal = 'Endurance';
-    else if (initialGoal == 'tone' || initialGoal == 'get_toned') initialGoal = 'General Fitness';
-
-    String initialLevel = _profile!.fitnessLevel ?? 'Intermediate';
-    if (initialLevel.toLowerCase() == 'beginner') initialLevel = 'Beginner';
-    else if (initialLevel.toLowerCase() == 'intermediate') initialLevel = 'Intermediate';
-    else if (initialLevel.toLowerCase() == 'advanced') initialLevel = 'Advanced';
-
-    final goalCtrl = TextEditingController(text: initialGoal);
-    final levelCtrl = TextEditingController(text: initialLevel);
-    String country = _profile!.country ?? 'India';
-    if (!AppConstants.allCountries.contains(country)) country = AppConstants.allCountries.first;
-    String meal = _profile!.mealPreference ?? 'Traditional Indian';
-    if (!AppConstants.popularCuisines.contains(meal)) meal = AppConstants.popularCuisines.first;
-    double heightCm = (_profile!.heightCm ?? 175).toDouble();
-    double weightKg = _profile!.weightKg ?? 70.0;
-    DateTime? dateOfBirth = _profile!.dateOfBirth;
-    String gender = _profile!.gender ?? 'Male';
     bool saving = false;
 
-    List<String> goals = ['Weight Loss', 'Muscle Gain', 'Endurance', 'General Fitness'];
-    if (goalCtrl.text.isNotEmpty && !goals.contains(goalCtrl.text)) goals.add(goalCtrl.text);
-    List<String> levels = ['Beginner', 'Intermediate', 'Advanced'];
-    if (levelCtrl.text.isNotEmpty && !levels.contains(levelCtrl.text)) levels.add(levelCtrl.text);
-
-    await showModalBottomSheet(
+    await showDialog(
       context: context,
-      isScrollControlled: true,
-      useRootNavigator: true,
-      backgroundColor: AppColors.surface,
-      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(24))),
       builder: (context) => StatefulBuilder(
-        builder: (context, setModalState) {
-          return Padding(
-            padding: EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom + 24, left: 24, right: 24, top: 24),
-            child: SingleChildScrollView(
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  const Text('Edit Profile Details', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: AppColors.textHeader)),
-                  const SizedBox(height: 20),
-                  TextField(controller: nameCtrl, decoration: const InputDecoration(labelText: 'Full Name')),
-                  const SizedBox(height: 16),
-                  DropdownButtonFormField<String>(
-                    value: goalCtrl.text.isNotEmpty ? goalCtrl.text : goals.first,
-                    decoration: const InputDecoration(labelText: 'Primary Goal'),
-                    items: goals.map((e) => DropdownMenuItem(value: e, child: Text(e))).toList(),
-                    onChanged: (val) => goalCtrl.text = val!,
-                  ),
-                  const SizedBox(height: 16),
-                  DropdownButtonFormField<String>(
-                    value: levelCtrl.text.isNotEmpty ? levelCtrl.text : levels.first,
-                    decoration: const InputDecoration(labelText: 'Fitness Level'),
-                    items: levels.map((e) => DropdownMenuItem(value: e, child: Text(e))).toList(),
-                    onChanged: (val) => levelCtrl.text = val!,
-                  ),
-                  const SizedBox(height: 16),
-                  Text('Height: ${heightCm.round()} cm', style: const TextStyle(fontWeight: FontWeight.bold, color: AppColors.textHeader)),
-                  Slider(
-                    value: heightCm,
-                    min: 140,
-                    max: 220,
-                    divisions: 80,
-                    activeColor: AppColors.primary,
-                    onChanged: (v) => setModalState(() => heightCm = v),
-                  ),
-                  const SizedBox(height: 16),
-                  Text('Weight: ${weightKg.toStringAsFixed(1)} kg', style: const TextStyle(fontWeight: FontWeight.bold, color: AppColors.textHeader)),
-                  Slider(
-                    value: weightKg,
-                    min: 40,
-                    max: 150,
-                    divisions: 220,
-                    activeColor: AppColors.primary,
-                    onChanged: (v) => setModalState(() => weightKg = v),
-                  ),
-                  const SizedBox(height: 16),
-                  DropdownButtonFormField<String>(
-                    value: country,
-                    isExpanded: true,
-                    decoration: const InputDecoration(labelText: 'Country'),
-                    items: AppConstants.allCountries.map((e) => DropdownMenuItem(value: e, child: Text(e, overflow: TextOverflow.ellipsis))).toList(),
-                    onChanged: (v) => setModalState(() => country = v!),
-                  ),
-                  const SizedBox(height: 16),
-                  DropdownButtonFormField<String>(
-                    value: meal,
-                    isExpanded: true,
-                    decoration: const InputDecoration(labelText: 'Meal Preference / Cuisine'),
-                    items: AppConstants.popularCuisines.map((e) => DropdownMenuItem(value: e, child: Text(e, overflow: TextOverflow.ellipsis))).toList(),
-                    onChanged: (v) => setModalState(() => meal = v!),
-                  ),
-                  const SizedBox(height: 16),
-                  DropdownButtonFormField<String>(
-                    value: gender,
-                    isExpanded: true,
-                    decoration: const InputDecoration(labelText: 'Gender'),
-                    items: ['Male', 'Female', 'Other'].map((e) => DropdownMenuItem(value: e, child: Text(e))).toList(),
-                    onChanged: (v) => setModalState(() => gender = v!),
-                  ),
-                  const SizedBox(height: 24),
-                  ElevatedButton(
-                    onPressed: saving ? null : () async {
-                      HapticFeedback.lightImpact();
-                      setModalState(() => saving = true);
-                      try {
-                        await _supabase.updateProfileDetails(
-                          fullName: nameCtrl.text.trim(),
-                          goal: goalCtrl.text,
-                          level: levelCtrl.text,
-                          country: country,
-                          mealPreference: meal,
-                          heightCm: heightCm.round(),
-                          weightKg: weightKg,
-                          dateOfBirth: dateOfBirth,
-                          gender: gender,
-                        );
-                        await _load();
-                        if (context.mounted) Navigator.pop(context);
-                      } catch (e) {
-                        if (context.mounted) {
-                          ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Error: $e')));
-                          setModalState(() => saving = false);
-                        }
-                      }
-                    },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: AppColors.primary,
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
-                      padding: const EdgeInsets.symmetric(vertical: 16),
-                    ),
-                    child: saving
-                        ? const SizedBox(height: 20, width: 20, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
-                        : const Text('Save Changes', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
-                  ),
-                  const SizedBox(height: 24),
-                ],
-              ),
+        builder: (context, setDialogState) => AlertDialog(
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+          title: const Text('Edit Name', style: TextStyle(fontWeight: FontWeight.bold, color: AppColors.textHeader)),
+          content: TextField(
+            controller: nameCtrl,
+            autofocus: true,
+            decoration: const InputDecoration(labelText: 'Full Name', hintText: 'Enter your name'),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text('Cancel', style: TextStyle(color: AppColors.textSecondary)),
             ),
-          );
-        },
+            ElevatedButton(
+              onPressed: saving ? null : () async {
+                final newName = nameCtrl.text.trim();
+                if (newName.isEmpty) return;
+                setDialogState(() => saving = true);
+                try {
+                  await Supabase.instance.client.from('profiles').update({'full_name': newName}).eq('id', _profile!.id);
+                  await _load();
+                  if (context.mounted) Navigator.pop(context);
+                } catch (e) {
+                  if (context.mounted) {
+                    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Error: $e')));
+                    setDialogState(() => saving = false);
+                  }
+                }
+              },
+              style: ElevatedButton.styleFrom(backgroundColor: AppColors.primary, shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12))),
+              child: saving
+                  ? const SizedBox(width: 16, height: 16, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
+                  : const Text('Save', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -367,12 +262,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Profile'),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.edit, color: AppColors.primary),
-            onPressed: () => _showEditProfileDialog(context),
-          ),
-        ],
       ),
       body: ListView(
         padding: const EdgeInsets.fromLTRB(16, 16, 16, 140),
@@ -393,7 +282,21 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(_profile?.fullName ?? 'User', style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: AppColors.textHeader)),
+                      Row(
+                        children: [
+                          Expanded(
+                            child: Text(_profile?.fullName ?? 'User', style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: AppColors.textHeader), overflow: TextOverflow.ellipsis),
+                          ),
+                          InkWell(
+                            onTap: () => _showEditNameDialog(context),
+                            borderRadius: BorderRadius.circular(20),
+                            child: const Padding(
+                              padding: EdgeInsets.all(4),
+                              child: Icon(Icons.edit, size: 18, color: AppColors.primary),
+                            ),
+                          ),
+                        ],
+                      ),
                       Text(_profile?.email ?? '', style: const TextStyle(color: AppColors.textSecondary)),
                       const SizedBox(height: 4),
                       Chip(label: Text(tier), backgroundColor: AppColors.primary.withValues(alpha: 0.15)),
@@ -416,8 +319,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     const Spacer(),
                     TextButton.icon(
                       onPressed: () => context.go('/onboarding'),
-                      icon: const Icon(Icons.restart_alt, size: 16, color: AppColors.primary),
-                      label: const Text('Retake Survey', style: TextStyle(color: AppColors.primary, fontWeight: FontWeight.bold, fontSize: 13)),
+                      icon: const Icon(Icons.tune, size: 16, color: AppColors.primary),
+                      label: const Text('Edit Assessment', style: TextStyle(color: AppColors.primary, fontWeight: FontWeight.bold, fontSize: 13)),
                     ),
                   ],
                 ),

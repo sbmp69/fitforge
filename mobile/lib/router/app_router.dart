@@ -33,7 +33,7 @@ class AppRouter {
         if (onboarded && !loggedIn && !loc.startsWith('/login') && !loc.startsWith('/signup') && loc != '/onboarding') {
           return '/login';
         }
-        if (loggedIn && (loc == '/login' || loc == '/signup' || loc == '/onboarding' || loc == '/')) {
+        if (loggedIn && (loc == '/login' || loc == '/signup' || loc == '/')) {
           return '/home';
         }
         return null;
