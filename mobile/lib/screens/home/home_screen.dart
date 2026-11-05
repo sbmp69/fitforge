@@ -104,23 +104,27 @@ class _HomeScreenState extends State<HomeScreen> {
         _supabase.getProgressLogs(limit: 30),
       ]);
       
-      final notifs = NotificationService();
-      await notifs.requestPermissions();
-      await notifs.scheduleSmartCycling(_profile?.country);
-        if (mounted) {
-          final profile = results[0] as Profile?;
-          if (profile != null && profile.heightCm == null) {
-            context.go('/physique-onboarding');
-            return;
+      if (mounted) {
+        final profile = results[0] as Profile?;
+        setState(() {
+          _profile = profile;
+          _workout = results[1] as WorkoutPlan?;
+          _meal = results[2] as MealPlan?;
+          _logs = results[3] as List<ProgressLog>;
+          _loading = false;
+        });
+
+        // Initialize smart notifications in background without blocking Home UI
+        unawaited(() async {
+          try {
+            final notifs = NotificationService();
+            await notifs.requestPermissions();
+            await notifs.scheduleSmartCycling(profile?.country);
+          } catch (e) {
+            debugPrint('Notification scheduling error: $e');
           }
-          setState(() {
-            _profile = profile;
-            _workout = results[1] as WorkoutPlan?;
-            _meal = results[2] as MealPlan?;
-            _logs = results[3] as List<ProgressLog>;
-            _loading = false;
-          });
-        }
+        }());
+      }
     } catch (e) {
       debugPrint('Error loading home data (offline): $e');
       if (mounted) {
