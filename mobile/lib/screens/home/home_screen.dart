@@ -1,3 +1,5 @@
+import 'dart:convert';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:ui';
 import 'dart:async';
 import 'package:flutter/material.dart';
@@ -47,6 +49,13 @@ class _HomeScreenState extends State<HomeScreen> {
     _load();
     _startAdTimer();
     _checkForUpdate();
+
+    // Absolute fallback: NEVER stay on shimmer for more than 3 seconds
+    Timer(const Duration(seconds: 3), () {
+      if (mounted && _loading) {
+        setState(() => _loading = false);
+      }
+    });
   }
 
   Future<void> _checkForUpdate() async {
@@ -95,22 +104,63 @@ class _HomeScreenState extends State<HomeScreen> {
 
   Future<void> _load() async {
     if (!mounted) return;
+
+    // 1. Instant Cache-First Loading (0ms UI render)
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final cachedProfStr = prefs.getString('cached_profile');
+      final cachedWorkStr = prefs.getString('cached_workout_plan');
+      final cachedMealStr = prefs.getString('cached_meal_plan');
+      final cachedLogsStr = prefs.getString('cached_logs');
+
+      Profile? p;
+      WorkoutPlan? w;
+      MealPlan? m;
+      List<ProgressLog> l = [];
+
+      if (cachedProfStr != null) {
+        try { p = Profile.fromJson(jsonDecode(cachedProfStr)); } catch (_) {}
+      }
+      if (cachedWorkStr != null) {
+        try { w = WorkoutPlan.fromJson(jsonDecode(cachedWorkStr)); } catch (_) {}
+      }
+      if (cachedMealStr != null) {
+        try { m = MealPlan.fromJson(jsonDecode(cachedMealStr)); } catch (_) {}
+      }
+      if (cachedLogsStr != null) {
+        try {
+          final list = jsonDecode(cachedLogsStr) as List<dynamic>;
+          l = list.map((e) => ProgressLog.fromJson(e)).toList();
+        } catch (_) {}
+      }
+
+      if (mounted && (p != null || w != null || m != null)) {
+        setState(() {
+          if (p != null) _profile = p;
+          if (w != null) _workout = w;
+          if (m != null) _meal = m;
+          if (l.isNotEmpty) _logs = l;
+          _loading = false; // Render immediately!
+        });
+      }
+    } catch (_) {}
     
+    // 2. Fresh Network Fetch with a strict 4-second timeout
     try {
       final results = await Future.wait([
         _supabase.getProfile(),
         _supabase.getActiveWorkoutPlan(),
         _supabase.getActiveMealPlan(),
         _supabase.getProgressLogs(limit: 30),
-      ]);
+      ]).timeout(const Duration(seconds: 4));
       
       if (mounted) {
         final profile = results[0] as Profile?;
         setState(() {
-          _profile = profile;
-          _workout = results[1] as WorkoutPlan?;
-          _meal = results[2] as MealPlan?;
-          _logs = results[3] as List<ProgressLog>;
+          _profile = profile ?? _profile;
+          _workout = results[1] as WorkoutPlan? ?? _workout;
+          _meal = results[2] as MealPlan? ?? _meal;
+          _logs = (results[3] as List<ProgressLog>).isNotEmpty ? (results[3] as List<ProgressLog>) : _logs;
           _loading = false;
         });
 
@@ -119,19 +169,23 @@ class _HomeScreenState extends State<HomeScreen> {
           try {
             final notifs = NotificationService();
             await notifs.requestPermissions();
-            await notifs.scheduleSmartCycling(profile?.country);
+            await notifs.scheduleSmartCycling(profile?.country ?? _profile?.country);
           } catch (e) {
             debugPrint('Notification scheduling error: $e');
           }
         }());
       }
     } catch (e) {
-      debugPrint('Error loading home data (offline): $e');
+      debugPrint('Error or timeout loading home data: $e');
       if (mounted) {
         setState(() {
           _isOffline = true;
           _loading = false;
         });
+      }
+    } finally {
+      if (mounted && _loading) {
+        setState(() => _loading = false);
       }
     }
   }
@@ -192,11 +246,7 @@ class _HomeScreenState extends State<HomeScreen> {
     final todayLogMatches = _logs.where((l) => l.logDate == todayStr);
     final todayLog = todayLogMatches.isEmpty ? null : todayLogMatches.first;
 
-    return UpgradeAlert(
-      upgrader: Upgrader(),
-      showIgnore: false,
-      showLater: false,
-      child: Scaffold(
+    return Scaffold(
         backgroundColor: AppColors.background,
         appBar: AppBar(
           backgroundColor: Colors.transparent,
@@ -427,7 +477,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                     const Text('Goal Target', style: TextStyle(fontSize: 12, color: AppColors.textSecondary)),
                                     const SizedBox(height: 2),
                                     Text(
-                                      'kg ➔ kg',
+                                      '${_profile?.weightKg?.toStringAsFixed(1) ?? "--"} kg ➔ ${_profile?.targetWeightKg?.toStringAsFixed(1) ?? "--"} kg',
                                       style: const TextStyle(fontSize: 15, fontWeight: FontWeight.bold, color: AppColors.textHeader),
                                     ),
                                   ],
@@ -508,8 +558,7 @@ class _HomeScreenState extends State<HomeScreen> {
             ],
           ),
         ),
-      ),
-    );
+      );
   }
 }
 

@@ -15,10 +15,10 @@ class MealItem {
 
   factory MealItem.fromJson(Map<String, dynamic> json) => MealItem(
         name: json['name'] as String? ?? '',
-        calories: json['calories'] as int? ?? 0,
-        protein: json['protein'] as int? ?? 0,
-        carbs: json['carbs'] as int? ?? 0,
-        fat: json['fat'] as int? ?? 0,
+        calories: (json['calories'] as num?)?.toInt() ?? 0,
+        protein: (json['protein'] as num?)?.toInt() ?? 0,
+        carbs: (json['carbs'] as num?)?.toInt() ?? 0,
+        fat: (json['fat'] as num?)?.toInt() ?? 0,
       );
 }
 

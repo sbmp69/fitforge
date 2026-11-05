@@ -74,7 +74,7 @@ class WorkoutPlan {
       title: json['title'] as String? ?? 'Workout Plan',
       goal: json['goal'] as String? ?? '',
       level: json['level'] as String? ?? '',
-      daysPerWeek: json['days_per_week'] as int? ?? 0,
+      daysPerWeek: (json['days_per_week'] as num?)?.toInt() ?? 0,
       summary: planData['summary'] as String?,
       days: (planData['days'] as List<dynamic>? ?? [])
           .map((d) => WorkoutDay.fromJson(d as Map<String, dynamic>))
