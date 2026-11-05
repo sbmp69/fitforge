@@ -1,3 +1,5 @@
+import 'dart:async';
+import 'package:intl/intl.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../../services/supabase_service.dart';
 import 'package:flutter/material.dart';
@@ -57,6 +59,98 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   final int _totalSteps = 18;
   final OnboardingData _data = OnboardingData();
 
+  bool _isAnalyzing = false;
+  bool _showTeaser = false;
+  double _analysisProgress = 0.0;
+  String _analysisText = 'Calculating caloric surplus/deficit...';
+  Timer? _analysisTimer;
+
+  @override
+  void dispose() {
+    _analysisTimer?.cancel();
+    _pageController.dispose();
+    super.dispose();
+  }
+
+  void _startAnalyzing() {
+    setState(() {
+      _isAnalyzing = true;
+      _showTeaser = false;
+      _analysisProgress = 0.0;
+      _analysisText = 'Calculating caloric surplus/deficit...';
+    });
+
+    _analysisTimer?.cancel();
+    _analysisTimer = Timer.periodic(const Duration(milliseconds: 50), (timer) {
+      if (!mounted) {
+        timer.cancel();
+        return;
+      }
+      setState(() {
+        _analysisProgress += 0.016; // Reaches 1.0 in ~3.1 seconds
+        if (_analysisProgress < 0.35) {
+          _analysisText = 'Calculating caloric surplus/deficit...';
+        } else if (_analysisProgress < 0.70) {
+          _analysisText = 'Designing optimal workout split...';
+        } else if (_analysisProgress < 0.95) {
+          _analysisText = 'Generating meal schedule...';
+        } else {
+          _analysisText = 'Personalizing your roadmap...';
+        }
+
+        if (_analysisProgress >= 1.0) {
+          _analysisProgress = 1.0;
+          timer.cancel();
+          Future.delayed(const Duration(milliseconds: 300), () {
+            if (mounted) {
+              setState(() {
+                _isAnalyzing = false;
+                _showTeaser = true;
+              });
+            }
+          });
+        }
+      });
+    });
+  }
+
+  DateTime _calculateProjectedDate() {
+    final current = _data.currentWeightKg;
+    final target = _data.targetWeightKg;
+    final diff = (current - target).abs();
+
+    double weeklyRate = 0.5;
+    final pace = _data.targetPace.toLowerCase();
+    if (pace.contains('fast') || pace.contains('aggressive')) {
+      weeklyRate = 0.75;
+    } else if (pace.contains('steady') || pace.contains('slow')) {
+      weeklyRate = 0.35;
+    }
+
+    int weeks = (diff / weeklyRate).ceil();
+    if (weeks < 4) weeks = 4;
+    if (weeks > 52) weeks = 52;
+    return DateTime.now().add(Duration(days: weeks * 7));
+  }
+
+  int _calculateDailyCalories() {
+    final w = _data.currentWeightKg > 0 ? _data.currentWeightKg : 70.0;
+    final h = _data.heightCm > 0 ? _data.heightCm : 175;
+    final a = _data.age > 0 ? _data.age : 25;
+    final isMale = _data.gender.toLowerCase() == 'male';
+
+    double bmr = 10 * w + 6.25 * h - 5 * a + (isMale ? 5 : -161);
+    double tdee = bmr * 1.35;
+
+    final goal = _data.goal.toLowerCase();
+    if (goal.contains('lose') || goal.contains('loss')) {
+      return (tdee - 450).round();
+    } else if (goal.contains('gain') || goal.contains('muscle') || goal.contains('bulk')) {
+      return (tdee + 350).round();
+    }
+    return tdee.round();
+  }
+
   void _nextPage() {
     if (_currentStep < _totalSteps - 1) {
       _pageController.nextPage(
@@ -64,7 +158,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
         curve: Curves.easeInOut,
       );
     } else {
-      _finishOnboarding();
+      _startAnalyzing();
     }
   }
 
@@ -99,6 +193,13 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   }
   @override
   Widget build(BuildContext context) {
+    if (_isAnalyzing) {
+      return _buildAnalyzingScreen();
+    }
+    if (_showTeaser) {
+      return _buildTeaserScreen();
+    }
+
     final progress = (_currentStep + 1) / _totalSteps;
 
     return Scaffold(
@@ -1460,7 +1561,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
       subtitle: "Choose your weekly workout rhythm and set training reminders.",
       bottomAction: _PrimaryButton(
         title: 'BUILD MY PERSONALIZED PLAN',
-        onPressed: _finishOnboarding,
+        onPressed: _startAnalyzing,
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -1513,6 +1614,342 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
               onChanged: (val) => setState(() => _data.workoutReminder = val),
             ),
           ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildAnalyzingScreen() {
+    final int percent = (_analysisProgress * 100).toInt().clamp(0, 100);
+
+    return Scaffold(
+      backgroundColor: AppColors.background,
+      body: SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 32),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              const Spacer(),
+              Stack(
+                alignment: Alignment.center,
+                children: [
+                  SizedBox(
+                    width: 150,
+                    height: 150,
+                    child: CircularProgressIndicator(
+                      value: _analysisProgress,
+                      strokeWidth: 8,
+                      backgroundColor: AppColors.primaryLight,
+                      valueColor: const AlwaysStoppedAnimation<Color>(AppColors.primary),
+                    ),
+                  ),
+                  Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      const Icon(Icons.bolt, color: AppColors.primary, size: 36),
+                      Text(
+                        '$percent%',
+                        style: const TextStyle(
+                          fontSize: 28,
+                          fontWeight: FontWeight.bold,
+                          color: AppColors.textHeader,
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+              const SizedBox(height: 36),
+              const Text(
+                'Personalizing Your Plan...',
+                style: TextStyle(
+                  fontSize: 22,
+                  fontWeight: FontWeight.bold,
+                  color: AppColors.textHeader,
+                ),
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 12),
+              AnimatedSwitcher(
+                duration: const Duration(milliseconds: 300),
+                child: Text(
+                  _analysisText,
+                  key: ValueKey<String>(_analysisText),
+                  style: const TextStyle(
+                    fontSize: 15,
+                    fontWeight: FontWeight.w600,
+                    color: AppColors.primary,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+              ),
+              const SizedBox(height: 40),
+              Container(
+                padding: const EdgeInsets.all(20),
+                decoration: BoxDecoration(
+                  color: AppColors.surface,
+                  borderRadius: BorderRadius.circular(16),
+                  border: Border.all(color: AppColors.border),
+                ),
+                child: Column(
+                  children: [
+                    _buildAnalysisCheckItem(
+                      'Calculating caloric surplus/deficit...',
+                      _analysisProgress >= 0.33,
+                    ),
+                    const Divider(height: 24),
+                    _buildAnalysisCheckItem(
+                      'Designing optimal workout split...',
+                      _analysisProgress >= 0.66,
+                    ),
+                    const Divider(height: 24),
+                    _buildAnalysisCheckItem(
+                      'Generating meal schedule...',
+                      _analysisProgress >= 0.95,
+                    ),
+                  ],
+                ),
+              ),
+              const Spacer(),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildAnalysisCheckItem(String label, bool isDone) {
+    return Row(
+      children: [
+        AnimatedContainer(
+          duration: const Duration(milliseconds: 250),
+          width: 24,
+          height: 24,
+          decoration: BoxDecoration(
+            color: isDone ? AppColors.primary : Colors.transparent,
+            shape: BoxShape.circle,
+            border: Border.all(
+              color: isDone ? AppColors.primary : AppColors.textSecondary.withOpacity(0.4),
+              width: 2,
+            ),
+          ),
+          child: isDone
+              ? const Icon(Icons.check, size: 16, color: Colors.white)
+              : const SizedBox.shrink(),
+        ),
+        const SizedBox(width: 14),
+        Expanded(
+          child: Text(
+            label,
+            style: TextStyle(
+              fontSize: 14,
+              fontWeight: isDone ? FontWeight.bold : FontWeight.w500,
+              color: isDone ? AppColors.textHeader : AppColors.textSecondary,
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildTeaserScreen() {
+    final projectedDate = _calculateProjectedDate();
+    final dateStr = DateFormat('MMMM d, yyyy').format(projectedDate);
+    final dailyCals = _calculateDailyCalories();
+    final daysCount = _data.workoutDays.isNotEmpty ? _data.workoutDays.length : 3;
+
+    return Scaffold(
+      backgroundColor: AppColors.background,
+      body: SafeArea(
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.fromLTRB(20, 20, 20, 32),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Center(
+                child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
+                  decoration: BoxDecoration(
+                    color: AppColors.primaryLight,
+                    borderRadius: BorderRadius.circular(20),
+                    border: Border.all(color: AppColors.primary.withOpacity(0.3)),
+                  ),
+                  child: const Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(Icons.check_circle, color: AppColors.primary, size: 16),
+                      SizedBox(width: 6),
+                      Text(
+                        'ANALYSIS COMPLETE',
+                        style: TextStyle(
+                          color: AppColors.primary,
+                          fontSize: 12,
+                          fontWeight: FontWeight.w800,
+                          letterSpacing: 1.1,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              const SizedBox(height: 16),
+              const Text(
+                'Your Plan is Ready! 🎉',
+                style: TextStyle(
+                  fontSize: 26,
+                  fontWeight: FontWeight.bold,
+                  color: AppColors.textHeader,
+                ),
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 6),
+              const Text(
+                'Personalized for your body metrics, goals & schedule.',
+                style: TextStyle(fontSize: 14, color: AppColors.textSecondary),
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 24),
+
+              // Projected Goal Box
+              Container(
+                padding: const EdgeInsets.all(20),
+                decoration: BoxDecoration(
+                  gradient: const LinearGradient(
+                    colors: [Color(0xFFE8F3EB), Color(0xFFD4E8DA)],
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                  ),
+                  borderRadius: BorderRadius.circular(20),
+                  border: Border.all(color: AppColors.primary.withOpacity(0.3)),
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        Container(
+                          padding: const EdgeInsets.all(8),
+                          decoration: const BoxDecoration(
+                            color: AppColors.primary,
+                            shape: BoxShape.circle,
+                          ),
+                          child: const Icon(Icons.flag_rounded, color: Colors.white, size: 20),
+                        ),
+                        const SizedBox(width: 10),
+                        const Text(
+                          'PROJECTED TIMELINE',
+                          style: TextStyle(
+                            fontSize: 12,
+                            fontWeight: FontWeight.bold,
+                            letterSpacing: 1.2,
+                            color: AppColors.primary,
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 14),
+                    Text(
+                      'Projected to reach ${_data.targetWeightKg.toStringAsFixed(1)} kg by $dateStr 🎯',
+                      style: const TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                        color: AppColors.textHeader,
+                        height: 1.3,
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    Text(
+                      'Based on your starting weight of ${_data.currentWeightKg.toStringAsFixed(1)} kg and ${_data.targetPace} pace.',
+                      style: const TextStyle(fontSize: 13, color: AppColors.textSecondary),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 20),
+
+              // Key Highlights Grid
+              Row(
+                children: [
+                  Expanded(
+                    child: _buildTeaserMetricCard(
+                      icon: Icons.local_fire_department,
+                      title: 'Daily Target',
+                      value: '$dailyCals kcal',
+                      subtitle: 'Optimal metabolic burn',
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: _buildTeaserMetricCard(
+                      icon: Icons.fitness_center,
+                      title: 'Workout Split',
+                      value: '$daysCount Days/wk',
+                      subtitle: _data.goal.replaceAll('_', ' ').toUpperCase(),
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 12),
+              Row(
+                children: [
+                  Expanded(
+                    child: _buildTeaserMetricCard(
+                      icon: Icons.restaurant,
+                      title: 'Cuisine & Diet',
+                      value: _data.mealPreference,
+                      subtitle: 'Macro-matched recipes',
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: _buildTeaserMetricCard(
+                      icon: Icons.track_changes,
+                      title: 'Target Focus',
+                      value: _data.targetFocusAreas.isNotEmpty ? _data.targetFocusAreas.first : 'Full Body',
+                      subtitle: '${_data.targetFocusAreas.length} target zones',
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 28),
+
+              // Primary Action Button
+              _PrimaryButton(
+                title: 'CONTINUE TO MY PLAN ➔',
+                onPressed: _finishOnboarding,
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildTeaserMetricCard({
+    required IconData icon,
+    required String title,
+    required String value,
+    required String subtitle,
+  }) {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: AppColors.surface,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: AppColors.border),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Icon(icon, color: AppColors.primary, size: 24),
+          const SizedBox(height: 10),
+          Text(title, style: const TextStyle(fontSize: 11, color: AppColors.textSecondary, fontWeight: FontWeight.w600)),
+          const SizedBox(height: 4),
+          Text(value, style: const TextStyle(fontSize: 15, fontWeight: FontWeight.bold, color: AppColors.textHeader), maxLines: 1, overflow: TextOverflow.ellipsis),
+          const SizedBox(height: 2),
+          Text(subtitle, style: const TextStyle(fontSize: 10, color: AppColors.textSecondary), maxLines: 1, overflow: TextOverflow.ellipsis),
         ],
       ),
     );
