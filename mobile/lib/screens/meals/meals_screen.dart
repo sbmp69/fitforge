@@ -421,27 +421,17 @@ class _MealCard extends StatelessWidget {
         children: [
           ClipRRect(
             borderRadius: BorderRadius.circular(16),
-            child: Builder(
-              builder: (context) {
-                final foodImgs = [
-                  '1546069901-ba9599a7e63c', '1512621776951-a57141f2eefd', 
-                  '1493770348161-369560ae357d', '1473093295043-cdd812d0e601',
-                  '1467003909585-2f8a72700288'
-                ];
-                final imgId = foodImgs[meal.name.hashCode.abs() % foodImgs.length];
-                return Image.network(
-                  'https://images.unsplash.com/photo-$imgId?q=80&w=200',
-                  width: 60,
-                  height: 60,
-                  fit: BoxFit.cover,
+            child: Image.network(
+              _getMealImageUrl(meal.name),
+              width: 60,
+              height: 60,
+              fit: BoxFit.cover,
               errorBuilder: (context, error, stackTrace) => Container(
                 width: 60,
                 height: 60,
                 color: AppColors.primaryLight,
                 child: const Icon(Icons.restaurant, color: AppColors.primary),
               ),
-            );
-              },
             ),
           ),
           const SizedBox(width: 16),

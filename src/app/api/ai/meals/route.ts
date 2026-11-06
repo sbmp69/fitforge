@@ -167,12 +167,23 @@ Include breakfast, lunch, dinner, and 1-2 snacks per day with exact macro breakd
       userPrompt
     );
 
+    // Normalize dietary_preference to fit postgres enum ('veg', 'non_veg', 'vegan')
+    let dbDiet = 'non_veg';
+    const rawDiet = (dietaryPreference || profile.meal_preference || '').toLowerCase();
+    if (rawDiet.includes('vegan')) {
+      dbDiet = 'vegan';
+    } else if (rawDiet.includes('veg') && !rawDiet.includes('non')) {
+      dbDiet = 'veg';
+    } else {
+      dbDiet = 'non_veg';
+    }
+
     const { data: plan, error } = await supabase
       .from("meal_plans")
       .insert({
         user_id: user.id,
         calorie_target: planData.dailyCalorieTarget || calculateNutritionTargets(profile).calorieTarget,
-        dietary_preference: dietaryPreference,
+        dietary_preference: dbDiet,
         allergies: allergies || [],
         plan_data: planData,
         grocery_list: planData.groceryList || [],

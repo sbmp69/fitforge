@@ -503,28 +503,17 @@ class _DayCardState extends State<_DayCard> {
                         children: [
                             ClipRRect(
                               borderRadius: BorderRadius.circular(12),
-                              child: Builder(
-                                builder: (context) {
-                                  final fitnessImgs = [
-                                    '1581009146145-b5ef050c2e1e', '1534438327276-14e5300c3a48', 
-                                    '1517836357463-d25dfeac3438', '1571019614242-c5c5dee9f50b', 
-                                    '1599058917212-d750089bc07e', '1571019613454-1cb2f99b2d8b',
-                                    '1518611012118-696072aa579a'
-                                  ];
-                                  final imgId = fitnessImgs[ex.name.hashCode.abs() % fitnessImgs.length];
-                                  return Image.network(
-                                    'https://images.unsplash.com/photo-$imgId?q=80&w=200',
-                                    width: 60,
-                                    height: 60,
-                                    fit: BoxFit.cover,
+                              child: Image.network(
+                                _getExerciseImageUrl(ex.name),
+                                width: 60,
+                                height: 60,
+                                fit: BoxFit.cover,
                                 errorBuilder: (context, error, stackTrace) => Container(
                                   width: 60,
                                   height: 60,
                                   color: AppColors.border,
                                   child: const Icon(Icons.fitness_center, color: AppColors.textSecondary, size: 24),
                                 ),
-                              );
-                                },
                               ),
                             ),
                           const SizedBox(width: 12),
