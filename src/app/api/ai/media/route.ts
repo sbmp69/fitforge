@@ -7,7 +7,7 @@ const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
 const DEFAULT_OPENROUTER_KEY = Buffer.from('c2stb3ItdjEtZjljZGU0ODEzYWU2MWYzODA0ODdiN2Y1MTY5ZDBkMTkzNDkzY2ZjMzJhNDg0NTdjMGY1OTllMDk4NmNjNTc0Mg==', 'base64').toString('utf8');
 const OPENROUTER_API_KEY = process.env.OPENROUTER_IMAGE_API_KEY || DEFAULT_OPENROUTER_KEY;
-const TENCENT_MODEL = "tencent/hy-image-v3.5-preview";
+const FLUX_MODEL = "black-forest-labs/flux-3-image-klein";
 const BUCKET_NAME = "ai-assets";
 
 function slugify(name: string): string {
@@ -69,7 +69,7 @@ export async function POST(req: Request) {
         "X-Title": "FitForge",
       },
       body: JSON.stringify({
-        model: TENCENT_MODEL,
+        model: FLUX_MODEL,
         prompt: prompt,
         aspect_ratio: "1:1", resolution: "1K",
       }),

@@ -149,7 +149,7 @@ const apiKey = process.env.OPENROUTER_IMAGE_API_KEY || DEFAULT_OPENROUTER_KEY;
           "X-Title": "FitForge"
         },
         body: JSON.stringify({
-          model: "tencent/hy-image-v3.5-preview",
+          model: "black-forest-labs/flux-3-image-klein",
           prompt: `Gourmet authentic professional food photography of ${name}, beautifully presented Indian meal, vibrant colors, studio lighting, depth of field, 4k`,
           aspect_ratio: "1:1"
         })
