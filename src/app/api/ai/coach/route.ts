@@ -59,6 +59,24 @@ export async function POST(request: NextRequest) {
       if (profile.equipment?.length) hyperContext += `Available Equipment: ${profile.equipment.join(', ')}\n`;
       if (profile.workout_days?.length) hyperContext += `Training Days: ${profile.workout_days.join(', ')}\n`;
       if (profile.lifestyle_issues?.length) hyperContext += `Lifestyle / Issues: ${profile.lifestyle_issues.join(', ')}\n`;
+      const weight = Number(profile.weight_kg) || 75;
+      const height = Number(profile.height_cm) || 175;
+      const ageNum = parseInt(ageText, 10) || 25;
+      const isMale = (profile.gender || 'male').toLowerCase() !== 'female';
+      const bmr = Math.round(10 * weight + 6.25 * height - 5 * ageNum + (isMale ? 5 : -161));
+      const workoutDaysCount = Array.isArray(profile.workout_days) ? profile.workout_days.length : 3;
+      const tdee = Math.round(bmr * (workoutDaysCount <= 2 ? 1.25 : workoutDaysCount >= 5 ? 1.45 : 1.35));
+      const deficit = profile.target_pace === 'fast' ? 750 : profile.target_pace === 'steady' ? 350 : 500;
+      const dailyCalorieBudget = Math.max(isMale ? 1500 : 1200, tdee - deficit);
+      const dailyProteinFloor = Math.round(weight * 1.8);
+
+      hyperContext += `\n--- SCIENTIFIC METABOLIC TARGETS (7,700 kcal / kg FAT LOSS EQUATION) ---
+BMR: ${bmr} kcal | TDEE (Maintenance): ${tdee} kcal
+Daily Calorie Budget: ${dailyCalorieBudget} kcal (${tdee - dailyCalorieBudget} kcal daily deficit)
+Daily Protein Target: ${dailyProteinFloor}g / day (1.8g/kg body weight to preserve 100% lean muscle mass)
+Expected Fat Loss Rate: ${(deficit * 7 / 7700).toFixed(2)} kg / week
+When discussing calories, macros, or their target date, reference these exact mathematical numbers with absolute consistency.\n`;
+
       hyperContext += `\nCRITICAL CONSTRAINTS:
 - Respect the user's Country (${profile.country || 'their region'}) and Cuisine/Meal Preference (${profile.meal_preference || 'stated diet'}). Never suggest recipes, proteins, or ingredients alien to or forbidden in their dietary preference.
 - Strictly avoid exercises straining their injuries (${profile.injuries?.join(', ') || 'none'}).

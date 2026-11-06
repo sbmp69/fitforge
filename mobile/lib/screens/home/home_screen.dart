@@ -584,6 +584,52 @@ class _HomeScreenState extends State<HomeScreen> {
                             )).toList(),
                           ),
                         ],
+                        const SizedBox(height: 12),
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+                          decoration: BoxDecoration(
+                            color: Colors.white.withOpacity(0.85),
+                            borderRadius: BorderRadius.circular(12),
+                            border: Border.all(color: AppColors.primary.withOpacity(0.2)),
+                          ),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceAround,
+                            children: [
+                              Column(
+                                children: [
+                                  const Text('METABOLIC DEFICIT', style: TextStyle(fontSize: 8, fontWeight: FontWeight.w800, color: AppColors.textSecondary)),
+                                  const SizedBox(height: 2),
+                                  Text(
+                                    _profile?.targetPace == 'fast' ? '-750 kcal/day' : _profile?.targetPace == 'steady' ? '-350 kcal/day' : '-500 kcal/day',
+                                    style: const TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: AppColors.primary),
+                                  ),
+                                ],
+                              ),
+                              Container(width: 1, height: 22, color: AppColors.border),
+                              Column(
+                                children: [
+                                  const Text('PROTEIN FLOOR', style: TextStyle(fontSize: 8, fontWeight: FontWeight.w800, color: AppColors.textSecondary)),
+                                  const SizedBox(height: 2),
+                                  Text(
+                                    '${((_profile?.weightKg ?? 75) * 1.8).round()}g / day',
+                                    style: const TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: AppColors.textHeader),
+                                  ),
+                                ],
+                              ),
+                              Container(width: 1, height: 22, color: AppColors.border),
+                              Column(
+                                children: [
+                                  const Text('RATE OF LOSS', style: TextStyle(fontSize: 8, fontWeight: FontWeight.w800, color: AppColors.textSecondary)),
+                                  const SizedBox(height: 2),
+                                  Text(
+                                    _profile?.targetPace == 'fast' ? '~0.8 kg/wk' : _profile?.targetPace == 'steady' ? '~0.3 kg/wk' : '~0.5 kg/wk',
+                                    style: const TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: AppColors.textHeader),
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
+                        ),
                       ],
                     ),
                   ),
