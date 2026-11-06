@@ -1,4 +1,4 @@
-﻿export const maxDuration = 60;
+export const maxDuration = 60;
 import { NextRequest, NextResponse } from "next/server";
 import { createClient, createAuthClient } from "@/lib/supabase/server";
 import { generateText, COACH_SYSTEM_PROMPT } from "@/lib/openai";
@@ -47,14 +47,22 @@ export async function POST(request: NextRequest) {
         ageText = `${Math.abs(new Date(diff).getUTCFullYear() - 1970)}`;
       }
       hyperContext += `Age: ${ageText}, Gender: ${profile.gender ?? 'Unknown'}\n`;
+      hyperContext += `Country / Location: ${profile.country ?? 'Unknown'}\n`;
+      hyperContext += `Current Body Fat / Shape: ${profile.body_fat_range ?? 'Unknown'}, Desired Body Fat: ${profile.desired_body_fat ?? 'Unknown'}\n`;
       hyperContext += `Height: ${profile.height_cm ?? 'Unknown'}cm, Weight: ${profile.weight_kg ?? 'Unknown'}kg\n`;
             hyperContext += `Goal: ${profile.primary_goal ?? 'Unknown'}, Level: ${profile.fitness_level ?? 'Unknown'}\n`;
       if (profile.target_weight_kg) hyperContext += `Target Weight: ${profile.target_weight_kg}kg, Pace: ${profile.target_pace || 'normal'}\n`;
+      if (profile.weight_loss_history) hyperContext += `Weight Loss History: ${profile.weight_loss_history}\n`;
+      if (profile.meal_preference) hyperContext += `Cuisine / Meal Preference: ${profile.meal_preference}\n`;
       if (profile.target_focus_areas?.length) hyperContext += `Focus Muscle Groups: ${profile.target_focus_areas.join(', ')}\n`;
       if (profile.injuries?.length) hyperContext += `Injuries / Restrictions: ${profile.injuries.join(', ')}\n`;
       if (profile.equipment?.length) hyperContext += `Available Equipment: ${profile.equipment.join(', ')}\n`;
       if (profile.workout_days?.length) hyperContext += `Training Days: ${profile.workout_days.join(', ')}\n`;
       if (profile.lifestyle_issues?.length) hyperContext += `Lifestyle / Issues: ${profile.lifestyle_issues.join(', ')}\n`;
+      hyperContext += `\nCRITICAL CONSTRAINTS:
+- Respect the user's Country (${profile.country || 'their region'}) and Cuisine/Meal Preference (${profile.meal_preference || 'stated diet'}). Never suggest recipes, proteins, or ingredients alien to or forbidden in their dietary preference.
+- Strictly avoid exercises straining their injuries (${profile.injuries?.join(', ') || 'none'}).
+- Respect their available equipment (${profile.equipment?.join(', ') || 'bodyweight'}).\n`;
     }
     if (workoutPlan) {
       hyperContext += `\n--- ACTIVE WORKOUT PLAN ---\nTitle: ${workoutPlan.title}\n`;

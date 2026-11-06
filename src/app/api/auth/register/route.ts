@@ -1,4 +1,4 @@
-﻿import { NextResponse } from 'next/server';
+import { NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 
 export async function POST(req: Request) {
@@ -18,6 +18,7 @@ export async function POST(req: Request) {
       gender,
       target_focus_areas,
       body_fat_range,
+      desired_body_fat,
       target_weight_kg,
       target_pace,
       weight_loss_history,
@@ -78,6 +79,7 @@ export async function POST(req: Request) {
       if (gender !== undefined) profilePayload.gender = gender;
       if (target_focus_areas !== undefined) profilePayload.target_focus_areas = target_focus_areas;
       if (body_fat_range !== undefined) profilePayload.body_fat_range = body_fat_range;
+      if (desired_body_fat !== undefined) profilePayload.desired_body_fat = desired_body_fat;
       if (target_weight_kg !== undefined) profilePayload.target_weight_kg = target_weight_kg;
       if (target_pace !== undefined) profilePayload.target_pace = target_pace;
       if (weight_loss_history !== undefined) profilePayload.weight_loss_history = weight_loss_history;

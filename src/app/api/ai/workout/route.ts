@@ -58,8 +58,14 @@ export async function POST(request: NextRequest) {
     const effectiveEquipment = equipment || profile.equipment || ['bodyweight only'];
 
     let physiqueContext = `Physique Data: Age ${ageText}, Gender ${profile.gender || 'Unknown'}, Height: ${profile.height_cm || 'Not provided'}cm, Current Weight: ${profile.weight_kg || 'Not provided'}kg.`;
+    if (profile.body_fat_range) {
+      physiqueContext += ` Current Body Fat: ${profile.body_fat_range}. Target Desired Body Fat: ${profile.desired_body_fat || 'Lean & Toned'}.`;
+    }
     if (profile.target_weight_kg) {
       physiqueContext += ` Target Goal Weight: ${profile.target_weight_kg}kg. Target Pace: ${profile.target_pace || 'normal'}.`;
+    }
+    if (profile.weight_loss_history) {
+      physiqueContext += ` Fitness History: ${profile.weight_loss_history}.`;
     }
     if (profile.target_focus_areas && profile.target_focus_areas.length > 0) {
       physiqueContext += `\nPRIORITY FOCUS MUSCLE GROUPS: ${profile.target_focus_areas.join(', ')}. Dedicate extra volume and targeted exercises to these areas!`;

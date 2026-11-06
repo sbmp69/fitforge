@@ -1,4 +1,4 @@
-﻿class Profile {
+class Profile {
   final String id;
   final String email;
   final String? fullName;
@@ -18,6 +18,7 @@
   final String? gender;
   final List<String> targetFocusAreas;
   final String? bodyFatRange;
+  final String? desiredBodyFat;
   final double? targetWeightKg;
   final String? targetPace;
   final String? weightLossHistory;
@@ -47,6 +48,7 @@
     this.gender,
     this.targetFocusAreas = const [],
     this.bodyFatRange,
+    this.desiredBodyFat,
     this.targetWeightKg,
     this.targetPace,
     this.weightLossHistory,
@@ -77,6 +79,7 @@
         gender: json['gender'] as String?,
         targetFocusAreas: (json['target_focus_areas'] as List<dynamic>?)?.map((e) => e.toString()).toList() ?? const [],
         bodyFatRange: json['body_fat_range'] as String?,
+        desiredBodyFat: json['desired_body_fat'] as String?,
         targetWeightKg: (json['target_weight_kg'] as num?)?.toDouble(),
         targetPace: json['target_pace'] as String?,
         weightLossHistory: json['weight_loss_history'] as String?,

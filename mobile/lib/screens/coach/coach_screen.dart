@@ -10,6 +10,8 @@ import '../../widgets/animated_mesh_background.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import '../paywall/paywall_screen.dart';
 import '../../widgets/ai_outage_dialog.dart';
+import '../../models/profile.dart';
+import '../../services/supabase_service.dart';
 
 class CoachScreen extends StatefulWidget {
   const CoachScreen({super.key});
@@ -20,6 +22,8 @@ class CoachScreen extends StatefulWidget {
 
 class _CoachScreenState extends State<CoachScreen> {
   final _api = ApiService();
+  final _supabase = SupabaseService();
+  Profile? _profile;
   final _controller = TextEditingController();
   final _messages = <_Msg>[];
   bool _loading = false;
@@ -34,8 +38,13 @@ class _CoachScreenState extends State<CoachScreen> {
     setState(() => _loading = true);
     final prefs = await SharedPreferences.getInstance();
     try {
+  
       final session = Supabase.instance.client.auth.currentSession;
       if (session == null) return;
+      try {
+        final prof = await _supabase.getProfile();
+        if (mounted) setState(() => _profile = prof);
+      } catch (_) {}
       final data = await Supabase.instance.client
           .from('ai_chat_messages')
           .select()
@@ -83,7 +92,7 @@ class _CoachScreenState extends State<CoachScreen> {
       _loading = true;
     });
     
-    final session = Supabase.instance.client.auth.currentSession;
+
     try {
       final reply = await _api.chatWithCoach(text);
       
@@ -113,7 +122,7 @@ class _CoachScreenState extends State<CoachScreen> {
           children: [
             Expanded(
             child: _messages.isEmpty
-                ? const Center(child: Text('Ask anything about fitness & nutrition', style: TextStyle(color: AppColors.textSecondary)))
+                ? _buildEmptyState()
                 : ListView.builder(
                     reverse: true,
                     padding: const EdgeInsets.only(left: 16, right: 16, bottom: 16, top: kToolbarHeight + 16),
@@ -236,6 +245,104 @@ class _CoachScreenState extends State<CoachScreen> {
   void _sendQuick(String text) {
     _controller.text = text;
     _send();
+  }
+
+  Widget _buildEmptyState() {
+    return SingleChildScrollView(
+      padding: const EdgeInsets.fromLTRB(20, kToolbarHeight + 20, 20, 20),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Container(
+            padding: const EdgeInsets.all(20),
+            decoration: BoxDecoration(
+              color: AppColors.surface,
+              borderRadius: BorderRadius.circular(20),
+              border: Border.all(color: AppColors.border),
+              boxShadow: [
+                BoxShadow(color: Colors.black.withOpacity(0.04), blurRadius: 10, offset: const Offset(0, 4)),
+              ],
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.all(10),
+                      decoration: BoxDecoration(
+                        color: AppColors.primary.withOpacity(0.12),
+                        shape: BoxShape.circle,
+                      ),
+                      child: const Icon(Icons.psychology_rounded, color: AppColors.primary, size: 28),
+                    ),
+                    const SizedBox(width: 12),
+                    const Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text('FitForge AI Coach', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: AppColors.textHeader)),
+                          Text('Connected to your assessment profile', style: TextStyle(fontSize: 12, color: AppColors.primary, fontWeight: FontWeight.w600)),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 16),
+                Text(
+                  "I've tailored my coaching to your ${_profile?.primaryGoal ?? 'fitness goal'} at ${_profile?.fitnessLevel ?? 'beginner'} level.",
+                  style: const TextStyle(fontSize: 14, color: AppColors.textHeader, height: 1.4),
+                ),
+                const SizedBox(height: 12),
+                Wrap(
+                  spacing: 8,
+                  runSpacing: 8,
+                  children: [
+                    if (_profile?.country != null)
+                      _contextChip(Icons.location_on, _profile!.country!),
+                    if (_profile?.mealPreference != null)
+                      _contextChip(Icons.restaurant_menu, _profile!.mealPreference!),
+                    if (_profile?.bodyFatRange != null)
+                      _contextChip(Icons.accessibility_new, 'Body Fat: ${_profile!.bodyFatRange}'),
+                    if (_profile?.targetFocusAreas.isNotEmpty ?? false)
+                      _contextChip(Icons.flash_on, _profile!.targetFocusAreas.join(', ')),
+                    if (_profile != null && _profile!.injuries.isNotEmpty && !_profile!.injuries.contains('No injuries'))
+                      _contextChip(Icons.healing, 'Safe: ${_profile!.injuries.join(', ')}'),
+                  ],
+                ),
+                const SizedBox(height: 14),
+                const Text(
+                  "Ask me anything about your workout plan, meal recipes, exercise form, or recovery!",
+                  style: TextStyle(fontSize: 13, color: AppColors.textSecondary),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _contextChip(IconData icon, String label) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+      decoration: BoxDecoration(
+        color: AppColors.background,
+        borderRadius: BorderRadius.circular(10),
+        border: Border.all(color: AppColors.border),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(icon, size: 14, color: AppColors.primary),
+          const SizedBox(width: 5),
+          Text(
+            label,
+            style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: AppColors.textHeader),
+          ),
+        ],
+      ),
+    );
   }
 }
 

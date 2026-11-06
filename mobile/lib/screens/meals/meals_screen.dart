@@ -34,7 +34,7 @@ class _MealsScreenState extends State<MealsScreen> {
   bool _loading = false;
   bool _showForm = false;
 
-  String _diet = 'non_veg';
+  String _diet = 'traditional_indian';
   final _allergies = TextEditingController();
 
   @override
@@ -54,9 +54,13 @@ class _MealsScreenState extends State<MealsScreen> {
         _profile = results[1] as Profile?;
         if (_profile?.mealPreference != null) {
           final pref = _profile!.mealPreference!.toLowerCase();
-          if (pref.contains('veg') && !pref.contains('non')) _diet = 'vegetarian';
+          if (pref.contains('traditional') || pref.contains('indian')) _diet = 'traditional_indian';
+          else if (pref.contains('high protein') || pref.contains('protein')) _diet = 'high_protein';
+          else if (pref.contains('veg') && !pref.contains('non')) _diet = 'veg';
           else if (pref.contains('vegan')) _diet = 'vegan';
           else if (pref.contains('keto')) _diet = 'keto';
+          else if (pref.contains('mediterranean')) _diet = 'mediterranean';
+          else _diet = 'non_veg';
         }
       });
     }

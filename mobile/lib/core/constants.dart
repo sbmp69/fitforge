@@ -14,9 +14,13 @@ class AppConstants {
   };
 
   static const dietLabels = {
+    'traditional_indian': 'Traditional Indian',
+    'high_protein': 'High Protein',
     'veg': 'Vegetarian',
     'non_veg': 'Non-Vegetarian',
     'vegan': 'Vegan',
+    'keto': 'Keto / Low Carb',
+    'mediterranean': 'Mediterranean',
   };
 
   static const tierLabels = {

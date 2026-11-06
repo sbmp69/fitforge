@@ -18,6 +18,7 @@ import '../../models/workout_plan.dart';
 import '../../services/subscription_service.dart';
 import '../../services/supabase_service.dart';
 import '../../services/notification_service.dart';
+import '../../services/api_service.dart';
 
 import '../../widgets/app_card.dart';
 import '../../widgets/progress_ring.dart';
@@ -35,6 +36,8 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   final _supabase = SupabaseService();
+  final _api = ApiService();
+  bool _autoGenerating = false;
   Profile? _profile;
   WorkoutPlan? _workout;
   MealPlan? _meal;
@@ -164,6 +167,10 @@ class _HomeScreenState extends State<HomeScreen> {
           _loading = false;
         });
 
+        if ((_workout == null || _meal == null) && profile?.primaryGoal != null) {
+          _autoGenerateStarterPlans(profile!);
+        }
+
         // Initialize smart notifications in background without blocking Home UI
         unawaited(() async {
           try {
@@ -187,6 +194,65 @@ class _HomeScreenState extends State<HomeScreen> {
       if (mounted && _loading) {
         setState(() => _loading = false);
       }
+    }
+  }
+
+  Future<void> _autoGenerateStarterPlans(Profile prof) async {
+    if (_autoGenerating) return;
+    _autoGenerating = true;
+
+    final equip = <String>[];
+    for (final eq in prof.equipment) {
+      final lower = eq.toLowerCase();
+      if (lower.contains('bodyweight')) {
+        equip.addAll(['Bodyweight Only', 'No Equipment']);
+      } else if (lower.contains('portable')) {
+        equip.addAll(['Dumbbells', 'Resistance Bands', 'Kettlebell']);
+      } else if (lower.contains('gym')) {
+        equip.addAll(['Barbell', 'Dumbbells', 'Cable Machine', 'Bench']);
+      }
+    }
+    if (equip.isEmpty) equip.addAll(['Dumbbells', 'No Equipment']);
+
+    String diet = 'traditional_indian';
+    final pref = prof.mealPreference?.toLowerCase() ?? '';
+    if (pref.contains('veg') && !pref.contains('non')) {
+      diet = 'veg';
+    } else if (pref.contains('vegan')) {
+      diet = 'vegan';
+    } else if (pref.contains('keto')) {
+      diet = 'keto';
+    } else if (pref.contains('mediterranean')) {
+      diet = 'mediterranean';
+    } else if (pref.contains('high protein')) {
+      diet = 'high_protein';
+    }
+
+    try {
+      if (_workout == null) {
+        final wData = await _api.generateWorkout(
+          goal: prof.primaryGoal ?? 'build_muscle',
+          level: prof.fitnessLevel ?? 'beginner',
+          daysPerWeek: prof.workoutDays.isNotEmpty ? prof.workoutDays.length.clamp(2, 6) : 3,
+          equipment: equip,
+        );
+        if (mounted && wData['plan'] != null) {
+          setState(() => _workout = WorkoutPlan.fromJson(wData['plan']));
+        }
+      }
+      if (_meal == null) {
+        final mData = await _api.generateMeals(
+          dietaryPreference: diet,
+          allergies: [],
+        );
+        if (mounted && mData['plan'] != null) {
+          setState(() => _meal = MealPlan.fromJson(mData['plan']));
+        }
+      }
+    } catch (e) {
+      debugPrint('Background starter plan auto-generation error: $e');
+    } finally {
+      _autoGenerating = false;
     }
   }
 

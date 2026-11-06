@@ -64,6 +64,27 @@ class _WorkoutScreenState extends State<WorkoutScreen> {
         _profile = results[1] as Profile?;
         if (_profile?.primaryGoal != null) _goal = _profile!.primaryGoal!;
         if (_profile?.fitnessLevel != null) _level = _profile!.fitnessLevel!;
+        if (_profile?.workoutDays.isNotEmpty ?? false) {
+          _days = _profile!.workoutDays.length.clamp(2, 6).toDouble();
+        }
+        if (_profile?.equipment.isNotEmpty ?? false) {
+          _equipment.clear();
+          for (final eq in _profile!.equipment) {
+            final lower = eq.toLowerCase();
+            if (lower.contains('bodyweight')) {
+              _equipment.addAll(['Bodyweight Only', 'No Equipment']);
+            } else if (lower.contains('portable')) {
+              _equipment.addAll(['Dumbbells', 'Resistance Bands', 'Kettlebell']);
+            } else if (lower.contains('gym')) {
+              _equipment.addAll(['Barbell', 'Dumbbells', 'Cable Machine', 'Bench', 'Pull-up Bar']);
+            } else if (_equipmentOptions.contains(eq)) {
+              _equipment.add(eq);
+            }
+          }
+          if (_equipment.isEmpty) {
+            _equipment.addAll(['Dumbbells', 'No Equipment']);
+          }
+        }
       });
     }
   }
