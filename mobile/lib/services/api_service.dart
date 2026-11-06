@@ -87,4 +87,28 @@ class ApiService {
     if (res.statusCode != 200) throw Exception(data['error'] ?? 'Coach unavailable');
     return data['reply'] as String? ?? '';
   }
+
+  Future<String?> getCachedOrGeneratedImageUrl({
+    required String name,
+    required String category,
+  }) async {
+    try {
+      final res = await http.post(
+        Uri.parse('$baseUrl/api/ai/media'),
+        headers: await _headers(),
+        body: jsonEncode({
+          'name': name,
+          'category': category,
+        }),
+      );
+      if (res.statusCode == 200) {
+        final data = jsonDecode(res.body) as Map<String, dynamic>;
+        if (data['imageUrl'] != null && data['imageUrl'].toString().isNotEmpty) {
+          return data['imageUrl'] as String;
+        }
+      }
+    } catch (_) {}
+    return null;
+  }
+
 }

@@ -19,6 +19,7 @@ import '../paywall/paywall_screen.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../../widgets/ai_outage_dialog.dart';
+import '../../widgets/ai_cached_image.dart';
 
 class WorkoutScreen extends StatefulWidget {
   const WorkoutScreen({super.key});
@@ -501,20 +502,14 @@ class _DayCardState extends State<_DayCard> {
                       padding: const EdgeInsets.all(12),
                       child: Row(
                         children: [
-                            ClipRRect(
+                            AiCachedImage(
+                              name: ex.name,
+                              category: 'workout',
+                              fallbackUrl: _getExerciseImageUrl(ex.name),
+                              width: 60,
+                              height: 60,
                               borderRadius: BorderRadius.circular(12),
-                              child: Image.network(
-                                _getExerciseImageUrl(ex.name),
-                                width: 60,
-                                height: 60,
-                                fit: BoxFit.cover,
-                                errorBuilder: (context, error, stackTrace) => Container(
-                                  width: 60,
-                                  height: 60,
-                                  color: AppColors.border,
-                                  child: const Icon(Icons.fitness_center, color: AppColors.textSecondary, size: 24),
-                                ),
-                              ),
+                              fallbackIcon: Icons.fitness_center,
                             ),
                           const SizedBox(width: 12),
                           Expanded(

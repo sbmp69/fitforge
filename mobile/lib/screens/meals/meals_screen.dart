@@ -17,6 +17,7 @@ import '../../models/profile.dart';
 import '../paywall/paywall_screen.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../widgets/ai_outage_dialog.dart';
+import '../../widgets/ai_cached_image.dart';
 
 class MealsScreen extends StatefulWidget {
   const MealsScreen({super.key});
@@ -419,20 +420,14 @@ class _MealCard extends StatelessWidget {
       padding: const EdgeInsets.all(12),
       child: Row(
         children: [
-          ClipRRect(
+          AiCachedImage(
+            name: meal.name,
+            category: 'meal',
+            fallbackUrl: _getMealImageUrl(meal.name),
+            width: 60,
+            height: 60,
             borderRadius: BorderRadius.circular(16),
-            child: Image.network(
-              _getMealImageUrl(meal.name),
-              width: 60,
-              height: 60,
-              fit: BoxFit.cover,
-              errorBuilder: (context, error, stackTrace) => Container(
-                width: 60,
-                height: 60,
-                color: AppColors.primaryLight,
-                child: const Icon(Icons.restaurant, color: AppColors.primary),
-              ),
-            ),
+            fallbackIcon: Icons.restaurant,
           ),
           const SizedBox(width: 16),
           Expanded(
