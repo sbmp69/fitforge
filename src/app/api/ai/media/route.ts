@@ -71,7 +71,7 @@ export async function POST(req: Request) {
       body: JSON.stringify({
         model: TENCENT_MODEL,
         prompt: prompt,
-        aspect_ratio: "1:1",
+        aspect_ratio: "1:1", resolution: "1K",
       }),
     });
 
