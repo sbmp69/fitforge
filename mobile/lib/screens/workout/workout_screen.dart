@@ -565,3 +565,34 @@ class _DayCardState extends State<_DayCard> {
   }
 }
 
+
+
+String _getExerciseImageUrl(String name) {
+  final n = name.toLowerCase();
+  if (n.contains('bench') || n.contains('chest press') || n.contains('fly')) {
+    return 'https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b?q=80&w=240';
+  } else if (n.contains('push-up') || n.contains('pushup') || n.contains('push up')) {
+    return 'https://images.unsplash.com/photo-1598971639058-fab3c3109a00?q=80&w=240';
+  } else if (n.contains('squat') || n.contains('leg press')) {
+    return 'https://images.unsplash.com/photo-1574680096145-d05b474e2155?q=80&w=240';
+  } else if (n.contains('lunge') || n.contains('split squat')) {
+    return 'https://images.unsplash.com/photo-1434682881908-b43d0467b798?q=80&w=240';
+  } else if (n.contains('bridge') || n.contains('thrust') || n.contains('glute')) {
+    return 'https://images.unsplash.com/photo-1518611012118-696072aa579a?q=80&w=240';
+  } else if (n.contains('row') || n.contains('pulldown') || n.contains('pull-down')) {
+    return 'https://images.unsplash.com/photo-1605296867304-46d5465a13f1?q=80&w=240';
+  } else if (n.contains('deadlift') || n.contains('rdl')) {
+    return 'https://images.unsplash.com/photo-1517838277536-f5f99be501cd?q=80&w=240';
+  } else if (n.contains('curl') || n.contains('bicep')) {
+    return 'https://images.unsplash.com/photo-1581009146145-b5ef050c2e1e?q=80&w=240';
+  } else if (n.contains('dip') || n.contains('tricep') || n.contains('extension')) {
+    return 'https://images.unsplash.com/photo-1534438327276-14e5300c3a48?q=80&w=240';
+  } else if (n.contains('shoulder') || n.contains('overhead') || n.contains('military') || n.contains('lateral raise')) {
+    return 'https://images.unsplash.com/photo-1541534741688-6078c6bfb5c5?q=80&w=240';
+  } else if (n.contains('pull-up') || n.contains('chin-up') || n.contains('pullup')) {
+    return 'https://images.unsplash.com/photo-1599058917212-d750089bc07e?q=80&w=240';
+  } else if (n.contains('plank') || n.contains('crunch') || n.contains('ab') || n.contains('core')) {
+    return 'https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?q=80&w=240';
+  }
+  return 'https://images.unsplash.com/photo-1517836357463-d25dfeac3438?q=80&w=240';
+}
