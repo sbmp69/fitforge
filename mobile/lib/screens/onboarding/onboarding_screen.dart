@@ -475,32 +475,34 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                 borderRadius: BorderRadius.circular(20),
                 border: Border.all(color: AppColors.border),
               ),
-              padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 4),
               child: ClipRRect(
-                borderRadius: BorderRadius.circular(16),
-                child: FittedBox(
-                  fit: BoxFit.contain,
-                  child: SizedBox(
-                    width: 896,
-                    height: 1200,
-                    child: Stack(
-                      children: [
-                        // Real Bodybuilder Image
-                        Image.asset(
-                          'assets/images/bodybuilder_physique.png',
-                          width: 896,
-                          height: 1200,
-                          fit: BoxFit.fill,
-                        ),
-                        // Glowing Muscle Highlight Overlay
-                        Positioned.fill(
-                          child: CustomPaint(
-                            painter: _RealBodybuilderGlowPainter(
-                              selectedAreas: _data.targetFocusAreas,
+                borderRadius: BorderRadius.circular(20),
+                child: SizedBox.expand(
+                  child: FittedBox(
+                    fit: BoxFit.cover,
+                    alignment: Alignment.center,
+                    child: SizedBox(
+                      width: 896,
+                      height: 1200,
+                      child: Stack(
+                        children: [
+                          // Real Bodybuilder Image
+                          Image.asset(
+                            'assets/images/bodybuilder_physique.png',
+                            width: 896,
+                            height: 1200,
+                            fit: BoxFit.fill,
+                          ),
+                          // Glowing Muscle Highlight Overlay
+                          Positioned.fill(
+                            child: CustomPaint(
+                              painter: _RealBodybuilderGlowPainter(
+                                selectedAreas: _data.targetFocusAreas,
+                              ),
                             ),
                           ),
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
                   ),
                 ),
@@ -1862,13 +1864,48 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   // --- Step 16: Meal Preference / Cuisine ---
   Widget _buildMealPreferenceStep() {
     final options = [
-      {'key': 'Traditional Indian', 'title': 'Traditional Indian', 'subtitle': 'Balanced regional curries, lentils & grains', 'icon': Icons.restaurant},
-      {'key': 'High Protein', 'title': 'High Protein', 'subtitle': 'Lean meats, eggs, paneer, sprouts & fish', 'icon': Icons.fitness_center},
-      {'key': 'Vegetarian', 'title': 'Vegetarian', 'subtitle': 'Pure plant & dairy based, rich in nutrition', 'icon': Icons.eco},
-      {'key': 'Vegan', 'title': 'Vegan', 'subtitle': '100% plant-based, cruelty & dairy free', 'icon': Icons.spa},
-      {'key': 'Keto', 'title': 'Keto / Low Carb', 'subtitle': 'Healthy fats, leafy greens & minimal carbs', 'icon': Icons.local_fire_department},
-      {'key': 'Mediterranean', 'title': 'Mediterranean', 'subtitle': 'Olive oils, fresh greens, whole grains & seafood', 'icon': Icons.set_meal},
-      {'key': 'No Preference', 'title': 'No Preference / Flexible', 'subtitle': 'Open to diverse and versatile wholesome meals', 'icon': Icons.all_inclusive},
+      {
+        'key': 'Traditional Indian',
+        'title': 'Traditional Indian',
+        'subtitle': 'Balanced regional curries, lentils & grains',
+        'image': 'assets/images/meal_indian.jpg',
+      },
+      {
+        'key': 'High Protein',
+        'title': 'High Protein',
+        'subtitle': 'Lean meats, eggs, paneer, sprouts & fish',
+        'image': 'assets/images/meal_high_protein.jpg',
+      },
+      {
+        'key': 'Vegetarian',
+        'title': 'Vegetarian',
+        'subtitle': 'Pure plant & dairy based, rich in nutrition',
+        'image': 'assets/images/meal_vegetarian.jpg',
+      },
+      {
+        'key': 'Vegan',
+        'title': 'Vegan',
+        'subtitle': '100% plant-based, cruelty & dairy free',
+        'image': 'assets/images/meal_vegan.jpg',
+      },
+      {
+        'key': 'Keto',
+        'title': 'Keto / Low Carb',
+        'subtitle': 'Healthy fats, leafy greens & minimal carbs',
+        'image': 'assets/images/meal_keto.jpg',
+      },
+      {
+        'key': 'Mediterranean',
+        'title': 'Mediterranean',
+        'subtitle': 'Olive oils, fresh greens, whole grains & seafood',
+        'image': 'assets/images/meal_mediterranean.jpg',
+      },
+      {
+        'key': 'No Preference',
+        'title': 'No Preference / Flexible',
+        'subtitle': 'Open to diverse and versatile wholesome meals',
+        'image': 'assets/images/meal_flexible.jpg',
+      },
     ];
 
     return _StepContainer(
@@ -1891,7 +1928,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                 },
                 borderRadius: BorderRadius.circular(16),
                 child: Container(
-                  padding: const EdgeInsets.all(16),
+                  padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
                   decoration: BoxDecoration(
                     color: isSel ? AppColors.primaryLight : AppColors.surface,
                     borderRadius: BorderRadius.circular(16),
@@ -1902,13 +1939,14 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                   ),
                   child: Row(
                     children: [
-                      Container(
-                        padding: const EdgeInsets.all(10),
-                        decoration: BoxDecoration(
-                          color: isSel ? AppColors.primary : AppColors.primaryLight,
-                          shape: BoxShape.circle,
+                      ClipRRect(
+                        borderRadius: BorderRadius.circular(12),
+                        child: Image.asset(
+                          opt['image'] as String,
+                          width: 52,
+                          height: 52,
+                          fit: BoxFit.cover,
                         ),
-                        child: Icon(opt['icon'] as IconData, color: isSel ? Colors.white : AppColors.primary, size: 22),
                       ),
                       const SizedBox(width: 14),
                       Expanded(
@@ -1947,14 +1985,14 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   // --- Step 17: Country Selection ---
   Widget _buildCountryStep() {
     final countries = [
-      'India',
-      'United States',
-      'United Kingdom',
-      'Canada',
-      'Australia',
-      'United Arab Emirates',
-      'Germany',
-      'Other',
+      {'name': 'India', 'flag': '🇮🇳'},
+      {'name': 'United States', 'flag': '🇺🇸'},
+      {'name': 'United Kingdom', 'flag': '🇬🇧'},
+      {'name': 'Canada', 'flag': '🇨🇦'},
+      {'name': 'Australia', 'flag': '🇦🇺'},
+      {'name': 'United Arab Emirates', 'flag': '🇦🇪'},
+      {'name': 'Germany', 'flag': '🇩🇪'},
+      {'name': 'Other', 'flag': null},
     ];
 
     return _StepContainer(
@@ -1966,7 +2004,9 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
       ),
       child: SingleChildScrollView(
         child: Column(
-          children: countries.map((name) {
+          children: countries.map((item) {
+            final name = item['name'] as String;
+            final flag = item['flag'] as String?;
             final isSel = _data.country == name;
             return Padding(
               padding: const EdgeInsets.only(bottom: 12),
@@ -1977,7 +2017,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                 },
                 borderRadius: BorderRadius.circular(16),
                 child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 16),
+                  padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 14),
                   decoration: BoxDecoration(
                     color: isSel ? AppColors.primaryLight : AppColors.surface,
                     borderRadius: BorderRadius.circular(16),
@@ -1989,12 +2029,16 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                   child: Row(
                     children: [
                       Container(
-                        padding: const EdgeInsets.all(8),
+                        width: 42,
+                        height: 42,
+                        alignment: Alignment.center,
                         decoration: BoxDecoration(
-                          color: isSel ? AppColors.primary : AppColors.primaryLight,
+                          color: isSel ? AppColors.primary.withOpacity(0.15) : AppColors.background,
                           shape: BoxShape.circle,
                         ),
-                        child: Icon(Icons.public, color: isSel ? Colors.white : AppColors.primary, size: 20),
+                        child: flag != null
+                            ? Text(flag, style: const TextStyle(fontSize: 22))
+                            : Icon(Icons.public, color: isSel ? AppColors.primary : AppColors.textSecondary, size: 22),
                       ),
                       const SizedBox(width: 14),
                       Expanded(
@@ -3047,32 +3091,34 @@ class _HeightStadiometer extends StatelessWidget {
         child: LayoutBuilder(
           builder: (context, constraints) {
             final totalH = constraints.maxHeight;
-            const topMargin = 22.0;
-            const bottomMargin = 28.0;
-            final usableH = totalH - topMargin - bottomMargin;
+            const floorBottom = 26.0;
+            final maxAvailableH = totalH - floorBottom - 26.0;
 
-            // Ruler range (130cm to 220cm)
             const double minCm = 130.0;
             const double maxCm = 220.0;
 
+            // Character scale calculation (feet 100% fixed on floorBottom)
+            final fraction = ((heightCm - minCm) / (maxCm - minCm)).clamp(0.0, 1.0);
+            final characterHeight = (maxAvailableH * 0.62) + fraction * (maxAvailableH * 0.38);
+
+            // Exact Y position for any cm mark on the ruler
             double getY(double cm) {
-              final ratio = (cm - minCm) / (maxCm - minCm);
-              return topMargin + (1.0 - ratio.clamp(0.0, 1.0)) * usableH;
+              final f = ((cm - minCm) / (maxCm - minCm)).clamp(0.0, 1.0);
+              final cH = (maxAvailableH * 0.62) + f * (maxAvailableH * 0.38);
+              return totalH - floorBottom - (cH * 0.94);
             }
 
             final currentLaserY = getY(heightCm.toDouble());
-            final floorY = getY(minCm);
             final rulerTicks = [210, 200, 190, 180, 170, 160, 150, 140];
-            final characterH = (floorY - currentLaserY).clamp(80.0, totalH);
 
             return Stack(
               clipBehavior: Clip.none,
               children: [
-                // Floor / Platform base line
+                // Floor / Platform base line (FIXED)
                 Positioned(
                   left: 20,
                   right: 20,
-                  top: floorY,
+                  bottom: floorBottom,
                   child: Container(
                     height: 2,
                     color: AppColors.border,
@@ -3081,7 +3127,7 @@ class _HeightStadiometer extends StatelessWidget {
                 // Floor label
                 Positioned(
                   left: 14,
-                  top: floorY + 4,
+                  bottom: 8,
                   child: const Text(
                     'BASE (130 cm)',
                     style: TextStyle(
@@ -3096,8 +3142,8 @@ class _HeightStadiometer extends StatelessWidget {
                 // Ruler vertical guide line
                 Positioned(
                   left: 70,
-                  top: topMargin,
-                  bottom: bottomMargin,
+                  top: 20,
+                  bottom: floorBottom,
                   child: Container(
                     width: 1.5,
                     color: AppColors.border,
@@ -3145,16 +3191,16 @@ class _HeightStadiometer extends StatelessWidget {
                   );
                 }),
 
-                // Real Bodybuilder character with head locked to laser line and feet at base
+                // Real Bodybuilder character with FEET FIXED at floorBottom, scaling upward
                 Positioned(
-                  left: 90,
-                  right: 44,
-                  top: currentLaserY - (characterH * 0.033),
-                  height: characterH / 0.92,
+                  left: 80,
+                  right: 36,
+                  bottom: floorBottom,
+                  height: characterHeight,
                   child: Image.asset(
                     'assets/images/bodybuilder_physique.png',
                     fit: BoxFit.contain,
-                    alignment: Alignment.topCenter,
+                    alignment: Alignment.bottomCenter,
                   ),
                 ),
 
