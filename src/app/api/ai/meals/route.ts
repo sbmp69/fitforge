@@ -81,6 +81,100 @@ function calculateNutritionTargets(profile: any) {
   };
 }
 
+
+function slugify(name: string): string {
+  return name.toLowerCase().replace(/[^a-z0-9]+/g, '_').replace(/^_+|_+$/g, '').substring(0, 50);
+}
+
+function getVerifiedFallbackMealImage(name: string): string {
+  const n = name.toLowerCase();
+  if (n.includes('baingan') || n.includes('bharta') || n.includes('eggplant') || n.includes('sabzi')) {
+    return 'https://images.unsplash.com/photo-1546833999-b9f581a1996d?q=80&w=240';
+  } else if (n.includes('poha') || n.includes('upma') || n.includes('idli') || n.includes('dosa') || n.includes('uttapam') || n.includes('khichdi')) {
+    return 'https://images.unsplash.com/photo-1589301760014-d929f3979dbc?q=80&w=240';
+  } else if (n.includes('oat') || n.includes('porridge') || n.includes('cereal') || n.includes('muesli')) {
+    return 'https://images.unsplash.com/photo-1509358271058-acd22cc93898?q=80&w=240';
+  } else if (n.includes('paneer') || n.includes('palak') || n.includes('tofu')) {
+    return 'https://images.unsplash.com/photo-1631452180519-c014fe946bc7?q=80&w=240';
+  } else if (n.includes('roti') || n.includes('chapati') || n.includes('paratha') || n.includes('naan') || n.includes('bajra') || n.includes('bread')) {
+    return 'https://images.unsplash.com/photo-1565557623262-b51c2513a641?q=80&w=240';
+  } else if (n.includes('dal') || n.includes('lentil') || n.includes('sambar') || n.includes('soup') || n.includes('tadka') || n.includes('curry')) {
+    return 'https://images.unsplash.com/photo-1546833999-b9f581a1996d?q=80&w=240';
+  } else if (n.includes('chana') || n.includes('chickpea') || n.includes('rajma') || n.includes('bean') || n.includes('sprout')) {
+    return 'https://images.unsplash.com/photo-1515543237350-b3eea1ec8082?q=80&w=240';
+  } else if (n.includes('rice') || n.includes('biryani') || n.includes('pulao')) {
+    return 'https://images.unsplash.com/photo-1563379091339-03b21ab4a4f8?q=80&w=240';
+  } else if (n.includes('nut') || n.includes('almond') || n.includes('walnut') || n.includes('seed')) {
+    return 'https://images.unsplash.com/photo-1534483509719-3feaee7c30da?q=80&w=240';
+  } else if (n.includes('salad') || n.includes('cucumber') || n.includes('green')) {
+    return 'https://images.unsplash.com/photo-1512621776951-a57141f2eefd?q=80&w=240';
+  } else if (n.includes('yogurt') || n.includes('curd') || n.includes('smoothie') || n.includes('shake') || n.includes('lassi')) {
+    return 'https://images.unsplash.com/photo-1488477181946-6428a0291777?q=80&w=240';
+  } else if (n.includes('egg') || n.includes('omelette') || n.includes('scramble') || n.includes('bhurji')) {
+    return 'https://images.unsplash.com/photo-1525351484163-7529414344d8?q=80&w=240';
+  } else if (n.includes('chicken') || n.includes('turkey') || n.includes('meat') || n.includes('kebab')) {
+    return 'https://images.unsplash.com/photo-1598515214211-89d3c73ae83b?q=80&w=240';
+  } else if (n.includes('fish') || n.includes('salmon') || n.includes('tuna')) {
+    return 'https://images.unsplash.com/photo-1467003909585-2f8a72700288?q=80&w=240';
+  } else if (n.includes('fruit') || n.includes('apple') || n.includes('banana') || n.includes('berry')) {
+    return 'https://images.unsplash.com/photo-1490818387583-1baba5e638af?q=80&w=240';
+  }
+  return 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?q=80&w=240';
+}
+
+async function resolveMealImage(supabase: any, name: string): Promise<string> {
+  const slug = slugify(name);
+  const fileName = `meals/${slug}.png`;
+
+  // 1. Check if already stored in Supabase Storage
+  try {
+    const { data: files } = await supabase.storage.from("ai-assets").list("meals", { search: `${slug}.png` });
+    if (files && files.some((f: any) => f.name === `${slug}.png`)) {
+      const { data } = supabase.storage.from("ai-assets").getPublicUrl(fileName);
+      return data.publicUrl;
+    }
+  } catch (_) {}
+
+  // 2. Call OpenRouter Tencent Hy Image if key is available
+  const apiKey = process.env.OPENROUTER_IMAGE_API_KEY;
+  if (apiKey) {
+    try {
+      const res = await fetch("https://openrouter.ai/api/v1/images", {
+        method: "POST",
+        headers: {
+          "Authorization": `Bearer ${apiKey}`,
+          "Content-Type": "application/json",
+          "HTTP-Referer": "https://fitforge.ai",
+          "X-Title": "FitForge"
+        },
+        body: JSON.stringify({
+          model: "tencent/hy-image-v3.5-preview",
+          prompt: `Gourmet authentic professional food photography of ${name}, beautifully presented Indian meal, vibrant colors, studio lighting, depth of field, 4k`,
+          aspect_ratio: "1:1"
+        })
+      });
+      const json = await res.json();
+      if (res.ok && json.data && json.data[0]) {
+        let buffer: Buffer | null = null;
+        if (json.data[0].b64_json) {
+          buffer = Buffer.from(json.data[0].b64_json, "base64");
+        } else if (json.data[0].url) {
+          const imgFetch = await fetch(json.data[0].url);
+          buffer = Buffer.from(await imgFetch.arrayBuffer());
+        }
+        if (buffer) {
+          await supabase.storage.from("ai-assets").upload(fileName, buffer, { contentType: "image/png", upsert: true });
+          const { data } = supabase.storage.from("ai-assets").getPublicUrl(fileName);
+          return data.publicUrl;
+        }
+      }
+    } catch (_) {}
+  }
+
+  // 3. Guaranteed verified fallback
+  return getVerifiedFallbackMealImage(name);
+}
+
 export async function POST(request: NextRequest) {
   try {
     const token = request.headers.get("Authorization")?.replace("Bearer ", "");
@@ -166,6 +260,20 @@ Include breakfast, lunch, dinner, and 1-2 snacks per day with exact macro breakd
       MEAL_SYSTEM_PROMPT,
       userPrompt
     );
+
+    // Combine meal plan generation with image resolution right now on the backend!
+    if (planData && Array.isArray(planData.days)) {
+      for (const day of planData.days) {
+        if (day.breakfast?.name) (day.breakfast as any).image_url = await resolveMealImage(supabase, day.breakfast.name);
+        if (day.lunch?.name) (day.lunch as any).image_url = await resolveMealImage(supabase, day.lunch.name);
+        if (day.dinner?.name) (day.dinner as any).image_url = await resolveMealImage(supabase, day.dinner.name);
+        if (Array.isArray(day.snacks)) {
+          for (const s of day.snacks) {
+            if (s?.name) (s as any).image_url = await resolveMealImage(supabase, s.name);
+          }
+        }
+      }
+    }
 
     // Normalize dietary_preference to fit postgres enum ('veg', 'non_veg', 'vegan')
     let dbDiet = 'non_veg';

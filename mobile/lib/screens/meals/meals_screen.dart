@@ -423,7 +423,7 @@ class _MealCard extends StatelessWidget {
           AiCachedImage(
             name: meal.name,
             category: 'meal',
-            fallbackUrl: _getMealImageUrl(meal.name),
+            fallbackUrl: (meal.imageUrl != null && meal.imageUrl!.isNotEmpty) ? meal.imageUrl! : _getMealImageUrl(meal.name),
             width: 60,
             height: 60,
             borderRadius: BorderRadius.circular(16),
@@ -459,34 +459,36 @@ class _MealCard extends StatelessWidget {
 
 String _getMealImageUrl(String name) {
   final n = name.toLowerCase();
-  if (n.contains('idli') || n.contains('dosa') || n.contains('uttapam') || n.contains('vada') || n.contains('south indian')) {
-    return 'https://images.unsplash.com/photo-1589301760014-d929f3979dbc?q=80&w=240';
-  } else if (n.contains('paneer') || n.contains('tofu')) {
-    return 'https://images.unsplash.com/photo-1631452180519-c014fe946bc7?q=80&w=240';
-  } else if (n.contains('dal') || n.contains('lentil') || n.contains('sambar') || n.contains('curry') || n.contains('soup')) {
+  if (n.contains('baingan') || n.contains('bharta') || n.contains('eggplant') || n.contains('sabzi')) {
     return 'https://images.unsplash.com/photo-1546833999-b9f581a1996d?q=80&w=240';
-  } else if (n.contains('roti') || n.contains('chapati') || n.contains('paratha') || n.contains('bread') || n.contains('toast')) {
-    return 'https://images.unsplash.com/photo-1626074353765-517a681e40be?q=80&w=240';
-  } else if (n.contains('oat') || n.contains('porridge') || n.contains('cereal')) {
-    return 'https://images.unsplash.com/photo-1517673132405-a56a62b18caf?q=80&w=240';
+  } else if (n.contains('poha') || n.contains('upma') || n.contains('idli') || n.contains('dosa') || n.contains('uttapam') || n.contains('khichdi')) {
+    return 'https://images.unsplash.com/photo-1589301760014-d929f3979dbc?q=80&w=240';
+  } else if (n.contains('oat') || n.contains('porridge') || n.contains('cereal') || n.contains('muesli')) {
+    return 'https://images.unsplash.com/photo-1509358271058-acd22cc93898?q=80&w=240';
+  } else if (n.contains('paneer') || n.contains('palak') || n.contains('tofu')) {
+    return 'https://images.unsplash.com/photo-1631452180519-c014fe946bc7?q=80&w=240';
+  } else if (n.contains('roti') || n.contains('chapati') || n.contains('paratha') || n.contains('naan') || n.contains('bajra') || n.contains('bread')) {
+    return 'https://images.unsplash.com/photo-1565557623262-b51c2513a641?q=80&w=240';
+  } else if (n.contains('dal') || n.contains('lentil') || n.contains('sambar') || n.contains('soup') || n.contains('tadka') || n.contains('curry')) {
+    return 'https://images.unsplash.com/photo-1546833999-b9f581a1996d?q=80&w=240';
+  } else if (n.contains('chana') || n.contains('chickpea') || n.contains('rajma') || n.contains('bean') || n.contains('sprout')) {
+    return 'https://images.unsplash.com/photo-1515543237350-b3eea1ec8082?q=80&w=240';
+  } else if (n.contains('rice') || n.contains('biryani') || n.contains('pulao')) {
+    return 'https://images.unsplash.com/photo-1563379091339-03b21ab4a4f8?q=80&w=240';
+  } else if (n.contains('nut') || n.contains('almond') || n.contains('walnut') || n.contains('seed')) {
+    return 'https://images.unsplash.com/photo-1534483509719-3feaee7c30da?q=80&w=240';
+  } else if (n.contains('salad') || n.contains('cucumber') || n.contains('green')) {
+    return 'https://images.unsplash.com/photo-1512621776951-a57141f2eefd?q=80&w=240';
+  } else if (n.contains('yogurt') || n.contains('curd') || n.contains('smoothie') || n.contains('shake') || n.contains('lassi')) {
+    return 'https://images.unsplash.com/photo-1488477181946-6428a0291777?q=80&w=240';
   } else if (n.contains('egg') || n.contains('omelette') || n.contains('scramble') || n.contains('bhurji')) {
     return 'https://images.unsplash.com/photo-1525351484163-7529414344d8?q=80&w=240';
   } else if (n.contains('chicken') || n.contains('turkey') || n.contains('meat') || n.contains('kebab')) {
     return 'https://images.unsplash.com/photo-1598515214211-89d3c73ae83b?q=80&w=240';
-  } else if (n.contains('rice') || n.contains('biryani') || n.contains('pulao') || n.contains('khichdi')) {
-    return 'https://images.unsplash.com/photo-1563379091339-03b21ab4a4f8?q=80&w=240';
-  } else if (n.contains('salad') || n.contains('sprout') || n.contains('green')) {
-    return 'https://images.unsplash.com/photo-1512621776951-a57141f2eefd?q=80&w=240';
-  } else if (n.contains('yogurt') || n.contains('curd') || n.contains('smoothie') || n.contains('shake') || n.contains('lassi')) {
-    return 'https://images.unsplash.com/photo-1488477181946-6428a0291777?q=80&w=240';
-  } else if (n.contains('chana') || n.contains('chickpea') || n.contains('rajma') || n.contains('bean') || n.contains('soy')) {
-    return 'https://images.unsplash.com/photo-1540420773420-3366772f4999?q=80&w=240';
   } else if (n.contains('fish') || n.contains('salmon') || n.contains('tuna')) {
     return 'https://images.unsplash.com/photo-1467003909585-2f8a72700288?q=80&w=240';
   } else if (n.contains('fruit') || n.contains('apple') || n.contains('banana') || n.contains('berry')) {
     return 'https://images.unsplash.com/photo-1490818387583-1baba5e638af?q=80&w=240';
-  } else if (n.contains('almond') || n.contains('nut') || n.contains('seed')) {
-    return 'https://images.unsplash.com/photo-1508061252445-5350f31934b0?q=80&w=240';
   }
   return 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?q=80&w=240';
 }

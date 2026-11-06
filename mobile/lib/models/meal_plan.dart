@@ -4,6 +4,7 @@ class MealItem {
   final int protein;
   final int carbs;
   final int fat;
+  final String? imageUrl;
 
   const MealItem({
     required this.name,
@@ -11,6 +12,7 @@ class MealItem {
     required this.protein,
     required this.carbs,
     required this.fat,
+    this.imageUrl,
   });
 
   factory MealItem.fromJson(Map<String, dynamic> json) => MealItem(
@@ -19,6 +21,7 @@ class MealItem {
         protein: (json['protein'] as num?)?.toInt() ?? 0,
         carbs: (json['carbs'] as num?)?.toInt() ?? 0,
         fat: (json['fat'] as num?)?.toInt() ?? 0,
+        imageUrl: (json['image_url'] ?? json['imageUrl']) as String?,
       );
 }
 
