@@ -477,20 +477,19 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
               ),
               child: ClipRRect(
                 borderRadius: BorderRadius.circular(20),
-                child: SizedBox.expand(
+                child: Center(
                   child: FittedBox(
-                    fit: BoxFit.cover,
-                    alignment: Alignment.center,
+                    fit: BoxFit.contain,
                     child: SizedBox(
-                      width: 896,
-                      height: 1200,
+                      width: 411,
+                      height: 1155,
                       child: Stack(
                         children: [
-                          // Real Bodybuilder Image
+                          // Real Bodybuilder Transparent Cutout (No background)
                           Image.asset(
                             'assets/images/bodybuilder_physique.png',
-                            width: 896,
-                            height: 1200,
+                            width: 411,
+                            height: 1155,
                             fit: BoxFit.fill,
                           ),
                           // Glowing Muscle Highlight Overlay
@@ -2978,7 +2977,7 @@ class _PredictionCurvePainter extends CustomPainter {
 
 // =========================================================
 // Real Bodybuilder Glowing Muscle Highlight Painter
-// Calibrated to 896 x 1200 Coordinate Space
+// Calibrated to 411 x 1155 Transparent Cutout Space
 // =========================================================
 class _RealBodybuilderGlowPainter extends CustomPainter {
   final List<String> selectedAreas;
@@ -3010,15 +3009,15 @@ class _RealBodybuilderGlowPainter extends CustomPainter {
     // Chest (Pectorals)
     if (isFull || selectedAreas.contains('Chest')) {
       drawGlowZone(
-        Rect.fromCenter(center: const Offset(448, 350), width: 270, height: 110),
-        radius: 28,
+        Rect.fromCenter(center: const Offset(205, 307), width: 220, height: 110),
+        radius: 26,
       );
     }
 
     // Abs (6-pack & core)
     if (isFull || selectedAreas.contains('Abs')) {
       drawGlowZone(
-        Rect.fromCenter(center: const Offset(448, 475), width: 170, height: 130),
+        Rect.fromCenter(center: const Offset(205, 432), width: 150, height: 130),
         radius: 24,
       );
     }
@@ -3026,19 +3025,19 @@ class _RealBodybuilderGlowPainter extends CustomPainter {
     // Arms (Biceps, triceps & forearms)
     if (isFull || selectedAreas.contains('Arms')) {
       drawGlowZone(
-        Rect.fromCenter(center: const Offset(290, 410), width: 95, height: 240),
-        radius: 30,
+        Rect.fromCenter(center: const Offset(45, 367), width: 70, height: 240),
+        radius: 28,
       );
       drawGlowZone(
-        Rect.fromCenter(center: const Offset(606, 410), width: 95, height: 240),
-        radius: 30,
+        Rect.fromCenter(center: const Offset(366, 367), width: 70, height: 240),
+        radius: 28,
       );
     }
 
     // Back (Upper back / shoulders / traps)
     if (isFull || selectedAreas.contains('Back')) {
       drawGlowZone(
-        Rect.fromCenter(center: const Offset(448, 255), width: 340, height: 85),
+        Rect.fromCenter(center: const Offset(205, 212), width: 280, height: 85),
         radius: 26,
       );
     }
@@ -3046,7 +3045,7 @@ class _RealBodybuilderGlowPainter extends CustomPainter {
     // Glutes (Hips & glutes)
     if (isFull || selectedAreas.contains('Glutes')) {
       drawGlowZone(
-        Rect.fromCenter(center: const Offset(448, 580), width: 230, height: 110),
+        Rect.fromCenter(center: const Offset(205, 537), width: 200, height: 110),
         radius: 26,
       );
     }
@@ -3054,11 +3053,11 @@ class _RealBodybuilderGlowPainter extends CustomPainter {
     // Legs (Quads & calves)
     if (isFull || selectedAreas.contains('Leg')) {
       drawGlowZone(
-        Rect.fromCenter(center: const Offset(390, 830), width: 130, height: 350),
+        Rect.fromCenter(center: const Offset(150, 787), width: 100, height: 350),
         radius: 35,
       );
       drawGlowZone(
-        Rect.fromCenter(center: const Offset(506, 830), width: 130, height: 350),
+        Rect.fromCenter(center: const Offset(260, 787), width: 100, height: 350),
         radius: 35,
       );
     }
@@ -3070,7 +3069,10 @@ class _RealBodybuilderGlowPainter extends CustomPainter {
 
 // =========================================================
 // Real Bodybuilder Height Stadiometer Visualizer
-// Mathematically calibrated ruler, laser line, & character scale
+// - Transparent dynamic character cutout
+// - Feet 100% fixed on the bottom floor
+// - Body visibly scales up/down with height
+// - Laser locked to top of head and ruler marks
 // =========================================================
 class _HeightStadiometer extends StatelessWidget {
   final int heightCm;
@@ -3091,48 +3093,49 @@ class _HeightStadiometer extends StatelessWidget {
         child: LayoutBuilder(
           builder: (context, constraints) {
             final totalH = constraints.maxHeight;
-            const floorBottom = 26.0;
-            final maxAvailableH = totalH - floorBottom - 26.0;
+            const bottomFloor = 22.0;
+            const topMargin = 28.0;
+            final usableSpan = totalH - bottomFloor - topMargin;
 
-            const double minCm = 130.0;
-            const double maxCm = 220.0;
+            // Ruler range: 140 cm (lowest mark) to 210 cm (highest mark)
+            const double minMarkCm = 140.0;
+            const double maxMarkCm = 210.0;
 
-            // Character scale calculation (feet 100% fixed on floorBottom)
-            final fraction = ((heightCm - minCm) / (maxCm - minCm)).clamp(0.0, 1.0);
-            final characterHeight = (maxAvailableH * 0.62) + fraction * (maxAvailableH * 0.38);
-
-            // Exact Y position for any cm mark on the ruler
+            // At 140 cm, the head is at 60% of usableSpan from the floor.
+            // At 210 cm, the head is at 100% of usableSpan from the floor.
             double getY(double cm) {
-              final f = ((cm - minCm) / (maxCm - minCm)).clamp(0.0, 1.0);
-              final cH = (maxAvailableH * 0.62) + f * (maxAvailableH * 0.38);
-              return totalH - floorBottom - (cH * 0.94);
+              final frac = ((cm - minMarkCm) / (maxMarkCm - minMarkCm)).clamp(0.0, 1.0);
+              final headFromBottom = usableSpan * (0.60 + frac * 0.40);
+              return totalH - bottomFloor - headFromBottom;
             }
 
             final currentLaserY = getY(heightCm.toDouble());
+            final charHeight = (totalH - bottomFloor) - currentLaserY;
+            final charWidth = charHeight * (411.0 / 1155.0);
+
             final rulerTicks = [210, 200, 190, 180, 170, 160, 150, 140];
 
             return Stack(
               clipBehavior: Clip.none,
               children: [
-                // Floor / Platform base line (FIXED)
+                // Floor Baseline (FIXED AT BOTTOM)
                 Positioned(
                   left: 20,
                   right: 20,
-                  bottom: floorBottom,
+                  bottom: bottomFloor,
                   child: Container(
                     height: 2,
                     color: AppColors.border,
                   ),
                 ),
-                // Floor label
                 Positioned(
                   left: 14,
-                  bottom: 8,
+                  bottom: 6,
                   child: const Text(
-                    'BASE (130 cm)',
+                    'FLOOR',
                     style: TextStyle(
                       fontSize: 9,
-                      fontWeight: FontWeight.w600,
+                      fontWeight: FontWeight.w700,
                       color: AppColors.textSecondary,
                       letterSpacing: 0.5,
                     ),
@@ -3142,8 +3145,8 @@ class _HeightStadiometer extends StatelessWidget {
                 // Ruler vertical guide line
                 Positioned(
                   left: 70,
-                  top: 20,
-                  bottom: floorBottom,
+                  top: topMargin,
+                  bottom: bottomFloor,
                   child: Container(
                     width: 1.5,
                     color: AppColors.border,
@@ -3191,16 +3194,26 @@ class _HeightStadiometer extends StatelessWidget {
                   );
                 }),
 
-                // Real Bodybuilder character with FEET FIXED at floorBottom, scaling upward
+                // Real Bodybuilder transparent character cutout:
+                // - NO WHITE BACKGROUND (100% transparent PNG cutout)
+                // - FEET 100% FIXED ON THE FLOOR (bottom: bottomFloor)
+                // - SCALES UPWARDS VISIBLY WITH HEIGHT
+                // - HEAD TOUCHES EXACT LASER LINE
                 Positioned(
-                  left: 80,
-                  right: 36,
-                  bottom: floorBottom,
-                  height: characterHeight,
-                  child: Image.asset(
-                    'assets/images/bodybuilder_physique.png',
-                    fit: BoxFit.contain,
-                    alignment: Alignment.bottomCenter,
+                  left: 75,
+                  right: 25,
+                  bottom: bottomFloor,
+                  height: charHeight,
+                  child: Center(
+                    child: SizedBox(
+                      width: charWidth,
+                      height: charHeight,
+                      child: Image.asset(
+                        'assets/images/bodybuilder_physique.png',
+                        fit: BoxFit.fill,
+                        alignment: Alignment.bottomCenter,
+                      ),
+                    ),
                   ),
                 ),
 
