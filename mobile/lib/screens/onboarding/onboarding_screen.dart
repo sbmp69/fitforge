@@ -453,31 +453,53 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     );
   }
 
-  // --- Step 4: Focus Areas (Custom Vector Anatomy Diagram) ---
+  // --- Step 4: Focus Areas (Real Bodybuilder with Glowing Muscle Highlights) ---
   Widget _buildFocusAreasStep() {
     final muscleGroups = ['Back', 'Chest', 'Arms', 'Abs', 'Glutes', 'Leg', 'Full Body'];
 
     return _StepContainer(
       title: "Which areas do you want to focus on?",
-      subtitle: "Select a target area for more accurate workout recommendations.",
+      subtitle: "Select target zones on the physique to customize workout recommendations.",
       bottomAction: _PrimaryButton(title: 'CONTINUE', onPressed: _nextPage),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          // Dynamic FitForge Vector Anatomy Illustration
+          // Real Bodybuilder Silhouette with Interactive Glowing Muscles
           Expanded(
             flex: 5,
-            child: Center(
-              child: CustomPaint(
-                size: const Size(160, 340),
-                painter: _AnatomySilhouettePainter(
-                  selectedAreas: _data.targetFocusAreas,
+            child: Container(
+              height: 380,
+              decoration: BoxDecoration(
+                color: AppColors.surface,
+                borderRadius: BorderRadius.circular(20),
+                border: Border.all(color: AppColors.border),
+              ),
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(20),
+                child: Stack(
+                  alignment: Alignment.center,
+                  children: [
+                    // Real Bodybuilder Image
+                    Image.asset(
+                      'assets/images/bodybuilder_physique.png',
+                      height: 360,
+                      fit: BoxFit.contain,
+                    ),
+                    // Glowing Muscle Highlight Overlay
+                    Positioned.fill(
+                      child: CustomPaint(
+                        painter: _RealBodybuilderGlowPainter(
+                          selectedAreas: _data.targetFocusAreas,
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
               ),
             ),
           ),
-          const SizedBox(width: 8),
-          // Target Muscle Buttons
+          const SizedBox(width: 12),
+          // Target Muscle Selection Buttons
           Expanded(
             flex: 5,
             child: Column(
@@ -504,25 +526,43 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                         }
                       });
                     },
-                    borderRadius: BorderRadius.circular(12),
-                    child: Container(
+                    borderRadius: BorderRadius.circular(14),
+                    child: AnimatedContainer(
+                      duration: const Duration(milliseconds: 200),
                       width: double.infinity,
-                      padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 14),
+                      padding: const EdgeInsets.symmetric(vertical: 11, horizontal: 14),
                       decoration: BoxDecoration(
                         color: isSelected ? AppColors.primary : AppColors.surface,
-                        borderRadius: BorderRadius.circular(12),
+                        borderRadius: BorderRadius.circular(14),
                         border: Border.all(
                           color: isSelected ? AppColors.primary : AppColors.border,
+                          width: isSelected ? 2 : 1,
                         ),
+                        boxShadow: isSelected
+                            ? [
+                                BoxShadow(
+                                  color: AppColors.primary.withOpacity(0.35),
+                                  blurRadius: 8,
+                                  offset: const Offset(0, 2),
+                                )
+                              ]
+                            : null,
                       ),
-                      child: Text(
-                        group,
-                        textAlign: TextAlign.center,
-                        style: TextStyle(
-                          fontSize: 14,
-                          fontWeight: FontWeight.bold,
-                          color: isSelected ? Colors.white : AppColors.textHeader,
-                        ),
+                      child: Row(
+                        children: [
+                          Expanded(
+                            child: Text(
+                              group,
+                              style: TextStyle(
+                                fontSize: 14,
+                                fontWeight: FontWeight.bold,
+                                color: isSelected ? Colors.white : AppColors.textHeader,
+                              ),
+                            ),
+                          ),
+                          if (isSelected)
+                            const Icon(Icons.check_circle_rounded, color: Colors.white, size: 18),
+                        ],
                       ),
                     ),
                   ),
@@ -577,7 +617,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     );
   }
 
-  // --- Step 6: Height (Interactive Height Stadiometer) ---
+  // --- Step 6: Height (Real Bodybuilder Character Stadiometer) ---
   Widget _buildHeightStep() {
     final ft = (_data.heightCm / 30.48);
     final feet = ft.floor();
@@ -585,7 +625,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
 
     return _StepContainer(
       title: "Your height",
-      subtitle: "Height information helps us calculate your BMI more accurately",
+      subtitle: "Height information helps us calculate your BMI and frame metrics accurately",
       bottomAction: _PrimaryButton(title: 'CONTINUE', onPressed: _nextPage),
       child: Column(
         children: [
@@ -601,7 +641,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
               const SizedBox(width: 6),
               const Text('cm', style: TextStyle(fontSize: 20, color: AppColors.textSecondary, fontWeight: FontWeight.bold)),
               const SizedBox(width: 14),
-              Text('($feet\' $inches")', style: const TextStyle(fontSize: 16, color: AppColors.textSecondary)),
+              Text('($feet\' $inches\")', style: const TextStyle(fontSize: 16, color: AppColors.textSecondary, fontWeight: FontWeight.w600)),
             ],
           ),
           const SizedBox(height: 12),
@@ -619,57 +659,95 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
               onChanged: (val) => setState(() => _data.heightCm = val.round()),
             ),
           ),
-          const SizedBox(height: 20),
-          // Dynamic Stadiometer Graphic
+          const SizedBox(height: 16),
+          // Dynamic Stadiometer Graphic with Real Bodybuilder Silhouette
           Expanded(
             child: Container(
               width: double.infinity,
-              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
               decoration: BoxDecoration(
                 color: AppColors.surface,
                 borderRadius: BorderRadius.circular(20),
                 border: Border.all(color: AppColors.border),
               ),
-              child: Row(
+              child: Stack(
                 children: [
-                  // Stadiometer Ruler Marks
-                  SizedBox(
-                    width: 70,
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        _buildRulerMark('210 cm', _data.heightCm >= 210),
-                        _buildRulerMark('190 cm', _data.heightCm >= 190),
-                        _buildRulerMark('175 cm', _data.heightCm >= 175),
-                        _buildRulerMark('160 cm', _data.heightCm >= 160),
-                        _buildRulerMark('140 cm', _data.heightCm >= 140),
-                      ],
-                    ),
-                  ),
-                  const VerticalDivider(width: 1, color: AppColors.border),
-                  // Dynamic Height Vector Avatar
-                  Expanded(
-                    child: Center(
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.end,
-                        children: [
-                          Icon(
-                            Icons.accessibility_new_rounded,
-                            size: (_data.heightCm / 220.0 * 220).clamp(120.0, 220.0),
-                            color: AppColors.primary,
-                          ),
-                          const SizedBox(height: 8),
-                          Container(
-                            height: 4,
-                            width: 120,
-                            decoration: BoxDecoration(
-                              color: AppColors.primary.withValues(alpha: 0.3),
-                              borderRadius: BorderRadius.circular(2),
+                  Row(
+                    children: [
+                      // Ruler Marks
+                      SizedBox(
+                        width: 70,
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            _buildRulerMark('210 cm', _data.heightCm >= 210),
+                            _buildRulerMark('190 cm', _data.heightCm >= 190),
+                            _buildRulerMark('175 cm', _data.heightCm >= 175),
+                            _buildRulerMark('160 cm', _data.heightCm >= 160),
+                            _buildRulerMark('140 cm', _data.heightCm >= 140),
+                          ],
+                        ),
+                      ),
+                      const VerticalDivider(width: 1, color: AppColors.border),
+                      // Real Bodybuilder Character Standing Vertically
+                      Expanded(
+                        child: Center(
+                          child: Align(
+                            alignment: Alignment.bottomCenter,
+                            child: AnimatedContainer(
+                              duration: const Duration(milliseconds: 150),
+                              height: (_data.heightCm / 220.0 * 250).clamp(130.0, 250.0),
+                              child: Image.asset(
+                                'assets/images/bodybuilder_physique.png',
+                                fit: BoxFit.contain,
+                              ),
                             ),
                           ),
-                        ],
+                        ),
                       ),
+                    ],
+                  ),
+                  // Glowing Laser Height Alignment Indicator
+                  Positioned(
+                    left: 65,
+                    right: 10,
+                    top: (1.0 - ((_data.heightCm - 130) / (220 - 130))).clamp(0.05, 0.90) * 190,
+                    child: Row(
+                      children: [
+                        Container(
+                          width: 8,
+                          height: 8,
+                          decoration: const BoxDecoration(
+                            color: AppColors.primary,
+                            shape: BoxShape.circle,
+                          ),
+                        ),
+                        Expanded(
+                          child: Container(
+                            height: 2,
+                            decoration: BoxDecoration(
+                              gradient: LinearGradient(
+                                colors: [
+                                  AppColors.primary,
+                                  AppColors.primary.withOpacity(0.2),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ),
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                          decoration: BoxDecoration(
+                            color: AppColors.primary,
+                            borderRadius: BorderRadius.circular(6),
+                          ),
+                          child: Text(
+                            '${_data.heightCm} cm',
+                            style: const TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.bold),
+                          ),
+                        ),
+                      ],
                     ),
                   ),
                 ],
@@ -678,27 +756,6 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
           ),
         ],
       ),
-    );
-  }
-
-  Widget _buildRulerMark(String text, bool active) {
-    return Row(
-      children: [
-        Container(
-          width: active ? 16 : 8,
-          height: 2,
-          color: active ? AppColors.primary : AppColors.border,
-        ),
-        const SizedBox(width: 6),
-        Text(
-          text,
-          style: TextStyle(
-            fontSize: 11,
-            fontWeight: active ? FontWeight.bold : FontWeight.normal,
-            color: active ? AppColors.primary : AppColors.textSecondary,
-          ),
-        ),
-      ],
     );
   }
 
@@ -845,13 +902,45 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     );
   }
 
-  // --- Step 8: Desired Pace ---
+  // --- Step 8: Desired Pace (High-Energy, Rich Visual Cards) ---
   Widget _buildPaceStep() {
     final options = [
-      {'key': 'fast', 'title': 'Fast and Intense'},
-      {'key': 'normal', 'title': 'Normal pace is OK'},
-      {'key': 'steady', 'title': 'Steady and gradual'},
-      {'key': 'ai_decide', 'title': 'Let FitForge decide'},
+      {
+        'key': 'fast',
+        'title': 'Fast & Intense',
+        'tag': 'RAPID TRANSFORMATION',
+        'rate': '0.8 - 1.0 kg / week',
+        'desc': 'Targeted caloric deficit & progressive volume for quickest transformation.',
+        'icon': Icons.bolt_rounded,
+        'badgeColor': const Color(0xFFFF9800),
+      },
+      {
+        'key': 'normal',
+        'title': 'Normal Pace is OK',
+        'tag': 'RECOMMENDED • SUSTAINABLE',
+        'rate': '0.5 kg / week',
+        'desc': 'Balanced progression with optimal muscle preservation and lowest rebound risk.',
+        'icon': Icons.speed_rounded,
+        'badgeColor': AppColors.primary,
+      },
+      {
+        'key': 'steady',
+        'title': 'Steady & Gradual',
+        'tag': 'GENTLE & INJURY-FREE',
+        'rate': '0.25 kg / week',
+        'desc': 'Gentle habit building suited for busy schedules with zero burnout.',
+        'icon': Icons.spa_rounded,
+        'badgeColor': const Color(0xFF00B4D8),
+      },
+      {
+        'key': 'ai_decide',
+        'title': 'Let FitForge Decide',
+        'tag': 'AI SMART ADAPTIVE',
+        'rate': 'Dynamic auto-tuning',
+        'desc': 'FitForge AI monitors weekly recovery, sleep, and weights to auto-calibrate pace.',
+        'icon': Icons.auto_awesome_rounded,
+        'badgeColor': const Color(0xFF8338EC),
+      },
     ];
 
     return _StepContainer(
@@ -860,15 +949,110 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
       child: Column(
         children: options.map((opt) {
           final isSelected = _data.targetPace == opt['key'];
+          final badgeColor = opt['badgeColor'] as Color;
+
           return Padding(
             padding: const EdgeInsets.only(bottom: 12),
-            child: _SelectableOptionCard(
-              title: opt['title'] as String,
-              isSelected: isSelected,
+            child: InkWell(
               onTap: () {
                 setState(() => _data.targetPace = opt['key'] as String);
                 _nextPage();
               },
+              borderRadius: BorderRadius.circular(16),
+              child: AnimatedContainer(
+                duration: const Duration(milliseconds: 200),
+                padding: const EdgeInsets.all(14),
+                decoration: BoxDecoration(
+                  color: isSelected ? AppColors.primaryLight : AppColors.surface,
+                  borderRadius: BorderRadius.circular(16),
+                  border: Border.all(
+                    color: isSelected ? AppColors.primary : AppColors.border,
+                    width: isSelected ? 2 : 1,
+                  ),
+                  boxShadow: isSelected
+                      ? [
+                          BoxShadow(
+                            color: AppColors.primary.withOpacity(0.15),
+                            blurRadius: 10,
+                            offset: const Offset(0, 3),
+                          )
+                        ]
+                      : null,
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        Container(
+                          padding: const EdgeInsets.all(8),
+                          decoration: BoxDecoration(
+                            color: badgeColor.withOpacity(0.15),
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                          child: Icon(opt['icon'] as IconData, color: badgeColor, size: 22),
+                        ),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Row(
+                                children: [
+                                  Text(
+                                    opt['title'] as String,
+                                    style: TextStyle(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.bold,
+                                      color: isSelected ? AppColors.primary : AppColors.textHeader,
+                                    ),
+                                  ),
+                                  const Spacer(),
+                                  if (isSelected)
+                                    const Icon(Icons.check_circle_rounded, color: AppColors.primary, size: 20),
+                                ],
+                              ),
+                              const SizedBox(height: 3),
+                              Container(
+                                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                                decoration: BoxDecoration(
+                                  color: badgeColor.withOpacity(0.12),
+                                  borderRadius: BorderRadius.circular(6),
+                                ),
+                                child: Text(
+                                  opt['tag'] as String,
+                                  style: TextStyle(
+                                    fontSize: 9,
+                                    fontWeight: FontWeight.w800,
+                                    letterSpacing: 0.8,
+                                    color: badgeColor,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 8),
+                    Row(
+                      children: [
+                        const Icon(Icons.trending_down, size: 14, color: AppColors.textSecondary),
+                        const SizedBox(width: 4),
+                        Text(
+                          'Pace: ${opt['rate']}',
+                          style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: AppColors.textHeader),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      opt['desc'] as String,
+                      style: const TextStyle(fontSize: 12, color: AppColors.textSecondary, height: 1.3),
+                    ),
+                  ],
+                ),
+              ),
             ),
           );
         }).toList(),
@@ -899,12 +1083,31 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     // Dynamic Custom Avatar reflecting chosen body fat
-                    CustomPaint(
-                      size: const Size(140, 180),
-                      painter: _PhysiqueBodyFatPainter(
-                        bodyFat: _data.currentBodyFat,
-                        gender: _data.gender,
-                        primaryColor: AppColors.primary,
+                    SizedBox(
+                      height: 180,
+                      child: Stack(
+                        alignment: Alignment.center,
+                        children: [
+                          Image.asset(
+                            'assets/images/bodybuilder_physique.png',
+                            height: 180,
+                            fit: BoxFit.contain,
+                          ),
+                          Container(
+                            height: 180,
+                            width: 140,
+                            decoration: BoxDecoration(
+                              gradient: LinearGradient(
+                                begin: Alignment.topCenter,
+                                end: Alignment.bottomCenter,
+                                colors: [
+                                  Colors.transparent,
+                                  AppColors.primary.withOpacity(0.08),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ],
                       ),
                     ),
                     const SizedBox(height: 16),
@@ -959,7 +1162,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     }
   }
 
-  // --- Step 10: Target Date Prediction Graph ---
+  // --- Step 10: Target Date Prediction Graph (Interactive Realistic Timeline) ---
   Widget _buildWeightPredictionStep() {
     final date = _data.predictedTargetDate;
     final months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
@@ -967,7 +1170,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
 
     return _StepContainer(
       title: "We predict that you'll be",
-      subtitle: "We've got a clear understanding of you and your body.",
+      subtitle: "Interactive predictive progression model tailored to your metabolism & pace.",
       bottomAction: _PrimaryButton(title: 'CONTINUE', onPressed: _nextPage),
       child: Column(
         children: [
@@ -976,51 +1179,47 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
             children: [
               Text(
                 '${_data.targetWeightKg.round()}kg on ',
-                style: const TextStyle(fontSize: 32, fontWeight: FontWeight.bold, color: AppColors.textHeader),
+                style: const TextStyle(fontSize: 30, fontWeight: FontWeight.bold, color: AppColors.textHeader),
               ),
               Text(
                 dateStr,
-                style: const TextStyle(fontSize: 32, fontWeight: FontWeight.bold, color: AppColors.primary),
+                style: const TextStyle(fontSize: 30, fontWeight: FontWeight.bold, color: AppColors.primary),
               ),
             ],
           ),
-          const SizedBox(height: 32),
+          const SizedBox(height: 20),
+          // Interactive Realistic Fitness Curve Graph
+          _InteractivePredictionGraph(
+            startWeight: _data.currentWeightKg,
+            targetWeight: _data.targetWeightKg,
+            targetDateStr: dateStr,
+          ),
+          const SizedBox(height: 18),
           Container(
-            height: 200,
-            padding: const EdgeInsets.all(16),
+            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
             decoration: BoxDecoration(
-              color: AppColors.surface,
-              borderRadius: BorderRadius.circular(16),
-              border: Border.all(color: AppColors.border),
+              color: AppColors.primaryLight.withOpacity(0.5),
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(color: AppColors.primary.withOpacity(0.25)),
             ),
-            child: Stack(
+            child: const Row(
               children: [
-                Center(
-                  child: CustomPaint(
-                    size: const Size(double.infinity, 120),
-                    painter: _PredictionCurvePainter(),
-                  ),
-                ),
-                Positioned(
-                  right: 20,
-                  top: 20,
-                  child: Container(
-                    padding: const EdgeInsets.all(8),
-                    decoration: BoxDecoration(
-                      color: AppColors.primaryLight,
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    child: const Icon(Icons.emoji_events, color: AppColors.primary, size: 36),
+                Icon(Icons.touch_app_rounded, color: AppColors.primary, size: 18),
+                SizedBox(width: 8),
+                Expanded(
+                  child: Text(
+                    'Touch and drag along the curve to inspect weekly weight milestones!',
+                    style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: AppColors.primary),
                   ),
                 ),
               ],
             ),
           ),
-          const SizedBox(height: 24),
+          const SizedBox(height: 12),
           const Text(
-            'Excellent! Based on your metabolism and schedule, this realistic progression safeguards muscle while burning stubborn fat.',
+            'Based on your metabolism and schedule, this realistic progression safeguards muscle while burning stubborn fat.',
             textAlign: TextAlign.center,
-            style: TextStyle(fontSize: 14, color: AppColors.textSecondary, height: 1.5),
+            style: TextStyle(fontSize: 13, color: AppColors.textSecondary, height: 1.4),
           ),
         ],
       ),
@@ -1162,9 +1361,46 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     );
   }
 
-  // --- Step 13: Injuries ---
+  // --- Step 13: Injuries (3D Anatomical Visual Cards - Zero Cognitive Load) ---
   Widget _buildInjuriesStep() {
-    final injuryList = ['No injuries', 'Shoulders', 'Back', 'Waist', 'Wrist', 'Knee'];
+    final injuryItems = [
+      {
+        'key': 'No injuries',
+        'title': 'No injuries',
+        'subtitle': '100% healthy & pain-free',
+        'image': 'assets/images/injury_none.png',
+      },
+      {
+        'key': 'Shoulders',
+        'title': 'Shoulders',
+        'subtitle': 'Rotator cuff & deltoids',
+        'image': 'assets/images/injury_shoulder.png',
+      },
+      {
+        'key': 'Back',
+        'title': 'Back',
+        'subtitle': 'Spine & lower lumbar',
+        'image': 'assets/images/injury_back.png',
+      },
+      {
+        'key': 'Waist',
+        'title': 'Waist & Core',
+        'subtitle': 'Lower torso & obliques',
+        'image': 'assets/images/injury_waist.png',
+      },
+      {
+        'key': 'Wrist',
+        'title': 'Wrist & Hand',
+        'subtitle': 'Carpal joints & tendons',
+        'image': 'assets/images/injury_wrist.png',
+      },
+      {
+        'key': 'Knee',
+        'title': 'Knee',
+        'subtitle': 'Patella & ligaments',
+        'image': 'assets/images/injury_knee.png',
+      },
+    ];
 
     return _StepContainer(
       title: "Have you suffered any injuries recently?",
@@ -1176,28 +1412,31 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
         crossAxisCount: 2,
         crossAxisSpacing: 12,
         mainAxisSpacing: 12,
-        childAspectRatio: 1.6,
-        children: injuryList.map((inj) {
-          final isSelected = _data.injuries.contains(inj);
+        childAspectRatio: 1.15,
+        children: injuryItems.map((item) {
+          final key = item['key'] as String;
+          final isSelected = _data.injuries.contains(key);
+
           return InkWell(
             onTap: () {
               setState(() {
-                if (inj == 'No injuries') {
+                if (key == 'No injuries') {
                   _data.injuries = ['No injuries'];
                 } else {
                   _data.injuries.remove('No injuries');
                   if (isSelected) {
-                    _data.injuries.remove(inj);
+                    _data.injuries.remove(key);
                   } else {
-                    _data.injuries.add(inj);
+                    _data.injuries.add(key);
                   }
                   if (_data.injuries.isEmpty) _data.injuries.add('No injuries');
                 }
               });
             },
             borderRadius: BorderRadius.circular(16),
-            child: Container(
-              padding: const EdgeInsets.all(16),
+            child: AnimatedContainer(
+              duration: const Duration(milliseconds: 200),
+              padding: const EdgeInsets.all(10),
               decoration: BoxDecoration(
                 color: isSelected ? AppColors.primaryLight : AppColors.surface,
                 borderRadius: BorderRadius.circular(16),
@@ -1205,22 +1444,69 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                   color: isSelected ? AppColors.primary : AppColors.border,
                   width: isSelected ? 2 : 1,
                 ),
+                boxShadow: isSelected
+                    ? [
+                        BoxShadow(
+                          color: AppColors.primary.withOpacity(0.18),
+                          blurRadius: 8,
+                          offset: const Offset(0, 2),
+                        )
+                      ]
+                    : null,
               ),
-              child: Row(
+              child: Stack(
                 children: [
-                  Checkbox(
-                    value: isSelected,
-                    activeColor: AppColors.primary,
-                    onChanged: (_) {},
-                  ),
-                  Expanded(
-                    child: Text(
-                      inj,
-                      style: TextStyle(
-                        fontSize: 14,
-                        fontWeight: FontWeight.bold,
-                        color: isSelected ? AppColors.primary : AppColors.textHeader,
+                  Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      // 3D Anatomical Illustration
+                      Image.asset(
+                        item['image'] as String,
+                        height: 52,
+                        fit: BoxFit.contain,
                       ),
+                      const SizedBox(height: 8),
+                      Text(
+                        item['title'] as String,
+                        style: TextStyle(
+                          fontSize: 13,
+                          fontWeight: FontWeight.bold,
+                          color: isSelected ? AppColors.primary : AppColors.textHeader,
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+                      const SizedBox(height: 2),
+                      Text(
+                        item['subtitle'] as String,
+                        style: const TextStyle(
+                          fontSize: 10,
+                          color: AppColors.textSecondary,
+                        ),
+                        textAlign: TextAlign.center,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ],
+                  ),
+                  // Selection Checkmark Badge
+                  Positioned(
+                    top: 0,
+                    right: 0,
+                    child: Container(
+                      width: 20,
+                      height: 20,
+                      decoration: BoxDecoration(
+                        color: isSelected ? AppColors.primary : Colors.transparent,
+                        shape: BoxShape.circle,
+                        border: Border.all(
+                          color: isSelected ? AppColors.primary : AppColors.border,
+                          width: 1.5,
+                        ),
+                      ),
+                      child: isSelected
+                          ? const Icon(Icons.check, size: 14, color: Colors.white)
+                          : null,
                     ),
                   ),
                 ],
@@ -2462,3 +2748,309 @@ class _PredictionCurvePainter extends CustomPainter {
 }
 
 
+
+
+// =========================================================
+// Real Bodybuilder Glowing Muscle Highlight Painter
+// =========================================================
+class _RealBodybuilderGlowPainter extends CustomPainter {
+  final List<String> selectedAreas;
+
+  _RealBodybuilderGlowPainter({required this.selectedAreas});
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final w = size.width;
+    final h = size.height;
+    final isFull = selectedAreas.contains('Full Body');
+
+    void drawGlowZone(Rect rect, {double blur = 14.0}) {
+      final glowPaint = Paint()
+        ..color = AppColors.primary.withOpacity(0.55)
+        ..maskFilter = MaskFilter.blur(BlurStyle.normal, blur);
+      canvas.drawRRect(RRect.fromRectAndRadius(rect, Radius.circular(rect.width * 0.3)), glowPaint);
+
+      final strokePaint = Paint()
+        ..color = AppColors.primary
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = 2.0;
+      canvas.drawRRect(RRect.fromRectAndRadius(rect, Radius.circular(rect.width * 0.3)), strokePaint);
+    }
+
+    // Chest
+    if (isFull || selectedAreas.contains('Chest')) {
+      drawGlowZone(Rect.fromCenter(center: Offset(w * 0.50, h * 0.28), width: w * 0.36, height: h * 0.09));
+    }
+
+    // Abs
+    if (isFull || selectedAreas.contains('Abs')) {
+      drawGlowZone(Rect.fromCenter(center: Offset(w * 0.50, h * 0.40), width: w * 0.26, height: h * 0.12));
+    }
+
+    // Arms
+    if (isFull || selectedAreas.contains('Arms')) {
+      // Left arm (viewer's left)
+      drawGlowZone(Rect.fromCenter(center: Offset(w * 0.22, h * 0.36), width: w * 0.15, height: h * 0.22));
+      // Right arm (viewer's right)
+      drawGlowZone(Rect.fromCenter(center: Offset(w * 0.78, h * 0.36), width: w * 0.15, height: h * 0.22));
+    }
+
+    // Back / Lats
+    if (isFull || selectedAreas.contains('Back')) {
+      drawGlowZone(Rect.fromCenter(center: Offset(w * 0.50, h * 0.22), width: w * 0.46, height: h * 0.08));
+    }
+
+    // Glutes / Waist
+    if (isFull || selectedAreas.contains('Glutes')) {
+      drawGlowZone(Rect.fromCenter(center: Offset(w * 0.50, h * 0.51), width: w * 0.32, height: h * 0.08));
+    }
+
+    // Legs / Quads
+    if (isFull || selectedAreas.contains('Leg')) {
+      // Left thigh & calf
+      drawGlowZone(Rect.fromCenter(center: Offset(w * 0.38, h * 0.70), width: w * 0.16, height: h * 0.32));
+      // Right thigh & calf
+      drawGlowZone(Rect.fromCenter(center: Offset(w * 0.62, h * 0.70), width: w * 0.16, height: h * 0.32));
+    }
+  }
+
+  @override
+  bool shouldRepaint(covariant _RealBodybuilderGlowPainter oldDelegate) => true;
+}
+
+// =========================================================
+// Interactive Realistic Fitness Prediction Graph Widget
+// =========================================================
+class _InteractivePredictionGraph extends StatefulWidget {
+  final double startWeight;
+  final double targetWeight;
+  final String targetDateStr;
+
+  const _InteractivePredictionGraph({
+    required this.startWeight,
+    required this.targetWeight,
+    required this.targetDateStr,
+  });
+
+  @override
+  State<_InteractivePredictionGraph> createState() => _InteractivePredictionGraphState();
+}
+
+class _InteractivePredictionGraphState extends State<_InteractivePredictionGraph> {
+  double _touchFraction = 0.5; // 0.0 to 1.0
+
+  @override
+  Widget build(BuildContext context) {
+    final start = widget.startWeight;
+    final target = widget.targetWeight;
+    final diff = start - target;
+    final currentPointWeight = start - (diff * _touchFraction);
+    final week = (_touchFraction * 12).round();
+
+    return Container(
+      height: 220,
+      padding: const EdgeInsets.fromLTRB(16, 16, 16, 12),
+      decoration: BoxDecoration(
+        color: AppColors.surface,
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: AppColors.border),
+      ),
+      child: LayoutBuilder(
+        builder: (context, constraints) {
+          final w = constraints.maxWidth;
+          final h = constraints.maxHeight;
+
+          return GestureDetector(
+            onHorizontalDragUpdate: (details) {
+              final box = context.findRenderObject() as RenderBox?;
+              if (box != null) {
+                final localPos = box.globalToLocal(details.globalPosition);
+                setState(() {
+                  _touchFraction = (localPos.dx / w).clamp(0.0, 1.0);
+                });
+              }
+            },
+            onTapDown: (details) {
+              final box = context.findRenderObject() as RenderBox?;
+              if (box != null) {
+                final localPos = box.globalToLocal(details.globalPosition);
+                setState(() {
+                  _touchFraction = (localPos.dx / w).clamp(0.0, 1.0);
+                });
+              }
+            },
+            child: Stack(
+              children: [
+                // Custom Realistic Graph Canvas
+                CustomPaint(
+                  size: Size(w, h),
+                  painter: _RealisticChartPainter(
+                    touchFraction: _touchFraction,
+                    startWeight: start,
+                    targetWeight: target,
+                  ),
+                ),
+                // Floating Active Tooltip Tag
+                Positioned(
+                  left: (w * _touchFraction - 55).clamp(8.0, w - 120),
+                  top: 6,
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                    decoration: BoxDecoration(
+                      color: AppColors.textHeader,
+                      borderRadius: BorderRadius.circular(10),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withOpacity(0.2),
+                          blurRadius: 6,
+                          offset: const Offset(0, 2),
+                        ),
+                      ],
+                    ),
+                    child: Text(
+                      'Wk $week: ${currentPointWeight.toStringAsFixed(1)} kg',
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 11,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                ),
+                // Target Goal Milestone Badge
+                Positioned(
+                  right: 12,
+                  bottom: 12,
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                    decoration: BoxDecoration(
+                      color: AppColors.primary,
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        const Icon(Icons.emoji_events, color: Colors.white, size: 14),
+                        const SizedBox(width: 4),
+                        Text(
+                          'Goal: ${widget.targetWeight.round()} kg',
+                          style: const TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.bold),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          );
+        },
+      ),
+    );
+  }
+}
+
+class _RealisticChartPainter extends CustomPainter {
+  final double touchFraction;
+  final double startWeight;
+  final double targetWeight;
+
+  _RealisticChartPainter({
+    required this.touchFraction,
+    required this.startWeight,
+    required this.targetWeight,
+  });
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final w = size.width;
+    final h = size.height;
+    final paddingBottom = 26.0;
+    final paddingTop = 45.0;
+    final graphH = h - paddingTop - paddingBottom;
+
+    // 1. Horizontal Grid lines
+    final gridPaint = Paint()
+      ..color = AppColors.border.withOpacity(0.5)
+      ..strokeWidth = 1.0;
+
+    for (int i = 0; i <= 3; i++) {
+      final y = paddingTop + (graphH * i / 3);
+      canvas.drawLine(Offset(0, y), Offset(w, y), gridPaint);
+    }
+
+    // 2. Build Smooth Spline Curve
+    final curvePath = Path();
+    curvePath.moveTo(0, paddingTop + 8);
+    curvePath.cubicTo(
+      w * 0.35, paddingTop + 8,
+      w * 0.65, paddingTop + graphH - 8,
+      w, paddingTop + graphH - 8,
+    );
+
+    // 3. Shaded Gradient Fill Under Curve
+    final fillPath = Path.from(curvePath);
+    fillPath.lineTo(w, h - paddingBottom);
+    fillPath.lineTo(0, h - paddingBottom);
+    fillPath.close();
+
+    final fillPaint = Paint()
+      ..shader = LinearGradient(
+        begin: Alignment.topCenter,
+        end: Alignment.bottomCenter,
+        colors: [
+          AppColors.primary.withOpacity(0.35),
+          AppColors.primary.withOpacity(0.01),
+        ],
+      ).createShader(Rect.fromLTWH(0, 0, w, h));
+
+    canvas.drawPath(fillPath, fillPaint);
+
+    // 4. Draw Main Green Neon Curve
+    final linePaint = Paint()
+      ..color = AppColors.primary
+      ..strokeWidth = 3.5
+      ..style = PaintingStyle.stroke
+      ..strokeCap = StrokeCap.round;
+
+    canvas.drawPath(curvePath, linePaint);
+
+    // 5. Scrubber Line & Dot at Touch Position
+    final touchX = w * touchFraction;
+    // Calculate Y along cubic curve approximation
+    final t = touchFraction;
+    final p0 = paddingTop + 8;
+    final p3 = paddingTop + graphH - 8;
+    final touchY = (1 - t) * (1 - t) * (1 - t) * p0 +
+        3 * (1 - t) * (1 - t) * t * p0 +
+        3 * (1 - t) * t * t * p3 +
+        t * t * t * p3;
+
+    final scrubberPaint = Paint()
+      ..color = AppColors.primary.withOpacity(0.6)
+      ..strokeWidth = 1.5;
+    canvas.drawLine(Offset(touchX, paddingTop), Offset(touchX, h - paddingBottom), scrubberPaint);
+
+    // Outer glow ring
+    canvas.drawCircle(Offset(touchX, touchY), 10, Paint()..color = AppColors.primary.withOpacity(0.25));
+    // Solid active dot
+    canvas.drawCircle(Offset(touchX, touchY), 6, Paint()..color = AppColors.primary);
+    canvas.drawCircle(Offset(touchX, touchY), 2.5, Paint()..color = Colors.white);
+
+    // 6. X-Axis Time Labels
+    final textStyle = TextStyle(color: AppColors.textSecondary.withOpacity(0.8), fontSize: 10, fontWeight: FontWeight.bold);
+    void drawLabel(String text, double x) {
+      final span = TextSpan(text: text, style: textStyle);
+      final tp = TextPainter(text: span, textDirection: TextDirection.ltr);
+      tp.layout();
+      tp.paint(canvas, Offset(x - tp.width / 2, h - 16));
+    }
+
+    drawLabel('Today', 18);
+    drawLabel('Month 1', w * 0.35);
+    drawLabel('Month 2', w * 0.65);
+    drawLabel('Goal Date', w - 24);
+  }
+
+  @override
+  bool shouldRepaint(covariant _RealisticChartPainter oldDelegate) => true;
+}
