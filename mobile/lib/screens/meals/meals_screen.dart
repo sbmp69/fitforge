@@ -472,11 +472,11 @@ String _getMealImageUrl(String name) {
   } else if (n.contains('dal') || n.contains('lentil') || n.contains('sambar') || n.contains('soup') || n.contains('tadka') || n.contains('curry')) {
     return 'https://images.unsplash.com/photo-1546833999-b9f581a1996d?q=80&w=240';
   } else if (n.contains('chana') || n.contains('chickpea') || n.contains('rajma') || n.contains('bean') || n.contains('sprout')) {
-    return 'https://images.unsplash.com/photo-1515543237350-b3eea1ec8082?q=80&w=240';
+    return 'https://images.unsplash.com/photo-1546833999-b9f581a1996d?q=80&w=240';
   } else if (n.contains('rice') || n.contains('biryani') || n.contains('pulao')) {
     return 'https://images.unsplash.com/photo-1563379091339-03b21ab4a4f8?q=80&w=240';
   } else if (n.contains('nut') || n.contains('almond') || n.contains('walnut') || n.contains('seed')) {
-    return 'https://images.unsplash.com/photo-1534483509719-3feaee7c30da?q=80&w=240';
+    return 'https://images.unsplash.com/photo-1546833999-b9f581a1996d?q=80&w=240';
   } else if (n.contains('salad') || n.contains('cucumber') || n.contains('green')) {
     return 'https://images.unsplash.com/photo-1512621776951-a57141f2eefd?q=80&w=240';
   } else if (n.contains('yogurt') || n.contains('curd') || n.contains('smoothie') || n.contains('shake') || n.contains('lassi')) {
