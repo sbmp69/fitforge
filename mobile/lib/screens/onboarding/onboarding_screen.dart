@@ -1,5 +1,6 @@
 import 'dart:async';
-import 'package:intl/intl.dart';
+import 'dart:ui' as ui;
+import 'package:intl/intl.dart' hide TextDirection;
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../../services/supabase_service.dart';
 import 'package:flutter/material.dart';
@@ -756,6 +757,27 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
           ),
         ],
       ),
+    );
+  }
+
+  Widget _buildRulerMark(String label, bool isActive) {
+    return Row(
+      children: [
+        Text(
+          label,
+          style: TextStyle(
+            color: isActive ? AppColors.primary : AppColors.textSecondary,
+            fontSize: 11,
+            fontWeight: isActive ? FontWeight.bold : FontWeight.normal,
+          ),
+        ),
+        const SizedBox(width: 4),
+        Container(
+          width: 12,
+          height: 2,
+          color: isActive ? AppColors.primary : AppColors.border,
+        ),
+      ],
     );
   }
 
@@ -3040,7 +3062,7 @@ class _RealisticChartPainter extends CustomPainter {
     final textStyle = TextStyle(color: AppColors.textSecondary.withOpacity(0.8), fontSize: 10, fontWeight: FontWeight.bold);
     void drawLabel(String text, double x) {
       final span = TextSpan(text: text, style: textStyle);
-      final tp = TextPainter(text: span, textDirection: TextDirection.ltr);
+      final tp = TextPainter(text: span, textDirection: ui.TextDirection.ltr);
       tp.layout();
       tp.paint(canvas, Offset(x - tp.width / 2, h - 16));
     }
