@@ -469,32 +469,40 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
           Expanded(
             flex: 5,
             child: Container(
-              height: 380,
+              height: 400,
               decoration: BoxDecoration(
                 color: AppColors.surface,
                 borderRadius: BorderRadius.circular(20),
                 border: Border.all(color: AppColors.border),
               ),
+              padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 4),
               child: ClipRRect(
-                borderRadius: BorderRadius.circular(20),
-                child: Stack(
-                  alignment: Alignment.center,
-                  children: [
-                    // Real Bodybuilder Image
-                    Image.asset(
-                      'assets/images/bodybuilder_physique.png',
-                      height: 360,
-                      fit: BoxFit.contain,
-                    ),
-                    // Glowing Muscle Highlight Overlay
-                    Positioned.fill(
-                      child: CustomPaint(
-                        painter: _RealBodybuilderGlowPainter(
-                          selectedAreas: _data.targetFocusAreas,
+                borderRadius: BorderRadius.circular(16),
+                child: FittedBox(
+                  fit: BoxFit.contain,
+                  child: SizedBox(
+                    width: 896,
+                    height: 1200,
+                    child: Stack(
+                      children: [
+                        // Real Bodybuilder Image
+                        Image.asset(
+                          'assets/images/bodybuilder_physique.png',
+                          width: 896,
+                          height: 1200,
+                          fit: BoxFit.fill,
                         ),
-                      ),
+                        // Glowing Muscle Highlight Overlay
+                        Positioned.fill(
+                          child: CustomPaint(
+                            painter: _RealBodybuilderGlowPainter(
+                              selectedAreas: _data.targetFocusAreas,
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
-                  ],
+                  ),
                 ),
               ),
             ),
@@ -531,7 +539,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                     child: AnimatedContainer(
                       duration: const Duration(milliseconds: 200),
                       width: double.infinity,
-                      padding: const EdgeInsets.symmetric(vertical: 11, horizontal: 14),
+                      padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 12),
                       decoration: BoxDecoration(
                         color: isSelected ? AppColors.primary : AppColors.surface,
                         borderRadius: BorderRadius.circular(14),
@@ -555,7 +563,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                             child: Text(
                               group,
                               style: TextStyle(
-                                fontSize: 14,
+                                fontSize: 13,
                                 fontWeight: FontWeight.bold,
                                 color: isSelected ? Colors.white : AppColors.textHeader,
                               ),
@@ -645,7 +653,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
               Text('($feet\' $inches\")', style: const TextStyle(fontSize: 16, color: AppColors.textSecondary, fontWeight: FontWeight.w600)),
             ],
           ),
-          const SizedBox(height: 12),
+          const SizedBox(height: 8),
           SliderTheme(
             data: SliderTheme.of(context).copyWith(
               activeTrackColor: AppColors.primary,
@@ -660,124 +668,13 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
               onChanged: (val) => setState(() => _data.heightCm = val.round()),
             ),
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: 12),
           // Dynamic Stadiometer Graphic with Real Bodybuilder Silhouette
           Expanded(
-            child: Container(
-              width: double.infinity,
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-              decoration: BoxDecoration(
-                color: AppColors.surface,
-                borderRadius: BorderRadius.circular(20),
-                border: Border.all(color: AppColors.border),
-              ),
-              child: Stack(
-                children: [
-                  Row(
-                    children: [
-                      // Ruler Marks
-                      SizedBox(
-                        width: 70,
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            _buildRulerMark('210 cm', _data.heightCm >= 210),
-                            _buildRulerMark('190 cm', _data.heightCm >= 190),
-                            _buildRulerMark('175 cm', _data.heightCm >= 175),
-                            _buildRulerMark('160 cm', _data.heightCm >= 160),
-                            _buildRulerMark('140 cm', _data.heightCm >= 140),
-                          ],
-                        ),
-                      ),
-                      const VerticalDivider(width: 1, color: AppColors.border),
-                      // Real Bodybuilder Character Standing Vertically
-                      Expanded(
-                        child: Center(
-                          child: Align(
-                            alignment: Alignment.bottomCenter,
-                            child: AnimatedContainer(
-                              duration: const Duration(milliseconds: 150),
-                              height: (_data.heightCm / 220.0 * 250).clamp(130.0, 250.0),
-                              child: Image.asset(
-                                'assets/images/bodybuilder_physique.png',
-                                fit: BoxFit.contain,
-                              ),
-                            ),
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                  // Glowing Laser Height Alignment Indicator
-                  Positioned(
-                    left: 65,
-                    right: 10,
-                    top: (1.0 - ((_data.heightCm - 130) / (220 - 130))).clamp(0.05, 0.90) * 190,
-                    child: Row(
-                      children: [
-                        Container(
-                          width: 8,
-                          height: 8,
-                          decoration: const BoxDecoration(
-                            color: AppColors.primary,
-                            shape: BoxShape.circle,
-                          ),
-                        ),
-                        Expanded(
-                          child: Container(
-                            height: 2,
-                            decoration: BoxDecoration(
-                              gradient: LinearGradient(
-                                colors: [
-                                  AppColors.primary,
-                                  AppColors.primary.withOpacity(0.2),
-                                ],
-                              ),
-                            ),
-                          ),
-                        ),
-                        Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                          decoration: BoxDecoration(
-                            color: AppColors.primary,
-                            borderRadius: BorderRadius.circular(6),
-                          ),
-                          child: Text(
-                            '${_data.heightCm} cm',
-                            style: const TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.bold),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
-            ),
+            child: _HeightStadiometer(heightCm: _data.heightCm),
           ),
         ],
       ),
-    );
-  }
-
-  Widget _buildRulerMark(String label, bool isActive) {
-    return Row(
-      children: [
-        Text(
-          label,
-          style: TextStyle(
-            color: isActive ? AppColors.primary : AppColors.textSecondary,
-            fontSize: 11,
-            fontWeight: isActive ? FontWeight.bold : FontWeight.normal,
-          ),
-        ),
-        const SizedBox(width: 4),
-        Container(
-          width: 12,
-          height: 2,
-          color: isActive ? AppColors.primary : AppColors.border,
-        ),
-      ],
     );
   }
 
@@ -1082,6 +979,85 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     );
   }
 
+  String _getPhysiqueAssetForBodyFat(String bf) {
+    switch (bf) {
+      case '<15%':
+      case '10%':
+      case '15%':
+        return 'assets/images/physique_lean.png';
+      case '20%':
+        return 'assets/images/physique_fit.png';
+      case '25%':
+        return 'assets/images/physique_average.png';
+      case '30%':
+      case '35%':
+        return 'assets/images/physique_stocky.png';
+      case '>40%':
+      case '40%':
+      default:
+        return 'assets/images/physique_heavy.png';
+    }
+  }
+
+  Widget _buildBodyFatSelectorRow({
+    required List<String> tiers,
+    required String selectedTier,
+    required ValueChanged<String> onSelected,
+  }) {
+    return Row(
+      children: tiers.map((t) {
+        final isSel = selectedTier == t || (selectedTier == '15%' && t == '<15%');
+        return Expanded(
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 3),
+            child: InkWell(
+              onTap: () => onSelected(t),
+              borderRadius: BorderRadius.circular(10),
+              child: AnimatedContainer(
+                duration: const Duration(milliseconds: 150),
+                padding: const EdgeInsets.symmetric(vertical: 11),
+                decoration: BoxDecoration(
+                  color: isSel ? AppColors.primary : AppColors.surface,
+                  borderRadius: BorderRadius.circular(10),
+                  border: Border.all(
+                    color: isSel ? AppColors.primary : AppColors.border,
+                    width: isSel ? 1.5 : 1.0,
+                  ),
+                  boxShadow: isSel
+                      ? [
+                          BoxShadow(
+                            color: AppColors.primary.withOpacity(0.3),
+                            blurRadius: 6,
+                            offset: const Offset(0, 2),
+                          ),
+                        ]
+                      : null,
+                ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    if (isSel) ...[
+                      const Icon(Icons.check, size: 14, color: Colors.white),
+                      const SizedBox(width: 3),
+                    ],
+                    Text(
+                      t,
+                      style: TextStyle(
+                        color: isSel ? Colors.white : AppColors.textHeader,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 13,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        );
+      }).toList(),
+    );
+  }
+
   // --- Step 9: Dynamic Current Body Shape Visualizer ---
   Widget _buildCurrentBodyFatStep() {
     final tiers = ['<15%', '20%', '25%', '30%', '>40%'];
@@ -1095,7 +1071,8 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
           Expanded(
             child: Center(
               child: Container(
-                padding: const EdgeInsets.all(24),
+                width: double.infinity,
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
                 decoration: BoxDecoration(
                   color: AppColors.surface,
                   borderRadius: BorderRadius.circular(24),
@@ -1104,35 +1081,30 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    // Dynamic Custom Avatar reflecting chosen body fat
-                    SizedBox(
-                      height: 180,
-                      child: Stack(
-                        alignment: Alignment.center,
-                        children: [
-                          Image.asset(
-                            'assets/images/bodybuilder_physique.png',
-                            height: 180,
-                            fit: BoxFit.contain,
-                          ),
-                          Container(
-                            height: 180,
-                            width: 140,
-                            decoration: BoxDecoration(
-                              gradient: LinearGradient(
-                                begin: Alignment.topCenter,
-                                end: Alignment.bottomCenter,
-                                colors: [
-                                  Colors.transparent,
-                                  AppColors.primary.withOpacity(0.08),
-                                ],
-                              ),
+                    // Dynamic Real Character reflecting chosen body fat
+                    Expanded(
+                      child: Center(
+                        child: AnimatedSwitcher(
+                          duration: const Duration(milliseconds: 250),
+                          transitionBuilder: (child, animation) => FadeTransition(
+                            opacity: animation,
+                            child: ScaleTransition(
+                              scale: Tween<double>(begin: 0.94, end: 1.0).animate(animation),
+                              child: child,
                             ),
                           ),
-                        ],
+                          child: ClipRRect(
+                            key: ValueKey(_data.currentBodyFat),
+                            borderRadius: BorderRadius.circular(16),
+                            child: Image.asset(
+                              _getPhysiqueAssetForBodyFat(_data.currentBodyFat),
+                              fit: BoxFit.contain,
+                            ),
+                          ),
+                        ),
                       ),
                     ),
-                    const SizedBox(height: 16),
+                    const SizedBox(height: 14),
                     Text(
                       'Estimated Body Fat: ${_data.currentBodyFat}',
                       style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: AppColors.textHeader),
@@ -1149,18 +1121,10 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
             ),
           ),
           const SizedBox(height: 16),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: tiers.map((t) {
-              final isSel = _data.currentBodyFat == t;
-              return ChoiceChip(
-                label: Text(t, style: TextStyle(color: isSel ? Colors.white : AppColors.textHeader, fontWeight: FontWeight.bold)),
-                selected: isSel,
-                selectedColor: AppColors.primary,
-                backgroundColor: AppColors.surface,
-                onSelected: (_) => setState(() => _data.currentBodyFat = t),
-              );
-            }).toList(),
+          _buildBodyFatSelectorRow(
+            tiers: tiers,
+            selectedTier: _data.currentBodyFat,
+            onSelected: (t) => setState(() => _data.currentBodyFat = t),
           ),
         ],
       ),
@@ -1261,7 +1225,8 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
           Expanded(
             child: Center(
               child: Container(
-                padding: const EdgeInsets.all(24),
+                width: double.infinity,
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
                 decoration: BoxDecoration(
                   color: AppColors.surface,
                   borderRadius: BorderRadius.circular(24),
@@ -1270,15 +1235,30 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    CustomPaint(
-                      size: const Size(140, 180),
-                      painter: _PhysiqueBodyFatPainter(
-                        bodyFat: _data.desiredBodyFat,
-                        gender: _data.gender,
-                        primaryColor: const Color(0xFF10B981),
+                    // Dynamic Real Character reflecting desired target body fat
+                    Expanded(
+                      child: Center(
+                        child: AnimatedSwitcher(
+                          duration: const Duration(milliseconds: 250),
+                          transitionBuilder: (child, animation) => FadeTransition(
+                            opacity: animation,
+                            child: ScaleTransition(
+                              scale: Tween<double>(begin: 0.94, end: 1.0).animate(animation),
+                              child: child,
+                            ),
+                          ),
+                          child: ClipRRect(
+                            key: ValueKey(_data.desiredBodyFat),
+                            borderRadius: BorderRadius.circular(16),
+                            child: Image.asset(
+                              _getPhysiqueAssetForBodyFat(_data.desiredBodyFat),
+                              fit: BoxFit.contain,
+                            ),
+                          ),
+                        ),
                       ),
                     ),
-                    const SizedBox(height: 16),
+                    const SizedBox(height: 14),
                     Text(
                       'Target Physique: ${_data.desiredBodyFat}',
                       style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: AppColors.textHeader),
@@ -1295,18 +1275,10 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
             ),
           ),
           const SizedBox(height: 16),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: tiers.map((t) {
-              final isSel = _data.desiredBodyFat == t;
-              return ChoiceChip(
-                label: Text(t, style: TextStyle(color: isSel ? Colors.white : AppColors.textHeader, fontWeight: FontWeight.bold)),
-                selected: isSel,
-                selectedColor: AppColors.primary,
-                backgroundColor: AppColors.surface,
-                onSelected: (_) => setState(() => _data.desiredBodyFat = t),
-              );
-            }).toList(),
+          _buildBodyFatSelectorRow(
+            tiers: tiers,
+            selectedTier: _data.desiredBodyFat,
+            onSelected: (t) => setState(() => _data.desiredBodyFat = t),
           ),
         ],
       ),
@@ -1543,30 +1515,218 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   // --- Step 14: Fitness Level ---
   Widget _buildFitnessLevelStep() {
     final levels = [
-      {'level': 'Beginner', 'desc': 'New to working out or coming back after a long break'},
-      {'level': 'Intermediate', 'desc': 'Work out regularly and know fundamental exercise form'},
-      {'level': 'Advanced', 'desc': 'Consistent high-intensity training with solid lifting experience'},
+      {
+        'level': 'Beginner',
+        'badge': 'LEVEL 1 • FOUNDATION',
+        'subtitle': 'New to working out or rebuilding routine after a long break',
+        'frequency': '2 - 3 workouts / week',
+        'focus': 'Mastering exercise form, core stability & endurance',
+        'pips': 1,
+        'icon': Icons.spa_rounded,
+        'color': const Color(0xFF10B981),
+      },
+      {
+        'level': 'Intermediate',
+        'badge': 'LEVEL 2 • ACCELERATOR',
+        'subtitle': 'Train consistently with solid knowledge of fundamental lifts',
+        'frequency': '3 - 5 workouts / week',
+        'focus': 'Progressive overload, muscle hypertrophy & strength',
+        'pips': 2,
+        'icon': Icons.fitness_center_rounded,
+        'color': const Color(0xFF059669),
+      },
+      {
+        'level': 'Advanced',
+        'badge': 'LEVEL 3 • ELITE ATHLETE',
+        'subtitle': 'Years of high-intensity training with solid lifting experience',
+        'frequency': '5 - 6 workouts / week',
+        'focus': 'Targeted periodization, peak power & maximum muscle density',
+        'pips': 3,
+        'icon': Icons.local_fire_department_rounded,
+        'color': const Color(0xFFD97706),
+      },
     ];
 
     return _StepContainer(
       title: "How would you rate your fitness level?",
       subtitle: "We'll tune the workout volume, sets, and rest intervals accordingly.",
+      bottomAction: _PrimaryButton(title: 'CONTINUE', onPressed: _nextPage),
       child: Column(
-        children: levels.map((l) {
-          final isSelected = _data.fitnessLevel == l['level'];
-          return Padding(
-            padding: const EdgeInsets.only(bottom: 12),
-            child: _SelectableOptionCard(
-              title: l['level'] as String,
-              subtitle: l['desc'] as String,
-              isSelected: isSelected,
-              onTap: () {
-                setState(() => _data.fitnessLevel = l['level'] as String);
-                _nextPage();
-              },
+        children: [
+          ...levels.map((lvl) {
+            final isSelected = _data.fitnessLevel == lvl['level'];
+            final color = lvl['color'] as Color;
+            final pips = lvl['pips'] as int;
+
+            return Padding(
+              padding: const EdgeInsets.only(bottom: 12),
+              child: InkWell(
+                onTap: () {
+                  setState(() => _data.fitnessLevel = lvl['level'] as String);
+                },
+                borderRadius: BorderRadius.circular(16),
+                child: AnimatedContainer(
+                  duration: const Duration(milliseconds: 200),
+                  padding: const EdgeInsets.all(16),
+                  decoration: BoxDecoration(
+                    color: AppColors.surface,
+                    borderRadius: BorderRadius.circular(16),
+                    border: Border.all(
+                      color: isSelected ? AppColors.primary : AppColors.border,
+                      width: isSelected ? 2.0 : 1.0,
+                    ),
+                    boxShadow: isSelected
+                        ? [
+                            BoxShadow(
+                              color: AppColors.primary.withOpacity(0.18),
+                              blurRadius: 10,
+                              offset: const Offset(0, 3),
+                            ),
+                          ]
+                        : null,
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        children: [
+                          Container(
+                            width: 44,
+                            height: 44,
+                            decoration: BoxDecoration(
+                              color: color.withOpacity(isSelected ? 0.2 : 0.1),
+                              shape: BoxShape.circle,
+                            ),
+                            child: Icon(lvl['icon'] as IconData, color: color, size: 22),
+                          ),
+                          const SizedBox(width: 12),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Row(
+                                  children: [
+                                    Container(
+                                      padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 2),
+                                      decoration: BoxDecoration(
+                                        color: color.withOpacity(0.12),
+                                        borderRadius: BorderRadius.circular(6),
+                                      ),
+                                      child: Text(
+                                        lvl['badge'] as String,
+                                        style: TextStyle(
+                                          color: color,
+                                          fontSize: 9,
+                                          fontWeight: FontWeight.w800,
+                                          letterSpacing: 0.5,
+                                        ),
+                                      ),
+                                    ),
+                                    const Spacer(),
+                                    // Intensity pips
+                                    Row(
+                                      children: List.generate(3, (idx) {
+                                        final active = idx < pips;
+                                        return Container(
+                                          width: 8,
+                                          height: 8,
+                                          margin: const EdgeInsets.only(left: 3),
+                                          decoration: BoxDecoration(
+                                            color: active ? AppColors.primary : AppColors.border,
+                                            shape: BoxShape.circle,
+                                          ),
+                                        );
+                                      }),
+                                    ),
+                                  ],
+                                ),
+                                const SizedBox(height: 4),
+                                Text(
+                                  lvl['level'] as String,
+                                  style: TextStyle(
+                                    fontSize: 17,
+                                    fontWeight: FontWeight.bold,
+                                    color: isSelected ? AppColors.primary : AppColors.textHeader,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                          const SizedBox(width: 8),
+                          Icon(
+                            isSelected ? Icons.check_circle_rounded : Icons.radio_button_unchecked_rounded,
+                            color: isSelected ? AppColors.primary : AppColors.border,
+                            size: 22,
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 10),
+                      Text(
+                        lvl['subtitle'] as String,
+                        style: const TextStyle(fontSize: 12, color: AppColors.textSecondary, height: 1.3),
+                      ),
+                      const SizedBox(height: 10),
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                        decoration: BoxDecoration(
+                          color: AppColors.background,
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        child: Row(
+                          children: [
+                            const Icon(Icons.calendar_today_rounded, size: 12, color: AppColors.textSecondary),
+                            const SizedBox(width: 6),
+                            Text(
+                              lvl['frequency'] as String,
+                              style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w600, color: AppColors.textHeader),
+                            ),
+                            const SizedBox(width: 12),
+                            const Icon(Icons.bolt_rounded, size: 14, color: AppColors.primary),
+                            const SizedBox(width: 4),
+                            Expanded(
+                              child: Text(
+                                lvl['focus'] as String,
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                                style: const TextStyle(fontSize: 11, color: AppColors.textSecondary),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            );
+          }),
+          const SizedBox(height: 6),
+          // AI Personalization Banner
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+            decoration: BoxDecoration(
+              color: AppColors.primary.withOpacity(0.08),
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(color: AppColors.primary.withOpacity(0.2)),
             ),
-          );
-        }).toList(),
+            child: Row(
+              children: [
+                const Icon(Icons.auto_awesome, color: AppColors.primary, size: 18),
+                const SizedBox(width: 10),
+                Expanded(
+                  child: Text(
+                    "FitForge AI automatically tunes starting weights, volume, and rest periods to match your tier.",
+                    style: TextStyle(
+                      fontSize: 11,
+                      color: AppColors.textHeader.withOpacity(0.9),
+                      height: 1.3,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -2774,6 +2934,7 @@ class _PredictionCurvePainter extends CustomPainter {
 
 // =========================================================
 // Real Bodybuilder Glowing Muscle Highlight Painter
+// Calibrated to 896 x 1200 Coordinate Space
 // =========================================================
 class _RealBodybuilderGlowPainter extends CustomPainter {
   final List<String> selectedAreas;
@@ -2782,62 +2943,295 @@ class _RealBodybuilderGlowPainter extends CustomPainter {
 
   @override
   void paint(Canvas canvas, Size size) {
-    final w = size.width;
-    final h = size.height;
     final isFull = selectedAreas.contains('Full Body');
 
-    void drawGlowZone(Rect rect, {double blur = 14.0}) {
+    void drawGlowZone(Rect rect, {double blur = 20.0, double radius = 24.0}) {
       final glowPaint = Paint()
-        ..color = AppColors.primary.withOpacity(0.55)
+        ..color = AppColors.primary.withOpacity(0.50)
         ..maskFilter = MaskFilter.blur(BlurStyle.normal, blur);
-      canvas.drawRRect(RRect.fromRectAndRadius(rect, Radius.circular(rect.width * 0.3)), glowPaint);
+      canvas.drawRRect(RRect.fromRectAndRadius(rect, Radius.circular(radius)), glowPaint);
+
+      final fillPaint = Paint()
+        ..color = AppColors.primary.withOpacity(0.20)
+        ..style = PaintingStyle.fill;
+      canvas.drawRRect(RRect.fromRectAndRadius(rect, Radius.circular(radius)), fillPaint);
 
       final strokePaint = Paint()
         ..color = AppColors.primary
         ..style = PaintingStyle.stroke
-        ..strokeWidth = 2.0;
-      canvas.drawRRect(RRect.fromRectAndRadius(rect, Radius.circular(rect.width * 0.3)), strokePaint);
+        ..strokeWidth = 3.5;
+      canvas.drawRRect(RRect.fromRectAndRadius(rect, Radius.circular(radius)), strokePaint);
     }
 
-    // Chest
+    // Chest (Pectorals)
     if (isFull || selectedAreas.contains('Chest')) {
-      drawGlowZone(Rect.fromCenter(center: Offset(w * 0.50, h * 0.28), width: w * 0.36, height: h * 0.09));
+      drawGlowZone(
+        Rect.fromCenter(center: const Offset(448, 350), width: 270, height: 110),
+        radius: 28,
+      );
     }
 
-    // Abs
+    // Abs (6-pack & core)
     if (isFull || selectedAreas.contains('Abs')) {
-      drawGlowZone(Rect.fromCenter(center: Offset(w * 0.50, h * 0.40), width: w * 0.26, height: h * 0.12));
+      drawGlowZone(
+        Rect.fromCenter(center: const Offset(448, 475), width: 170, height: 130),
+        radius: 24,
+      );
     }
 
-    // Arms
+    // Arms (Biceps, triceps & forearms)
     if (isFull || selectedAreas.contains('Arms')) {
-      // Left arm (viewer's left)
-      drawGlowZone(Rect.fromCenter(center: Offset(w * 0.22, h * 0.36), width: w * 0.15, height: h * 0.22));
-      // Right arm (viewer's right)
-      drawGlowZone(Rect.fromCenter(center: Offset(w * 0.78, h * 0.36), width: w * 0.15, height: h * 0.22));
+      drawGlowZone(
+        Rect.fromCenter(center: const Offset(290, 410), width: 95, height: 240),
+        radius: 30,
+      );
+      drawGlowZone(
+        Rect.fromCenter(center: const Offset(606, 410), width: 95, height: 240),
+        radius: 30,
+      );
     }
 
-    // Back / Lats
+    // Back (Upper back / shoulders / traps)
     if (isFull || selectedAreas.contains('Back')) {
-      drawGlowZone(Rect.fromCenter(center: Offset(w * 0.50, h * 0.22), width: w * 0.46, height: h * 0.08));
+      drawGlowZone(
+        Rect.fromCenter(center: const Offset(448, 255), width: 340, height: 85),
+        radius: 26,
+      );
     }
 
-    // Glutes / Waist
+    // Glutes (Hips & glutes)
     if (isFull || selectedAreas.contains('Glutes')) {
-      drawGlowZone(Rect.fromCenter(center: Offset(w * 0.50, h * 0.51), width: w * 0.32, height: h * 0.08));
+      drawGlowZone(
+        Rect.fromCenter(center: const Offset(448, 580), width: 230, height: 110),
+        radius: 26,
+      );
     }
 
-    // Legs / Quads
+    // Legs (Quads & calves)
     if (isFull || selectedAreas.contains('Leg')) {
-      // Left thigh & calf
-      drawGlowZone(Rect.fromCenter(center: Offset(w * 0.38, h * 0.70), width: w * 0.16, height: h * 0.32));
-      // Right thigh & calf
-      drawGlowZone(Rect.fromCenter(center: Offset(w * 0.62, h * 0.70), width: w * 0.16, height: h * 0.32));
+      drawGlowZone(
+        Rect.fromCenter(center: const Offset(390, 830), width: 130, height: 350),
+        radius: 35,
+      );
+      drawGlowZone(
+        Rect.fromCenter(center: const Offset(506, 830), width: 130, height: 350),
+        radius: 35,
+      );
     }
   }
 
   @override
   bool shouldRepaint(covariant _RealBodybuilderGlowPainter oldDelegate) => true;
+}
+
+// =========================================================
+// Real Bodybuilder Height Stadiometer Visualizer
+// Mathematically calibrated ruler, laser line, & character scale
+// =========================================================
+class _HeightStadiometer extends StatelessWidget {
+  final int heightCm;
+
+  const _HeightStadiometer({required this.heightCm});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: double.infinity,
+      decoration: BoxDecoration(
+        color: AppColors.surface,
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: AppColors.border),
+      ),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(20),
+        child: LayoutBuilder(
+          builder: (context, constraints) {
+            final totalH = constraints.maxHeight;
+            const topMargin = 22.0;
+            const bottomMargin = 28.0;
+            final usableH = totalH - topMargin - bottomMargin;
+
+            // Ruler range (130cm to 220cm)
+            const double minCm = 130.0;
+            const double maxCm = 220.0;
+
+            double getY(double cm) {
+              final ratio = (cm - minCm) / (maxCm - minCm);
+              return topMargin + (1.0 - ratio.clamp(0.0, 1.0)) * usableH;
+            }
+
+            final currentLaserY = getY(heightCm.toDouble());
+            final floorY = getY(minCm);
+            final rulerTicks = [210, 200, 190, 180, 170, 160, 150, 140];
+            final characterH = (floorY - currentLaserY).clamp(80.0, totalH);
+
+            return Stack(
+              clipBehavior: Clip.none,
+              children: [
+                // Floor / Platform base line
+                Positioned(
+                  left: 20,
+                  right: 20,
+                  top: floorY,
+                  child: Container(
+                    height: 2,
+                    color: AppColors.border,
+                  ),
+                ),
+                // Floor label
+                Positioned(
+                  left: 14,
+                  top: floorY + 4,
+                  child: const Text(
+                    'BASE (130 cm)',
+                    style: TextStyle(
+                      fontSize: 9,
+                      fontWeight: FontWeight.w600,
+                      color: AppColors.textSecondary,
+                      letterSpacing: 0.5,
+                    ),
+                  ),
+                ),
+
+                // Ruler vertical guide line
+                Positioned(
+                  left: 70,
+                  top: topMargin,
+                  bottom: bottomMargin,
+                  child: Container(
+                    width: 1.5,
+                    color: AppColors.border,
+                  ),
+                ),
+
+                // Ruler tick marks and labels
+                ...rulerTicks.map((mark) {
+                  final markY = getY(mark.toDouble());
+                  final isPassed = heightCm >= mark;
+                  final isCurrentNearest = (heightCm - mark).abs() <= 3;
+
+                  return Positioned(
+                    left: 10,
+                    top: markY - 9,
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        SizedBox(
+                          width: 50,
+                          child: Text(
+                            '$mark cm',
+                            textAlign: TextAlign.right,
+                            style: TextStyle(
+                              fontSize: 11,
+                              fontWeight: isCurrentNearest
+                                  ? FontWeight.w900
+                                  : (isPassed ? FontWeight.bold : FontWeight.w500),
+                              color: isCurrentNearest
+                                  ? AppColors.primary
+                                  : (isPassed ? AppColors.textHeader : AppColors.textSecondary.withOpacity(0.55)),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: 4),
+                        Container(
+                          width: mark % 20 == 0 ? 10 : 6,
+                          height: 2,
+                          color: isCurrentNearest
+                              ? AppColors.primary
+                              : (isPassed ? AppColors.primary.withOpacity(0.6) : AppColors.border),
+                        ),
+                      ],
+                    ),
+                  );
+                }),
+
+                // Real Bodybuilder character with head locked to laser line and feet at base
+                Positioned(
+                  left: 90,
+                  right: 44,
+                  top: currentLaserY - (characterH * 0.033),
+                  height: characterH / 0.92,
+                  child: Image.asset(
+                    'assets/images/bodybuilder_physique.png',
+                    fit: BoxFit.contain,
+                    alignment: Alignment.topCenter,
+                  ),
+                ),
+
+                // Glowing Laser Height Alignment Indicator
+                Positioned(
+                  left: 65,
+                  right: 14,
+                  top: currentLaserY - 10,
+                  child: Row(
+                    children: [
+                      Container(
+                        width: 9,
+                        height: 9,
+                        decoration: BoxDecoration(
+                          color: AppColors.primary,
+                          shape: BoxShape.circle,
+                          boxShadow: [
+                            BoxShadow(
+                              color: AppColors.primary.withOpacity(0.7),
+                              blurRadius: 6,
+                              spreadRadius: 2,
+                            ),
+                          ],
+                        ),
+                      ),
+                      Expanded(
+                        child: Container(
+                          height: 2,
+                          decoration: BoxDecoration(
+                            gradient: LinearGradient(
+                              colors: [
+                                AppColors.primary,
+                                AppColors.primary.withOpacity(0.7),
+                                AppColors.primary.withOpacity(0.25),
+                              ],
+                            ),
+                            boxShadow: [
+                              BoxShadow(
+                                color: AppColors.primary.withOpacity(0.4),
+                                blurRadius: 4,
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                        decoration: BoxDecoration(
+                          color: AppColors.primary,
+                          borderRadius: BorderRadius.circular(8),
+                          boxShadow: [
+                            BoxShadow(
+                              color: AppColors.primary.withOpacity(0.35),
+                              blurRadius: 6,
+                              offset: const Offset(0, 2),
+                            ),
+                          ],
+                        ),
+                        child: Text(
+                          '$heightCm cm',
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 11,
+                            fontWeight: FontWeight.w900,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            );
+          },
+        ),
+      ),
+    );
+  }
 }
 
 // =========================================================
