@@ -65,12 +65,13 @@ You MUST respond with a strict, valid JSON object matching this schema:
 }
 
 Rules for health_score and meter:
-- health_score is an integer from 0 to 100.
-  - 70 to 100: 'healthy' (green) -> High nutrient density, lean protein, fiber, whole unrefined foods.
-  - 45 to 69: 'moderate' (yellow) -> Balanced or energy-dense; good for bulking or active days, moderate fat/carbs.
-  - 0 to 44: 'unhealthy' (red) -> Ultra-processed, deep-fried, high trans fats, refined sugars, low nutrient density.
-- meter_position is health_score / 100 (ranging from 0.0 to 1.0).
-- If analyzing an image: identify the food items on the plate accurately, including regional variations (e.g. Indian curries, rotis, rice, dal, tadka oils, Western salads, meats, desserts).
+- health_score is an integer from 0 to 100 based strictly on nutritional density, protein-to-calorie ratio, fiber, saturated fat, and processing level:
+  - 85 to 100 (Elite Healthy / Green): Very high lean protein, high fiber, minimal saturated fat/sugar (e.g. Whey protein shake: 88-95, Grilled chicken/tofu salad: 85-92, Sprouts/Moong dal chilla: 82-88).
+  - 70 to 84 (Wholesome Balanced / Green): Clean whole grains, pulses, fermented batters with light oil, lean home meals (e.g. Masala Dosa with vegetable sambar: 70-74, Dal Tadka with Roti: 72-78, Oatmeal with fruit: 75-80).
+  - 50 to 69 (Energy-Dense / Moderate Yellow): High carbohydrate density, moderate-to-high saturated fat from butter/ghee/cheese, calorie-heavy (e.g. 2 Aloo Parathas with generous butter: 52-56, Paneer Butter Masala: 54-58, Chicken Biryani: 58-64).
+  - 35 to 49 (Cheat Meal / Borderline Red): Deep-fried snacks, heavy refined flours, high sodium/trans fats (e.g. Samosas: 38-44, Pav Bhaji with extra butter: 40-45, Fast food burger: 38-44).
+  - 0 to 34 (Ultra-Processed / Sugar Bomb Red): Deep-fried sweets, sugary pastries, sodas, chips (e.g. Gulab Jamun/Jalebi: 20-30, French fries: 28-34).
+- Distinguish dishes sharply: NEVER assign similar scores to heavy-butter meals and light dishes! A 550 kcal dish with 24g+ fat from butter must score lower (50-56) than a 350 kcal meal with only 8g fat and sambar (70-74).
 - Ensure all numbers (calories, protein_g, carbs_g, fat_g, fiber_g) are realistic and mathematically consistent (protein*4 + carbs*4 + fat*9 ≈ calories).`;
 
     // Construct user messages for OpenRouter / OpenAI
