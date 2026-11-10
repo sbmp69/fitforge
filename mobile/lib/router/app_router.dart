@@ -7,10 +7,9 @@ import '../screens/auth/login_screen.dart';
 import '../screens/auth/signup_screen.dart';
 import '../screens/coach/coach_screen.dart';
 import '../screens/home/home_screen.dart';
-
+import '../screens/food_scanner/food_scanner_screen.dart';
 import '../screens/meals/meals_screen.dart';
 import '../screens/onboarding/onboarding_screen.dart';
-import '../screens/onboarding/physique_onboarding_screen.dart';
 import '../screens/profile/profile_screen.dart';
 import '../screens/progress/progress_screen.dart';
 import '../screens/shell/main_shell.dart';
@@ -43,6 +42,7 @@ class AppRouter {
         GoRoute(path: '/physique-onboarding', redirect: (_, __) => '/home'),
         GoRoute(path: '/login', builder: (_, __) => const LoginScreen()),
         GoRoute(path: '/signup', builder: (_, __) => const SignupScreen()),
+        GoRoute(path: '/food-scanner', builder: (_, __) => const FoodScannerScreen()),
         StatefulShellRoute.indexedStack(
           builder: (context, state, navigationShell) => MainShell(navigationShell: navigationShell),
           branches: [

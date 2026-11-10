@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:http/http.dart' as http;
 import 'package:supabase_flutter/supabase_flutter.dart';
+import '../models/food_scan_result.dart';
 
 class ApiService {
   String get baseUrl => dotenv.env['API_BASE_URL'] ?? 'http://10.0.2.2:3000';
@@ -68,14 +69,16 @@ class ApiService {
     return data;
   }
 
-  Future<String> getWeeklyInsight() async {
-    final res = await http.post(
+  Future<String> getInsights() async {
+    final res = await http.get(
       Uri.parse('$baseUrl/api/ai/insights'),
       headers: await _headers(),
     );
     final data = jsonDecode(res.body) as Map<String, dynamic>;
     return data['insight']?['insight_text'] as String? ?? '';
   }
+
+  Future<String> getWeeklyInsight() => getInsights();
 
   Future<String> chatWithCoach(String message) async {
     final res = await http.post(
@@ -111,4 +114,25 @@ class ApiService {
     return null;
   }
 
+  Future<FoodScanResult> scanFood({
+    String? text,
+    String? imageBase64,
+    String? mimeType,
+    String? localImagePath,
+  }) async {
+    final res = await http.post(
+      Uri.parse('$baseUrl/api/ai/scan-food'),
+      headers: await _headers(),
+      body: jsonEncode({
+        if (text != null && text.trim().isNotEmpty) 'text': text.trim(),
+        if (imageBase64 != null && imageBase64.isNotEmpty) 'imageBase64': imageBase64,
+        if (mimeType != null) 'mimeType': mimeType,
+      }),
+    );
+    final data = jsonDecode(res.body) as Map<String, dynamic>;
+    if (res.statusCode != 200) {
+      throw Exception(data['error'] ?? 'Failed to analyze food');
+    }
+    return FoodScanResult.fromJson(data, imagePath: localImagePath);
+  }
 }

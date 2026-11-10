@@ -646,6 +646,13 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
               const SizedBox(height: 12),
               _QuickActionCard(
+                icon: Icons.fastfood_rounded,
+                title: "AI Food & Calorie Scanner",
+                subtitle: "Snap dish photo or type • Health Meter",
+                onTap: () => context.push('/food-scanner'),
+              ),
+              const SizedBox(height: 12),
+              _QuickActionCard(
                 icon: Icons.restaurant,
                 title: "Meal Plan",
                 subtitle: _meal?.title ?? "No plan yet",

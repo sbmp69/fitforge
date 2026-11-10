@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'dart:async';
 import 'package:flutter/services.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -137,6 +138,11 @@ class _MealsScreenState extends State<MealsScreen> {
       appBar: AppBar(
         title: const Text('Meals'),
         actions: [
+          IconButton(
+            icon: const Icon(Icons.qr_code_scanner_rounded, color: AppColors.primary),
+            tooltip: 'AI Food Scanner',
+            onPressed: () => context.push('/food-scanner'),
+          ),
           TextButton(
             onPressed: () => setState(() => _showForm = !_showForm),
             child: Text(
@@ -151,6 +157,74 @@ class _MealsScreenState extends State<MealsScreen> {
           ListView(
             padding: const EdgeInsets.fromLTRB(16, 16, 16, 140),
             children: [
+              // AI Food Scanner & Health Meter Banner
+              InkWell(
+                onTap: () => context.push('/food-scanner'),
+                borderRadius: BorderRadius.circular(20),
+                child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                  decoration: BoxDecoration(
+                    gradient: const LinearGradient(
+                      colors: [Color(0xFF2E7D32), Color(0xFF416B58)],
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                    ),
+                    borderRadius: BorderRadius.circular(20),
+                    boxShadow: [
+                      BoxShadow(
+                        color: const Color(0xFF2E7D32).withValues(alpha: 0.22),
+                        blurRadius: 10,
+                        offset: const Offset(0, 4),
+                      ),
+                    ],
+                  ),
+                  child: Row(
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.all(10),
+                        decoration: BoxDecoration(
+                          color: Colors.white.withValues(alpha: 0.2),
+                          shape: BoxShape.circle,
+                        ),
+                        child: const Icon(Icons.camera_alt_rounded, color: Colors.white, size: 22),
+                      ),
+                      const SizedBox(width: 14),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: const [
+                            Text(
+                              'AI Calorie & Health Scanner',
+                              style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 15),
+                            ),
+                            SizedBox(height: 2),
+                            Text(
+                              'Snap photo or type any dish • BMI-style Health Meter',
+                              style: TextStyle(color: Colors.white70, fontSize: 11),
+                            ),
+                          ],
+                        ),
+                      ),
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                        decoration: BoxDecoration(
+                          color: Colors.white.withValues(alpha: 0.2),
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: const Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Text('Scan', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 12)),
+                            SizedBox(width: 4),
+                            Icon(Icons.arrow_forward_rounded, color: Colors.white, size: 14),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              const SizedBox(height: 16),
               if (_plan == null) ...[
                 Container(
                   padding: const EdgeInsets.all(20),
