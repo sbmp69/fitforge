@@ -194,13 +194,15 @@ class _FoodScannerScreenState extends State<FoodScannerScreen> with SingleTicker
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              // Intro Banner
-              _buildIntroCard(),
-              const SizedBox(height: 16),
+              // Intro Banner (only shown before scanning)
+              if (_result == null) ...[
+                _buildIntroCard(),
+                const SizedBox(height: 16),
+              ],
 
               // Search & Upload Section
               _buildInputSection(),
-              const SizedBox(height: 20),
+              const SizedBox(height: 16),
 
               // Loading State
               if (_loading) _buildLoadingCard(),
@@ -272,6 +274,53 @@ class _FoodScannerScreenState extends State<FoodScannerScreen> with SingleTicker
   }
 
   Widget _buildInputSection() {
+    if (_result != null) {
+      return Container(
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
+        decoration: BoxDecoration(
+          color: AppColors.surface,
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(color: AppColors.border),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withValues(alpha: 0.02),
+              blurRadius: 6,
+              offset: const Offset(0, 2),
+            ),
+          ],
+        ),
+        child: Row(
+          children: [
+            Expanded(
+              child: TextField(
+                controller: _textController,
+                textInputAction: TextInputAction.search,
+                onSubmitted: (_) => _analyzeText(),
+                decoration: const InputDecoration(
+                  hintText: 'Type another dish to scan...',
+                  hintStyle: TextStyle(color: AppColors.textSecondary, fontSize: 13),
+                  prefixIcon: Icon(Icons.search_rounded, color: AppColors.primary, size: 20),
+                  isDense: true,
+                  border: InputBorder.none,
+                  contentPadding: EdgeInsets.symmetric(vertical: 8),
+                ),
+              ),
+            ),
+            IconButton(
+              icon: const Icon(Icons.camera_alt_rounded, color: AppColors.primary, size: 20),
+              tooltip: 'Camera',
+              onPressed: _loading ? null : () => _pickImage(ImageSource.camera),
+            ),
+            IconButton(
+              icon: const Icon(Icons.photo_library_rounded, color: AppColors.textSecondary, size: 20),
+              tooltip: 'Gallery',
+              onPressed: _loading ? null : () => _pickImage(ImageSource.gallery),
+            ),
+          ],
+        ),
+      );
+    }
+
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
