@@ -246,10 +246,10 @@ class _FoodScannerScreenState extends State<FoodScannerScreen> with SingleTicker
             child: const Icon(Icons.fastfood_rounded, color: Colors.white, size: 28),
           ),
           const SizedBox(width: 14),
-          Expanded(
+          const Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
-              children: const [
+              children: [
                 Text(
                   'AI Nutrition & Health Meter',
                   style: TextStyle(
@@ -341,8 +341,8 @@ class _FoodScannerScreenState extends State<FoodScannerScreen> with SingleTicker
           const SizedBox(height: 16),
 
           // Divider with "OR SNAP FOOD PHOTO"
-          Row(
-            children: const [
+          const Row(
+            children: [
               Expanded(child: Divider(color: AppColors.border)),
               Padding(
                 padding: EdgeInsets.symmetric(horizontal: 12),
@@ -515,36 +515,65 @@ class _FoodScannerScreenState extends State<FoodScannerScreen> with SingleTicker
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
                   Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          result.foodName,
+                    child: Text(
+                      result.foodName,
+                      style: const TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                        color: AppColors.textHeader,
+                        height: 1.25,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 10),
+                  _buildHealthBadge(result),
+                ],
+              ),
+              const SizedBox(height: 12),
+              Container(
+                width: double.infinity,
+                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                decoration: BoxDecoration(
+                  color: AppColors.background,
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(color: AppColors.border),
+                ),
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Padding(
+                      padding: EdgeInsets.only(top: 2),
+                      child: Icon(Icons.scale_rounded, size: 15, color: AppColors.primary),
+                    ),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: RichText(
+                        text: TextSpan(
+                          text: 'Portion: ',
                           style: const TextStyle(
-                            fontSize: 20,
+                            fontSize: 13,
                             fontWeight: FontWeight.bold,
                             color: AppColors.textHeader,
                           ),
-                        ),
-                        const SizedBox(height: 4),
-                        Row(
                           children: [
-                            const Icon(Icons.scale_rounded, size: 14, color: AppColors.textSecondary),
-                            const SizedBox(width: 4),
-                            Text(
-                              'Portion: ${result.portionSize}',
-                              style: const TextStyle(fontSize: 13, color: AppColors.textSecondary, fontWeight: FontWeight.w500),
+                            TextSpan(
+                              text: result.portionSize,
+                              style: const TextStyle(
+                                fontSize: 13,
+                                fontWeight: FontWeight.normal,
+                                color: AppColors.textBody,
+                                height: 1.35,
+                              ),
                             ),
                           ],
                         ),
-                      ],
+                      ),
                     ),
-                  ),
-                  _buildHealthBadge(result),
-                ],
+                  ],
+                ),
               ),
             ],
           ),
@@ -642,6 +671,19 @@ class _FoodScannerScreenState extends State<FoodScannerScreen> with SingleTicker
   }
 
   Widget _buildHealthMeterGauge(FoodScanResult result) {
+    Color meterColor;
+    Color meterBgColor;
+    if (result.healthScore >= 70) {
+      meterColor = const Color(0xFF2E7D32);
+      meterBgColor = const Color(0xFFE8F5E9);
+    } else if (result.healthScore >= 45) {
+      meterColor = const Color(0xFFE65100);
+      meterBgColor = const Color(0xFFFFF8E1);
+    } else {
+      meterColor = const Color(0xFFC62828);
+      meterBgColor = const Color(0xFFFFEBEE);
+    }
+
     return Container(
       padding: const EdgeInsets.all(18),
       decoration: BoxDecoration(
@@ -673,14 +715,15 @@ class _FoodScannerScreenState extends State<FoodScannerScreen> with SingleTicker
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                 decoration: BoxDecoration(
-                  color: AppColors.primaryLight,
+                  color: meterBgColor,
                   borderRadius: BorderRadius.circular(10),
+                  border: Border.all(color: meterColor.withValues(alpha: 0.3)),
                 ),
                 child: Text(
                   '${result.healthScore} / 100',
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontWeight: FontWeight.w800,
-                    color: AppColors.primary,
+                    color: meterColor,
                     fontSize: 14,
                   ),
                 ),
@@ -692,81 +735,113 @@ class _FoodScannerScreenState extends State<FoodScannerScreen> with SingleTicker
             'Like a BMI scale: Red (High Calorie/Processed) -> Yellow (Moderate) -> Green (Clean)',
             style: TextStyle(color: AppColors.textSecondary, fontSize: 11),
           ),
-          const SizedBox(height: 24),
+          const SizedBox(height: 18),
 
           // The Dynamic Meter Bar with Pointer
           AnimatedBuilder(
             animation: _meterAnimation,
             builder: (context, child) {
-              final double clampedScore = (result.healthScore / 100.0).clamp(0.02, 0.98);
-              final double animatedPosition = clampedScore * _meterAnimation.value;
+              final double clampedScore = (result.healthScore / 100.0).clamp(0.0, 1.0);
+              final double animatedScore = clampedScore * _meterAnimation.value;
 
-              return Column(
-                children: [
-                  // Needle / Pointer Indicator
-                  FractionallySizedBox(
-                    alignment: Alignment.centerLeft,
-                    widthFactor: 1.0,
-                    child: LayoutBuilder(
-                      builder: (context, constraints) {
-                        final double offset = (constraints.maxWidth * animatedPosition) - 16;
-                        return Transform.translate(
-                          offset: Offset(offset.clamp(0.0, constraints.maxWidth - 32), 0),
-                          child: Column(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Container(
-                                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-                                decoration: BoxDecoration(
-                                  color: AppColors.textHeader,
-                                  borderRadius: BorderRadius.circular(8),
-                                ),
-                                child: Text(
-                                  '${(result.healthScore * _meterAnimation.value).round()}',
-                                  style: const TextStyle(
-                                    color: Colors.white,
-                                    fontSize: 11,
-                                    fontWeight: FontWeight.bold,
+              return LayoutBuilder(
+                builder: (context, constraints) {
+                  final double trackWidth = constraints.maxWidth;
+                  const double pointerWidth = 46.0;
+                  final double leftOffset = (trackWidth * animatedScore - (pointerWidth / 2))
+                      .clamp(0.0, trackWidth - pointerWidth);
+
+                  return Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      // Score Pointer Bubble with Down Arrow
+                      Container(
+                        margin: EdgeInsets.only(left: leftOffset),
+                        width: pointerWidth,
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Container(
+                              padding: const EdgeInsets.symmetric(vertical: 3),
+                              alignment: Alignment.center,
+                              decoration: BoxDecoration(
+                                color: meterColor,
+                                borderRadius: BorderRadius.circular(8),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: meterColor.withValues(alpha: 0.35),
+                                    blurRadius: 6,
+                                    offset: const Offset(0, 2),
                                   ),
+                                ],
+                              ),
+                              child: Text(
+                                '${(result.healthScore * _meterAnimation.value).round()}',
+                                style: const TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.bold,
                                 ),
                               ),
-                              const Icon(
-                                Icons.arrow_drop_down,
-                                color: AppColors.textHeader,
-                                size: 20,
-                              ),
-                            ],
-                          ),
-                        );
-                      },
-                    ),
-                  ),
-
-                  // Gradient Meter Track
-                  Container(
-                    height: 16,
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(10),
-                      gradient: const LinearGradient(
-                        colors: [
-                          Color(0xFFE53935), // Red (Unhealthy / Deep Fried / Ultra Processed)
-                          Color(0xFFFFA726), // Amber
-                          Color(0xFFFDD835), // Yellow (Moderate)
-                          Color(0xFF66BB6A), // Light Green
-                          Color(0xFF2E7D32), // Forest Green (Healthy / Lean / High Fiber)
-                        ],
-                        stops: [0.0, 0.35, 0.50, 0.70, 1.0],
-                      ),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black.withValues(alpha: 0.08),
-                          blurRadius: 4,
-                          offset: const Offset(0, 2),
+                            ),
+                            Icon(
+                              Icons.arrow_drop_down,
+                              color: meterColor,
+                              size: 18,
+                            ),
+                          ],
                         ),
-                      ],
-                    ),
-                  ),
-                ],
+                      ),
+
+                      // Gradient Meter Track
+                      Stack(
+                        alignment: Alignment.centerLeft,
+                        children: [
+                          Container(
+                            height: 14,
+                            width: double.infinity,
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(10),
+                              gradient: const LinearGradient(
+                                colors: [
+                                  Color(0xFFE53935), // Red (Unhealthy / Deep Fried / Ultra Processed)
+                                  Color(0xFFFFA726), // Amber
+                                  Color(0xFFFDD835), // Yellow (Moderate)
+                                  Color(0xFF66BB6A), // Light Green
+                                  Color(0xFF2E7D32), // Forest Green (Healthy / Lean / High Fiber)
+                                ],
+                                stops: [0.0, 0.35, 0.50, 0.70, 1.0],
+                              ),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.black.withValues(alpha: 0.08),
+                                  blurRadius: 4,
+                                  offset: const Offset(0, 2),
+                                ),
+                              ],
+                            ),
+                          ),
+                          // Dot marker on the track
+                          Positioned(
+                            left: (trackWidth * animatedScore - 5).clamp(2.0, trackWidth - 12.0),
+                            child: Container(
+                              width: 10,
+                              height: 10,
+                              decoration: BoxDecoration(
+                                color: Colors.white,
+                                shape: BoxShape.circle,
+                                border: Border.all(color: Colors.black45, width: 1.5),
+                                boxShadow: const [
+                                  BoxShadow(color: Colors.black26, blurRadius: 3),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  );
+                },
               );
             },
           ),
@@ -774,9 +849,9 @@ class _FoodScannerScreenState extends State<FoodScannerScreen> with SingleTicker
           const SizedBox(height: 12),
 
           // Zone Labels below meter
-          Row(
+          const Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: const [
+            children: [
               Text(
                 '🔴 0-44\nCheat / Dense',
                 textAlign: TextAlign.left,
@@ -939,8 +1014,8 @@ class _FoodScannerScreenState extends State<FoodScannerScreen> with SingleTicker
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Row(
-            children: const [
+          const Row(
+            children: [
               Icon(Icons.smart_toy_rounded, color: AppColors.primary, size: 20),
               SizedBox(width: 8),
               Text(
