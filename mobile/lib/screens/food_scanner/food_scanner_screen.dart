@@ -62,10 +62,7 @@ class _FoodScannerScreenState extends State<FoodScannerScreen> with SingleTicker
         imageQuality: 85,
       );
       if (picked != null) {
-        setState(() {
-          _selectedImage = File(picked.path);
-        });
-        _analyzeImage(_selectedImage!);
+        _analyzeImage(File(picked.path));
       }
     } catch (e) {
       if (mounted) {
@@ -83,7 +80,7 @@ class _FoodScannerScreenState extends State<FoodScannerScreen> with SingleTicker
     HapticFeedback.lightImpact();
     setState(() {
       _loading = true;
-      _loadingMessage = 'Scanning image with AI vision...';
+      _loadingMessage = 'Verifying & scanning image with AI vision...';
     });
 
     try {
@@ -94,15 +91,21 @@ class _FoodScannerScreenState extends State<FoodScannerScreen> with SingleTicker
         imageBase64: base64String,
         mimeType: 'image/jpeg',
         localImagePath: imageFile.path,
-        text: _textController.text.trim().isNotEmpty ? _textController.text.trim() : null,
       );
 
       if (mounted) {
+        _textController.clear();
         setState(() {
+          _selectedImage = imageFile;
           _result = result;
           _loading = false;
         });
         _animController.forward(from: 0.0);
+      }
+    } on NonFoodItemException catch (e) {
+      if (mounted) {
+        setState(() => _loading = false);
+        _showNotFoodDialog(e);
       }
     } catch (e) {
       if (mounted) {
@@ -135,7 +138,6 @@ class _FoodScannerScreenState extends State<FoodScannerScreen> with SingleTicker
 
     setState(() {
       _loading = true;
-      _selectedImage = null;
       _loadingMessage = 'Calculating calories, macros & health score...';
     });
 
@@ -144,10 +146,16 @@ class _FoodScannerScreenState extends State<FoodScannerScreen> with SingleTicker
 
       if (mounted) {
         setState(() {
+          _selectedImage = null;
           _result = result;
           _loading = false;
         });
         _animController.forward(from: 0.0);
+      }
+    } on NonFoodItemException catch (e) {
+      if (mounted) {
+        setState(() => _loading = false);
+        _showNotFoodDialog(e);
       }
     } catch (e) {
       if (mounted) {
@@ -160,6 +168,92 @@ class _FoodScannerScreenState extends State<FoodScannerScreen> with SingleTicker
         );
       }
     }
+  }
+
+  void _showNotFoodDialog(NonFoodItemException error) {
+    HapticFeedback.heavyImpact();
+    showDialog(
+      context: context,
+      barrierDismissible: true,
+      builder: (ctx) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
+        backgroundColor: AppColors.surface,
+        contentPadding: const EdgeInsets.fromLTRB(24, 24, 24, 16),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(
+              padding: const EdgeInsets.all(16),
+              decoration: const BoxDecoration(
+                color: Color(0xFFFFEBEE),
+                shape: BoxShape.circle,
+              ),
+              child: const Icon(
+                Icons.no_food_rounded,
+                color: Color(0xFFC62828),
+                size: 40,
+              ),
+            ),
+            const SizedBox(height: 18),
+            const Text(
+              'Not a Food Item',
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+                color: AppColors.textHeader,
+              ),
+            ),
+            const SizedBox(height: 10),
+            if (error.detectedSubject.isNotEmpty)
+              Container(
+                margin: const EdgeInsets.only(bottom: 10),
+                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                decoration: BoxDecoration(
+                  color: const Color(0xFFFFF8E1),
+                  borderRadius: BorderRadius.circular(10),
+                  border: Border.all(color: const Color(0xFFFFA000).withValues(alpha: 0.3)),
+                ),
+                child: Text(
+                  'Detected: ${error.detectedSubject}',
+                  textAlign: TextAlign.center,
+                  style: const TextStyle(
+                    fontSize: 12,
+                    fontWeight: FontWeight.w600,
+                    color: Color(0xFFE65100),
+                  ),
+                ),
+              ),
+            Text(
+              error.message,
+              textAlign: TextAlign.center,
+              style: const TextStyle(
+                fontSize: 14,
+                color: AppColors.textBody,
+                height: 1.45,
+              ),
+            ),
+            const SizedBox(height: 22),
+            SizedBox(
+              width: double.infinity,
+              child: ElevatedButton.icon(
+                onPressed: () => Navigator.of(ctx).pop(),
+                icon: const Icon(Icons.camera_alt_rounded, color: Colors.white, size: 18),
+                label: const Text(
+                  'Try Real Food',
+                  style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 15),
+                ),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: AppColors.primary,
+                  padding: const EdgeInsets.symmetric(vertical: 14),
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
   }
 
   void _resetScanner() {

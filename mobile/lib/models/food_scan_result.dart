@@ -85,3 +85,16 @@ class FoodScanResult {
     };
   }
 }
+
+class NonFoodItemException implements Exception {
+  final String message;
+  final String detectedSubject;
+
+  NonFoodItemException({
+    required this.message,
+    this.detectedSubject = 'Non-food item',
+  });
+
+  @override
+  String toString() => message;
+}

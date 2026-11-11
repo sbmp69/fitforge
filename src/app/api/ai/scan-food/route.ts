@@ -42,11 +42,26 @@ export async function POST(request: NextRequest) {
     }
 
     const systemPrompt = `You are FitForge's elite Clinical Nutritionist & AI Food Scanner.
-Analyze the provided food item (from text description or photo).
+Analyze the provided input (from text description or photo).
 User Context: Goal: ${userGoal}, Dietary Preference: ${dietaryPref}.
 
-You MUST respond with a strict, valid JSON object matching this schema:
+STEP 1 - STRICT GUARDRAIL CHECK:
+Verify if the input (image or text) is ACTUALLY edible food, beverage, fruit, snack, meal, or nutritional supplement.
+- If the image shows a person/selfie without food, a laptop, phone, car, shoes, pet, documents, receipts, screenshots, blank wall, or empty dish -> MUST set "is_food": false.
+- If the text is gibberish ("asdfg"), non-edible objects ("Nike shoes", "iPhone", "car"), or unrelated questions -> MUST set "is_food": false.
+
+You MUST respond with a strict, valid JSON object matching ONE of these schemas:
+
+SCHEMA A (If NOT food):
 {
+  "is_food": false,
+  "detected_subject": "Brief description of what was actually uploaded or typed (e.g., 'a laptop', 'a human selfie', 'a pair of shoes')",
+  "rejection_reason": "Clear, polite 1-2 sentence message informing the user that we detected a non-food item and asking them to capture or enter an actual food, drink, or meal."
+}
+
+SCHEMA B (If it IS food):
+{
+  "is_food": true,
   "food_name": "Clear, appetizing title of the dish/item",
   "portion_size": "Realistic estimated portion size (e.g. '1 bowl (~300g)' or '2 slices with toppings')",
   "calories": 450,
@@ -146,6 +161,20 @@ Rules for health_score and meter:
       // Try stripping markdown blocks if any
       const cleaned = rawContent.replace(/```json/g, "").replace(/```/g, "").trim();
       parsedResult = JSON.parse(cleaned);
+    }
+
+    // Check Guardrail: if input is NOT food, return 422 with rejection details
+    if (parsedResult.is_food === false) {
+      return NextResponse.json(
+        {
+          is_food: false,
+          detected_subject: parsedResult.detected_subject || "Non-food item",
+          error:
+            parsedResult.rejection_reason ||
+            "This doesn't look like food! Please capture or enter an actual dish, snack, or drink.",
+        },
+        { status: 422 }
+      );
     }
 
     // Fallback clamps

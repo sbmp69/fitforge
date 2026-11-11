@@ -130,6 +130,12 @@ class ApiService {
       }),
     );
     final data = jsonDecode(res.body) as Map<String, dynamic>;
+    if (res.statusCode == 422 || data['is_food'] == false) {
+      throw NonFoodItemException(
+        message: data['error']?.toString() ?? 'This does not appear to be food.',
+        detectedSubject: data['detected_subject']?.toString() ?? 'Non-food item',
+      );
+    }
     if (res.statusCode != 200) {
       throw Exception(data['error'] ?? 'Failed to analyze food');
     }
