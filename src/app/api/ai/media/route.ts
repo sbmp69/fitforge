@@ -20,7 +20,7 @@ function slugify(name: string): string {
 
 export async function POST(req: Request) {
   try {
-    const { name, category } = await req.json(); // category: 'meal' | 'workout'
+    const { name, category, generate = false } = await req.json(); // category: 'meal' | 'workout'
     if (!name) {
       return NextResponse.json({ error: "Name is required" }, { status: 400 });
     }
@@ -42,6 +42,16 @@ export async function POST(req: Request) {
         name,
         slug,
       });
+    }
+
+    // Do not call OpenRouter if generate is false (saves all credits)
+    if (!generate) {
+      return NextResponse.json({
+        cached: false,
+        message: "Automatic generation disabled to conserve credits",
+        name,
+        slug,
+      }, { status: 200 });
     }
 
     if (!OPENROUTER_API_KEY) {

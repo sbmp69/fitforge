@@ -350,7 +350,7 @@ class SupabaseService {
 
     if (googleUser == null) return false;
     
-    final googleAuth = await googleUser.authentication;
+    final googleAuth = googleUser.authentication;
     final idToken = googleAuth.idToken;
 
     if (idToken == null) throw 'No ID Token found.';

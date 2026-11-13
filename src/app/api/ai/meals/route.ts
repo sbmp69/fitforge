@@ -126,7 +126,7 @@ async function resolveMealImage(supabase: any, name: string): Promise<string> {
   const slug = slugify(name);
   const fileName = `meals/${slug}.png`;
 
-  // 1. Check if already stored in Supabase Storage
+  // 1. Check if already stored in Supabase Storage (zero credit cost)
   try {
     const { data: files } = await supabase.storage.from("ai-assets").list("meals", { search: `${slug}.png` });
     if (files && files.some((f: any) => f.name === `${slug}.png`)) {
@@ -135,44 +135,8 @@ async function resolveMealImage(supabase: any, name: string): Promise<string> {
     }
   } catch (_) {}
 
-  // 2. Call OpenRouter Tencent Hy Image if key is available
-  const DEFAULT_OPENROUTER_KEY = Buffer.from('c2stb3ItdjEtZjljZGU0ODEzYWU2MWYzODA0ODdiN2Y1MTY5ZDBkMTkzNDkzY2ZjMzJhNDg0NTdjMGY1OTllMDk4NmNjNTc0Mg==', 'base64').toString('utf8');
-const apiKey = process.env.OPENROUTER_IMAGE_API_KEY || DEFAULT_OPENROUTER_KEY;
-  if (apiKey) {
-    try {
-      const res = await fetch("https://openrouter.ai/api/v1/images", {
-        method: "POST",
-        headers: {
-          "Authorization": `Bearer ${apiKey}`,
-          "Content-Type": "application/json",
-          "HTTP-Referer": "https://fitforge.ai",
-          "X-Title": "FitForge"
-        },
-        body: JSON.stringify({
-          model: "black-forest-labs/flux-3-image-klein",
-          prompt: `Gourmet authentic professional food photography of ${name}, beautifully presented Indian meal, vibrant colors, studio lighting, depth of field, 4k`,
-          aspect_ratio: "1:1"
-        })
-      });
-      const json = await res.json();
-      if (res.ok && json.data && json.data[0]) {
-        let buffer: Buffer | null = null;
-        if (json.data[0].b64_json) {
-          buffer = Buffer.from(json.data[0].b64_json, "base64");
-        } else if (json.data[0].url) {
-          const imgFetch = await fetch(json.data[0].url);
-          buffer = Buffer.from(await imgFetch.arrayBuffer());
-        }
-        if (buffer) {
-          await supabase.storage.from("ai-assets").upload(fileName, buffer, { contentType: "image/png", upsert: true });
-          const { data } = supabase.storage.from("ai-assets").getPublicUrl(fileName);
-          return data.publicUrl;
-        }
-      }
-    } catch (_) {}
-  }
-
-  // 3. Guaranteed verified fallback
+  // 2. Return verified high-quality fallback image immediately.
+  // We NEVER call OpenRouter in a loop during meal plan creation to conserve 100% of user credits.
   return getVerifiedFallbackMealImage(name);
 }
 

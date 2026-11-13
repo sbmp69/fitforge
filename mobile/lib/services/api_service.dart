@@ -99,6 +99,7 @@ class ApiService {
   Future<String?> getCachedOrGeneratedImageUrl({
     required String name,
     required String category,
+    bool generate = false,
   }) async {
     try {
       final res = await http.post(
@@ -107,6 +108,7 @@ class ApiService {
         body: jsonEncode({
           'name': name,
           'category': category,
+          'generate': generate,
         }),
       );
       if (res.statusCode == 200) {

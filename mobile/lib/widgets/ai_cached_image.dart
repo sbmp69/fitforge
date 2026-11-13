@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import '../services/api_service.dart';
 import '../core/theme.dart';
 
 final Map<String, String> _globalAiImageMemoryCache = {};
+final Set<String> _failedCandidateUrls = {};
 
 class AiCachedImage extends StatefulWidget {
   final String name;
@@ -30,6 +30,7 @@ class AiCachedImage extends StatefulWidget {
 
 class _AiCachedImageState extends State<AiCachedImage> {
   String? _resolvedUrl;
+  bool _candidateFailed = false;
 
   @override
   void initState() {
@@ -40,9 +41,17 @@ class _AiCachedImageState extends State<AiCachedImage> {
   @override
   void didUpdateWidget(covariant AiCachedImage oldWidget) {
     super.didUpdateWidget(oldWidget);
-    if (oldWidget.name != widget.name) {
+    if (oldWidget.name != widget.name || oldWidget.fallbackUrl != widget.fallbackUrl) {
+      _candidateFailed = false;
       _resolveImage();
     }
+  }
+
+  String _slugify(String text) {
+    return text
+        .toLowerCase()
+        .replaceAll(RegExp(r'[^a-z0-9]+'), '_')
+        .replaceAll(RegExp(r'^_+|_+$'), '');
   }
 
   void _resolveImage() {
@@ -52,38 +61,70 @@ class _AiCachedImageState extends State<AiCachedImage> {
       return;
     }
 
-    _resolvedUrl = widget.fallbackUrl;
+    // If fallbackUrl is already a custom Supabase asset URL, use it directly
+    if (widget.fallbackUrl.isNotEmpty && widget.fallbackUrl.contains('supabase.co')) {
+      _resolvedUrl = widget.fallbackUrl;
+      _globalAiImageMemoryCache[cacheKey] = widget.fallbackUrl;
+      return;
+    }
 
-    ApiService().getCachedOrGeneratedImageUrl(
-      name: widget.name,
-      category: widget.category,
-    ).then((url) {
-      if (url != null && url.isNotEmpty && mounted) {
-        _globalAiImageMemoryCache[cacheKey] = url;
-        setState(() {
-          _resolvedUrl = url;
-        });
-      }
-    });
+    final type = widget.category == 'workout' ? 'workouts' : 'meals';
+    final slug = _slugify(widget.name);
+    final candidateUrl =
+        'https://fzjwsbtmsaghhujpvyde.supabase.co/storage/v1/object/public/ai-assets/$type/$slug.png';
+
+    if (_failedCandidateUrls.contains(candidateUrl)) {
+      _resolvedUrl = widget.fallbackUrl;
+    } else {
+      _resolvedUrl = candidateUrl;
+    }
   }
 
   @override
   Widget build(BuildContext context) {
-    final url = _resolvedUrl ?? widget.fallbackUrl;
+    final effectiveUrl = (_candidateFailed || _resolvedUrl == null)
+        ? widget.fallbackUrl
+        : _resolvedUrl!;
 
     return ClipRRect(
       borderRadius: widget.borderRadius,
       child: Image.network(
-        url,
+        effectiveUrl,
         width: widget.width,
         height: widget.height,
         fit: BoxFit.cover,
-        errorBuilder: (context, error, stackTrace) => Container(
-          width: widget.width,
-          height: widget.height,
-          color: AppColors.surface,
-          child: Icon(widget.fallbackIcon, color: AppColors.textSecondary, size: 20),
-        ),
+        errorBuilder: (context, error, stackTrace) {
+          // If the candidate Supabase URL failed to load (404/not yet generated),
+          // fallback seamlessly to the curated fallback image without any AI API calls.
+          if (!_candidateFailed && effectiveUrl != widget.fallbackUrl) {
+            _failedCandidateUrls.add(effectiveUrl);
+            WidgetsBinding.instance.addPostFrameCallback((_) {
+              if (mounted) {
+                setState(() {
+                  _candidateFailed = true;
+                });
+              }
+            });
+            return Image.network(
+              widget.fallbackUrl,
+              width: widget.width,
+              height: widget.height,
+              fit: BoxFit.cover,
+              errorBuilder: (ctx, err, st) => Container(
+                width: widget.width,
+                height: widget.height,
+                color: AppColors.surface,
+                child: Icon(widget.fallbackIcon, color: AppColors.textSecondary, size: 20),
+              ),
+            );
+          }
+          return Container(
+            width: widget.width,
+            height: widget.height,
+            color: AppColors.surface,
+            child: Icon(widget.fallbackIcon, color: AppColors.textSecondary, size: 20),
+          );
+        },
       ),
     );
   }
