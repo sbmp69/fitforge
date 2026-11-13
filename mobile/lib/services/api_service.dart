@@ -69,16 +69,21 @@ class ApiService {
     return data;
   }
 
-  Future<String> getInsights() async {
-    final res = await http.get(
-      Uri.parse('$baseUrl/api/ai/insights'),
-      headers: await _headers(),
-    );
+  Future<String> getInsights({bool refresh = false}) async {
+    final uri = Uri.parse('$baseUrl/api/ai/insights${refresh ? '?refresh=true' : ''}');
+    final headers = await _headers();
+    var res = await http.get(uri, headers: headers);
+    if (res.statusCode != 200) {
+      res = await http.post(uri, headers: headers);
+    }
+    if (res.statusCode != 200) {
+      throw Exception('Failed to generate insights: HTTP ${res.statusCode}');
+    }
     final data = jsonDecode(res.body) as Map<String, dynamic>;
     return data['insight']?['insight_text'] as String? ?? '';
   }
 
-  Future<String> getWeeklyInsight() => getInsights();
+  Future<String> getWeeklyInsight({bool refresh = false}) => getInsights(refresh: refresh);
 
   Future<String> chatWithCoach(String message) async {
     final res = await http.post(

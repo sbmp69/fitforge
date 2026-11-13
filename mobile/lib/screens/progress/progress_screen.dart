@@ -8,7 +8,6 @@ import '../../services/api_service.dart';
 import '../../services/subscription_service.dart';
 import '../paywall/paywall_screen.dart';
 import 'package:flutter_animate/flutter_animate.dart';
-import '../../services/api_service.dart';
 import '../../services/supabase_service.dart';
 import '../../services/notification_service.dart';
 import '../../widgets/app_card.dart';
@@ -29,6 +28,7 @@ class _ProgressScreenState extends State<ProgressScreen> {
   final _api = ApiService();
   List<ProgressLog> _logs = [];
   bool _loading = true;
+  bool _loadingInsight = false;
   String _insight = '';
   int _insightsUsed = 0;
 
@@ -121,6 +121,8 @@ class _ProgressScreenState extends State<ProgressScreen> {
   }
 
   Future<void> _getInsight() async {
+    if (_loadingInsight) return;
+
     final prefs = await SharedPreferences.getInstance();
     final currentMonth = DateFormat('yyyy-MM').format(DateTime.now());
     final savedMonth = prefs.getString('insight_month');
@@ -138,19 +140,27 @@ class _ProgressScreenState extends State<ProgressScreen> {
       return;
     }
 
+    setState(() => _loadingInsight = true);
+
     try {
-      final text = await _api.getWeeklyInsight();
+      final text = await _api.getWeeklyInsight(refresh: _insight.isNotEmpty);
       await prefs.setInt('insights_used', used + 1);
-      if (mounted) setState(() {
-        _insight = text;
-        _insightsUsed = used + 1;
-      });
+      if (mounted) {
+        setState(() {
+          _insight = text;
+          _insightsUsed = used + 1;
+        });
+      }
     } catch (e) {
       if (mounted) {
         showDialog(
           context: context,
           builder: (context) => const AiOutageDialog(),
         );
+      }
+    } finally {
+      if (mounted) {
+        setState(() => _loadingInsight = false);
       }
     }
   }
@@ -238,12 +248,32 @@ class _ProgressScreenState extends State<ProgressScreen> {
                           Text('${(5 - _insightsUsed).clamp(0, 5)} left this month', style: const TextStyle(fontSize: 11, color: AppColors.primary)),
                       ],
                     ),
-                    TextButton(onPressed: _getInsight, child: const Text('Generate')),
+                    TextButton(
+                      onPressed: _loadingInsight ? null : _getInsight,
+                      child: _loadingInsight
+                          ? const SizedBox(
+                              width: 14,
+                              height: 14,
+                              child: CircularProgressIndicator(strokeWidth: 2),
+                            )
+                          : const Text('Generate'),
+                    ),
                   ],
                 ),
                 const SizedBox(height: 8),
-                _insight.isEmpty 
-                    ? const Text('Log progress and generate insights.', style: TextStyle(color: AppColors.textBody, height: 1.5))
+                _loadingInsight
+                    ? const Padding(
+                        padding: EdgeInsets.symmetric(vertical: 8.0),
+                        child: Row(
+                          children: [
+                            SizedBox(width: 16, height: 16, child: CircularProgressIndicator(strokeWidth: 2)),
+                            SizedBox(width: 10),
+                            Expanded(child: Text('Consulting AI Coach on your weekly progress...', style: TextStyle(color: AppColors.textSecondary, fontSize: 13))),
+                          ],
+                        ),
+                      )
+                    : _insight.isEmpty
+                        ? const Text('Log progress and generate insights.', style: TextStyle(color: AppColors.textBody, height: 1.5))
                     : MarkdownBody(
                         data: _insight,
                         styleSheet: MarkdownStyleSheet(
